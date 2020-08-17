@@ -1,76 +1,39 @@
-# Hi There ! :wink:
+# Hey there 👋, :wink:
 
-[Twitter](https://www.twitter.com/igmrrf) :happy:
+<h2 align="center">Hello there! My name is Richard Francis. 👋🤓</h2>
+<p align="center">I'm a React Developer, Nodejs Developer, Content Creator, Linux Administrator and Networking Consultant/Analyst.
+I'm also currently in my final year for my Bsc in Mechanical Engineering while working on my company and other projects.
+I currently passionate about MERN stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
+When I'm not writting code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
 
-[Portfolio](https://www.igmrrf.com) :smiled:
+![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
 
-<!-- # Igbiriki Francis Richard : Portfolio
+### :rocket: Articles
 
-## HTML CSS \$ JavaScript
+- [Enironmental Variables in Python](https://dev.to/igmrrf/environmental-variables-in-python-5a2k/)
+- [Docker: Resolving React Exited with code 0](https://dev.to/igmrrf/docker-react-exited-with-code-0-398n)
+- [Adding SSH keys to your Github Account](https://dev.to/igmrrf/adding-ssh-keys-to-your-github-account-1fp0)
 
-## Webpack, Babel & PWA
+## 💼 Currently working at
 
-Nothing much, you're welcomed to leave a star:wink:
+- [Lazy Legion: Developer and Founder](https://lazylegion.netlify.com) 💼
+- [Upbase Limited: Full Stack Developer](https://upbase.com.ng) 💼
+- [Open World: Freelance](https://igmrrf.com)💼
 
-## HOW TO RUN LOCALLY:
+## 💻 Currently working on
 
-### 1. CLONE THE REPO
+- [Portfolio](https://igmrrf.com)
+- [WishList](https://wishlist.netlify.app) 🚀
+- [Store Shop](https://storeshop.netlify.app)🚀
+- [Caption Cards](https://captioncards.netlify.app)🚀
 
-```SHELL
-git clone https://github.com/igmrrf/igmrrf
-```
+### 📫 Where to find me
 
-### 2. INSTALL DEPENDENCIES
+- [Twitter](https://twitter.com/igmrrf) :twitter:
+- [Instagram](https://instagram.com/igmrrf) 😎
+- [LinkedIn](https://linkedin.com/in/igmrrf) 👨💼
+- [Website](https://igmrrf.com) 😏🔗
+- [Facebook](https://facebook.com/igmrrf) 😏
+- [Lazy Legion Ke: Also Coming Soon](https://lazylegion.netlify.app) 🔨
 
-```SHELL
-yarn
-```
-
-### 3. RUNNING
-
-```text
-Use VSCODE live-server extention to run on 127.0.0.1:5500
-```
-
-or
-
-```text
-Open "index.html" with your favourite browser
-```
-
-## HOW TO MAKE EDITS LOCALLY AND RUN:
-
-### 1. INSTALLING DEPENDENCIES
-
-```text
-install webpack globally or install within your project
-run:
-```
-
-```text
-npm install -g webpack (globally)
-or
-npm install webpack
-```
-
-### 2. UPDATING
-
-```text
-run:
-```
-
-```shell
-$ yarn start
-```
-
-```
-to start webpack
-```
-
-### 3. EDITING
-
-```text
-Make edits to fit your desire and webpack will auto process the required files into the "dist/main.js"
-```
-
-Ctrl + Shift + R or Shift + F5 to hard reload. -->
+  ![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark)
