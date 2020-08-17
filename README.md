@@ -1,4 +1,10 @@
-# Igbiriki Francis Richard : Portfolio
+# Hi There ! :wink:
+
+[Twitter](https://www.twitter.com/igmrrf) :happy:
+
+[Portfolio](https://www.igmrrf.com) :smiled:
+
+<!-- # Igbiriki Francis Richard : Portfolio
 
 ## HTML CSS \$ JavaScript
 
@@ -67,4 +73,4 @@ to start webpack
 Make edits to fit your desire and webpack will auto process the required files into the "dist/main.js"
 ```
 
-Ctrl + Shift + R or Shift + F5 to hard reload.
+Ctrl + Shift + R or Shift + F5 to hard reload. -->
