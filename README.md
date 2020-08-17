@@ -1,9 +1,9 @@
-# Hey there 👋, :wink:
+# Hey there 👋,
 
-<h2 align="center">Hello there! My name is Richard Francis. 👋🤓</h2>
+<h2 align="center">IGMRRF</h2>
 <p align="center">I'm a React Developer, Nodejs Developer, Content Creator, Linux Administrator and Networking Consultant/Analyst.
 I'm also currently in my final year for my Bsc in Mechanical Engineering while working on my company and other projects.
-I currently passionate about MERN stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
+I'm currently passionate about MERN stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
 When I'm not writting code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
 
 ![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
@@ -16,24 +16,24 @@ When I'm not writting code, you can find me actively on twitter learning, writin
 
 ## 💼 Currently working at
 
-- [Lazy Legion: Developer and Founder](https://lazylegion.netlify.com) 💼
-- [Upbase Limited: Full Stack Developer](https://upbase.com.ng) 💼
-- [Open World: Freelance](https://igmrrf.com)💼
+- [Lazy Legion: Developer and Founder](https://lazylegion.netlify.com)
+- [Upbase Limited: Full Stack Developer](https://upbase.com.ng)
+- [Open World: Freelance](https://igmrrf.com)
 
 ## 💻 Currently working on
 
 - [Portfolio](https://igmrrf.com)
-- [WishList](https://wishlist.netlify.app) 🚀
-- [Store Shop](https://storeshop.netlify.app)🚀
-- [Caption Cards](https://captioncards.netlify.app)🚀
+- [WishList](https://wishlist.netlify.app)
+- [Store Shop](https://storeshop.netlify.app)
+- [Caption Cards](https://captioncards.netlify.app)
 
 ### 📫 Where to find me
 
-- [Twitter](https://twitter.com/igmrrf) :twitter:
+- [Twitter](https://twitter.com/igmrrf) 😎
 - [Instagram](https://instagram.com/igmrrf) 😎
-- [LinkedIn](https://linkedin.com/in/igmrrf) 👨💼
-- [Website](https://igmrrf.com) 😏🔗
-- [Facebook](https://facebook.com/igmrrf) 😏
-- [Lazy Legion Ke: Also Coming Soon](https://lazylegion.netlify.app) 🔨
+- [LinkedIn](https://linkedin.com/in/igmrrf) 😎
+- [Website](https://igmrrf.com)🔗
+- [Facebook](https://facebook.com/igmrrf)😎
+- [Lazy Legion Ke: Also Coming Soon](https://lazylegion.netlify.app)😎
 
   ![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark)
