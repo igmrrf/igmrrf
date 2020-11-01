@@ -1,0 +1,21 @@
+.stack {
+  h1 {
+    margin: 5vh 5vw;
+  }
+  .stack-lists {
+    display: flex;
+    width: 100vw;
+    justify-content: space-around;
+    .stack-category {
+      h2 {
+        border-bottom: 2px solid $white-color;
+      }
+      .stack-list {
+        .stack-item {
+          margin: 10px;
+          @include border;
+        }
+      }
+    }
+  }
+}

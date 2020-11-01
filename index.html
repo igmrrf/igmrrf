@@ -29,9 +29,9 @@
       content="https://pbs.twimg.com/profile_images/1232467174092083202/S2W8RPfm_400x400.jpg"
     />
   </head>
-  <body>
+  <body style="overflow: hidden">
     <header class="header">
-      <div class="logo" oncontextmenu="true">IGMRRF</div>
+      <div class="logo" oncontextmenu="true" contenteditable="true">IGMRRF</div>
       <nav class="navigation">
         <ul class="nav-list">
           <li class="nav-item">
@@ -51,8 +51,13 @@
         <h1>Igbiriki Francis Richard</h1>
         <div class="intro-image"></div>
         <div class="intro-text">
-          <span class="part-static">I am a </span>
-          <span class="part-animation">Text Testing Animation</span>
+          <p class="part-static"></p>
+            I hail from Bayelsa, a state in South-South Nigeria. A Full Stack
+            Engineer I can hope to call myself one day. A final year student of
+            Mechanical Engineering at The Niger Delta University, Wilberforce
+            Island
+          </p>
+          <h2 class="part-animation">I am a <br>  <span id='typed-text'></span></h2>
         </div>
       </section>
       <section class="projects" id="projects">
@@ -114,8 +119,43 @@
 
       <section class="contact" id="contact">
         <h1>Contact Me</h1>
-        <form>
-          <input type="text" name="contact-name" id="contact-name" />
+        <form class="contact-form">
+          <input
+            type="text"
+            name="contact-name"
+            id="contact-name"
+            placeholder="Name / Company"
+          />
+          <select
+            type="text"
+            name="contact-requirement"
+            id="contact-requirement"
+            placeholder=""
+          >
+            <option value="">Select Reason</option>
+            <option value="">Just a shout out</option>
+            <option value="">UI/UX Design</option>
+            <option value="">A Job Opening</option>
+            <option value="">Front End Developer</option>
+            <option value="">JavaScript Developer</option>
+            <option value="">Back End Developer</option>
+            <option value="">Full Stack Developer</option>
+          </select>
+          <input
+            type="text"
+            name="contact-subject"
+            id="contact-subject"
+            placeholder="Or Write Subject"
+          />
+          <textarea
+            name="contact-message"
+            id="contact-message"
+            placeholder="Message"
+            rows="5"
+          ></textarea>
+          <button type="submit" name="contact-submit" id="contact-submit">
+            Submit
+          </button>
         </form>
       </section>
     </main>

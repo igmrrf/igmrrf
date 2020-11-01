@@ -2,8 +2,10 @@
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
+
 html {
   scroll-behavior: smooth;
 }
@@ -19,15 +21,19 @@ ul li {
 
 /* HEADER */
 .header {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   background-color: white;
   color: #253341;
   font-weight: 600;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   padding: 10px 20px;
-  border: 2px solid black;
-  justify-content: space-between;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 
 .header .navigation {
@@ -37,50 +43,40 @@ ul li {
 .header .navigation .nav-list {
   min-width: 50%;
   height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: space-between;
-
-  align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .header .logo {
   animation: 2s infinite alternate-reverse steps(8);
   overflow: hidden;
   white-space: nowrap;
-  font-family: "fira Code";
-  border-right: 4px solid black;
+  font-family: 'Fira Code';
   width: 8ch;
   font-size: 2em;
 }
 
 .header .navigation .nav-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
 }
+
 .header .navigation .nav-list .nav-item {
   text-decoration: none;
 }
 
-/* CONTENT */
-.content {
-  min-height: 400vh;
-}
-
-.content section {
-  background-color: #253341;
-  color: white;
-  min-height: 100vh;
-  max-width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  border: 2px solid red;
-}
-
 .footer {
+  position: -webkit-sticky;
   position: sticky;
   bottom: 0;
   left: 0;
@@ -91,13 +87,126 @@ ul li {
   padding: 10px;
 }
 
+.about .intro-image {
+  height: 200px;
+  width: 200px;
+  background: url("../img/logo512.png");
+}
+
+.about .intro-text {
+  width: 80vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.about .intro-text .part-static {
+  margin-top: 5vh;
+}
+
+.about .intro-text .part-animation {
+  width: 80vw;
+  font-size: 30px;
+  text-align: center;
+  font-weight: 700;
+  display: block;
+}
+
+.stack h1 {
+  margin: 5vh 5vw;
+}
+
+.stack .stack-lists {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100vw;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+}
+
+.stack .stack-lists .stack-category h2 {
+  border-bottom: 2px solid #ffffff;
+}
+
+.stack .stack-lists .stack-category .stack-list .stack-item {
+  margin: 10px;
+  border: 2px solid red;
+}
+
+.contact .contact-form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 80vw;
+  gap: 30px;
+  padding: 30px;
+}
+
+.contact .contact-form button {
+  display: inline-block;
+  width: 300px;
+  padding: 10px 30px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* CONTENT */
+.content {
+  min-height: 400vh;
+}
+
+.content section {
+  color: white;
+  background-color: #253341;
+  min-height: 80vh;
+  max-width: 100vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
 /* KEYFRAMES */
+@-webkit-keyframes positiontype {
+  0% {
+    width: 0ch;
+  }
+  100% {
+    width: 22ch;
+  }
+}
 @keyframes positiontype {
   0% {
     width: 0ch;
   }
   100% {
     width: 22ch;
+  }
+}
+
+@-webkit-keyframes logotype {
+  0% {
+    width: 0ch;
+  }
+  100% {
+    width: 8ch;
   }
 }
 
@@ -109,3 +218,4 @@ ul li {
     width: 8ch;
   }
 }
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,22 @@
+.about {
+  .intro-image {
+    height: 200px;
+    width: 200px;
+    background: url('../img/logo512.png');
+  }
+  .intro-text {
+    width: 80vw;
+    display: flex;
+    flex-wrap: wrap;
+    .part-static {
+      margin-top: 5vh;
+    }
+    .part-animation {
+      width: 80vw;
+      font-size: 30px;
+      text-align: center;
+      font-weight: 700;
+      display: block;
+    }
+  }
+}

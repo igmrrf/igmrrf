@@ -1,0 +1,41 @@
+/* HEADER */
+.header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  color: #253341;
+  font-weight: 600;
+  display: flex;
+  padding: 10px 20px;
+  justify-content: space-between;
+}
+
+.header .navigation {
+  min-width: 60%;
+}
+
+.header .navigation .nav-list {
+  min-width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+.header .logo {
+  animation: 2s infinite alternate-reverse steps(8);
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: 'Fira Code';
+  width: 8ch;
+  font-size: 2em;
+}
+
+.header .navigation .nav-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+.header .navigation .nav-list .nav-item {
+  text-decoration: none;
+}
