@@ -22,6 +22,7 @@ const isRequired = () => {
 
 const print = (num = isRequired()) => {
   console.log(`printing ${num}`);
+
   console.log('bored');
 };
 
