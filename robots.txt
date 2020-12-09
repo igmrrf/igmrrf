@@ -1,6 +1,0 @@
-# Allowing access to all routes and locations
-User-agent: *
-
-#Disallowing access to folders auto generated while using cpanel
-Disallow: /cgi-bin/
-Disallow: /tmp/
