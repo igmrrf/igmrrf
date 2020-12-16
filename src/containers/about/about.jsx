@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { Component, createRef } from 'react';
+import { Input } from './about.styles';
 
-export default function About() {
-  return (
-    <div>
-      <h1>About</h1>
-    </div>
-  );
+class About extends Component {
+  constructor(props) {
+    super(props);
+    this.inputRef = createRef();
+  }
+  render() {
+    return (
+      <div>
+        <h1>About</h1>
+        <Input
+          ref={this.inputRef}
+          placeholder='Hover to focus'
+          onMouseEnter={() => {
+            this.inputRef.current.focus();
+          }}
+        />
+      </div>
+    );
+  }
 }
+export default About;
