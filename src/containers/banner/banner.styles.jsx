@@ -9,7 +9,7 @@ export const Button = styled.button`
 
   /*Color the border and text with theme.main */
   color: ${(props) => props.theme.main};
-  border: 2px solid ${(props) => props.theme.side};
+  border: 2px solid ${(props) => props.theme.dark};
 `;
 
 // We are passing a default theme for Buttons that aren't wrapped in the ThemeProvider
@@ -22,11 +22,11 @@ Button.defaultProps = {
 // Define what props.theme will look like
 export const theme = {
   main: 'blue',
-  side: 'red',
+  dark: 'red',
 };
 
 //Inverted Theme e.g secondary theme
-export const invertedTheme = ({ main, side }) => ({
-  main: side,
-  side: main,
+export const invertedTheme = ({ main, dark }) => ({
+  main: dark,
+  dark: main,
 });

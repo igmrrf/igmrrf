@@ -1,4 +1,4 @@
-import styled, { keyframes, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
 
 //Header
@@ -93,27 +93,20 @@ export const PasswordInput = styled(ProppedInput).attrs({ type: 'password' })`
   border: 2px solid aqua;
 `;
 
-//Don't forget to create an animation file
-const rotate = keyframes`
- from {
-   transform: rotate(0deg);
- }
- to {
-   transform: rotate(360deg);
- }
-`;
-
 export const Rotate = styled.div.attrs((props) => ({
   speed: props.speed || 2,
 }))`
   display: inline-block;
-  animation: ${rotate} ${(props) => props.speed}s linear infinite;
+  animation: ${(props) => props.theme.effects.pulse} ${(props) => props.speed}s
+    linear infinite;
+  animation-duration: infinite;
+  animation-delay: '0';
   padding: 2em 1em;
   font-size: 1.2em;
 `;
 
 const styles = css`
-  animation: ${rotate} 2s linear infinite;
+  animation: ${(props) => props.theme.effects.rotate} 2s linear infinite;
 `;
 
 console.log(styles);
