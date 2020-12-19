@@ -6,10 +6,8 @@ export const Button = styled.button`
   margin: 1em;
   padding: 0.25em 1em;
   border-radius: 3px;
-
-  /*Color the border and text with theme.main */
-  color: ${(props) => props.theme.main};
-  border: 2px solid ${(props) => props.theme.dark};
+  color: ${(props) => props.theme.ichi};
+  border: 2px solid ${(props) => props.theme.san};
 `;
 
 // We are passing a default theme for Buttons that aren't wrapped in the ThemeProvider

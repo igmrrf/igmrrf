@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Head, HeaderText } from './header.styles';
 
-const Header = ({ changeTheme, title }) => (
-  <Head>
-    <HeaderText primary>{title}</HeaderText>
-    <button onClick={changeTheme}>Change Theme</button>
-  </Head>
-);
+const Header = ({ changeTheme, title }) => {
+  const [theme, setTheme] = useState('light');
+
+  const updateTheme = () => {
+    changeTheme();
+    console.log('Changing icon');
+    if (theme === 'light') setTheme('dark');
+    else setTheme('light');
+    console.log(theme);
+  };
+  return (
+    <Head>
+      <HeaderText primary>{title}</HeaderText>
+      <button onClick={updateTheme}>{theme}</button>
+    </Head>
+  );
+};
 
 Header.propTypes = {
   changeTheme: PropTypes.func.isRequired,
