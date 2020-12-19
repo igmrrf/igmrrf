@@ -109,4 +109,3 @@ const styles = css`
   animation: ${(props) => props.theme.effects.rotate} 2s linear infinite;
 `;
 
-console.log(styles);

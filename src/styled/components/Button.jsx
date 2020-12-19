@@ -7,6 +7,7 @@ export const Button = styled.button`
   border-radius: 3px;
   color: ${(props) => props.theme.ichi};
   border: 2px solid ${(props) => props.theme.san};
+  background: ${(props) => props.theme.san};
 `;
 
 export const StyledButton = styled.div.attrs((props) => ({
@@ -14,3 +15,5 @@ export const StyledButton = styled.div.attrs((props) => ({
 }))`
   background: ${(props) => props.color};
 `;
+
+export default Button;

@@ -13,7 +13,7 @@ const typography = {
   h5: '2em',
   h6: '2em',
 };
-console.log(rotate);
+
 
 const theme = {
   main: '#00FF66',
