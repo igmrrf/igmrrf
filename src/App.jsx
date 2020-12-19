@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { ThemeProvider } from 'styled-components';
-import theme from './styled/theme';
+import { lightTheme } from './styled/theme';
+import { darkTheme } from './styled/theme';
 import Header from './containers/header/header';
 import Banner from './containers/banner/banner';
 import About from './containers/about/about';
@@ -19,11 +20,18 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export default function App() {
+  const [theme, setTheme] = useState(lightTheme);
+
+  const changeTheme = () => {
+    if (theme === lightTheme) setTheme(darkTheme);
+    else setTheme(lightTheme);
+  };
+
   return (
     <div>
       <GlobalStyle />
       <ThemeProvider theme={theme}>
-        <Header />
+        <Header changeTheme={changeTheme} />
         <Banner />
         <About />
         <Stack />

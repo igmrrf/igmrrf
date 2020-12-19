@@ -1,4 +1,4 @@
-import { rotate, pulse } from './effects';
+import { rotate, pulse, colorPulse } from './effects';
 
 const typography = {
   h1: '2em',
@@ -11,6 +11,18 @@ const typography = {
 console.log(rotate);
 
 const theme = {
+  main: '#00FF66',
+  dark: 'darkblue',
+  light: 'lightblue',
+  typography,
+  effects: {
+    rotate,
+    pulse,
+    colorPulse,
+  },
+};
+
+export const darkTheme = {
   main: 'blue',
   dark: 'darkblue',
   light: 'lightblue',
@@ -18,6 +30,18 @@ const theme = {
   effects: {
     rotate,
     pulse,
+    colorPulse,
+  },
+};
+export const lightTheme = {
+  main: 'rgb(0, 12, 24)',
+  dark: 'darkblue',
+  light: 'lightblue',
+  typography,
+  effects: {
+    rotate,
+    pulse,
+    colorPulse,
   },
 };
 

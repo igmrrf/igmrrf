@@ -97,8 +97,8 @@ export const Rotate = styled.div.attrs((props) => ({
   speed: props.speed || 2,
 }))`
   display: inline-block;
-  animation: ${(props) => props.theme.effects.pulse} ${(props) => props.speed}s
-    linear infinite;
+  animation: ${(props) => props.theme.effects.colorPulse}
+    ${(props) => props.speed}s linear infinite;
   animation-duration: infinite;
   animation-delay: '0';
   padding: 2em 1em;
