@@ -23,8 +23,10 @@ export default function App() {
   const [theme, setTheme] = useState(lightTheme);
 
   const changeTheme = () => {
+    console.log('Changing Theme');
     if (theme === lightTheme) setTheme(darkTheme);
     else setTheme(lightTheme);
+    console.log(theme);
   };
 
   return (
