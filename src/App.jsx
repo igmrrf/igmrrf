@@ -27,7 +27,13 @@ export default function App() {
   };
 
   return (
-    <div style={{ background: theme?.ichi, color: theme?.yan }}>
+    <div
+      style={{
+        transition: '0.5s ease-in',
+        background: theme?.ichi,
+        color: theme?.yan,
+      }}
+    >
       <GlobalStyle />
       <ThemeProvider theme={theme}>
         <Header changeTheme={changeTheme} />

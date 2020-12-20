@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../styled/components/Button';
 import styled from 'styled-components';
+import { Moon, Sun } from 'styled-icons/heroicons-solid';
 
 export const Head = styled.header`
   text-align: center;
@@ -21,7 +22,13 @@ const Header = ({ changeTheme, title }) => {
   return (
     <Head>
       {title}
-      <Button onClick={updateTheme}>{theme}</Button>
+      <Button onClick={updateTheme}>
+        {theme === 'Light' ? (
+          <Moon size={30} title={'Dark Mode'} />
+        ) : (
+          <Sun size={30} title={'Light Mode'} />
+        )}
+      </Button>
     </Head>
   );
 };
