@@ -36,4 +36,4 @@ When I'm not writting code, you can find me actively on twitter learning, writin
 - [Facebook](https://facebook.com/igmrrf)😎
 - [Lazy Legion](https://igmrrf.com)😎
 
-  ![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark)
+  ![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark&count_private=true)
