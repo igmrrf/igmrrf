@@ -14,7 +14,6 @@ const typography = {
   h6: '2em',
 };
 
-
 const theme = {
   main: '#00FF66',
   dark: 'darkblue',
@@ -24,16 +23,18 @@ const theme = {
 };
 
 export const darkTheme = {
-  ichi: 'rgb(0, 12, 24)',
-  ni: 'darkgreen',
-  san: 'white',
+  ichi: '#000C18',
+  ni: '#2C7D54',
+  san: '#0DFC85',
+  yan: 'white',
   typography,
   effects,
 };
 export const lightTheme = {
   ichi: 'white',
-  ni: 'green',
-  san: 'rgb(0, 12, 24)',
+  ni: '#0DFC85',
+  san: '#2C7D54',
+  yan: '#000C18',
   typography,
   effects,
 };

@@ -1,6 +1,15 @@
 //Theming
 import styled from 'styled-components';
 
+export const Color = styled.div.attrs((props) => ({
+  color: props.color,
+}))`
+  background-color: ${(props) => props.theme[props.color]};
+  height: 200px;
+  width: 200px;
+  margin: 20px;
+  border: 2px solid ${(props) => props.theme.yan};
+`;
 export const Button = styled.button`
   font-size: 1em;
   margin: 1em;

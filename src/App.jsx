@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { createGlobalStyle } from 'styled-components';
 import { ThemeProvider } from 'styled-components';
-import { lightTheme } from './styled/theme';
-import { darkTheme } from './styled/theme';
+import { lightTheme, darkTheme } from './styled/theme';
 import Header from './containers/header/header';
 import Banner from './containers/banner/banner';
 import About from './containers/about/about';
@@ -28,7 +27,7 @@ export default function App() {
   };
 
   return (
-    <div>
+    <div style={{ background: theme?.ichi, color: theme?.yan }}>
       <GlobalStyle />
       <ThemeProvider theme={theme}>
         <Header changeTheme={changeTheme} />
