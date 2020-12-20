@@ -6,9 +6,11 @@ I'm also currently in college studying Mechanical Engineering while working as a
 I'm passionate about MERN stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
 When I'm not writing code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
 
-![The Lazy Dev Otaku's Github Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
+![Top Languages Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
 
-![The Lazy Dev Otaku's Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark&count_private=true)
+![Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark&count_private=true)
+
+![Wakatime Stats](https://github-readme-stats.vercel.app/api/wakatime?username=igmrrf)
 
 ### :rocket: Articles
 
