@@ -1,12 +1,14 @@
 # Hey there 👋,
 
-<h2 align="center">IGMRRF</h2>
+<h2 align="center">TLDO</h2>
 <p align="center">I'm a React Developer, Nodejs Developer, Content Creator, Linux Administrator and Networking Consultant/Analyst.
-I'm also currently in my final year for my Bsc in Mechanical Engineering while working on my company and other projects.
-I'm currently passionate about MERN stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
-When I'm not writting code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
+I'm also currently in college studying Mechanical Engineering while working as a freelancer and contractor.
+I'm passionate about MERN stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
+When I'm not writing code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
 
-![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
+![The Lazy Dev Otaku's Github Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
+
+![The Lazy Dev Otaku's Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark&count_private=true)
 
 ### :rocket: Articles
 
@@ -16,24 +18,15 @@ When I'm not writting code, you can find me actively on twitter learning, writin
 
 ## 💼 Currently working at
 
-- [Lazy Legion: Developer and Founder](https://lazylegion.netlify.com)
-- [Upbase Limited: Full Stack Developer](https://upbase.com.ng)
 - [Open World: Freelance](https://igmrrf.com)
 
 ## 💻 Currently working on
 
 - [Portfolio](https://igmrrf.com)
 - [WishList](https://wishlist.netlify.app)
-- [Store Shop](https://storeshop.netlify.app)
-- [Caption Cards](https://captioncards.netlify.app)
 
 ### 📫 Where to find me
 
 - [Twitter](https://twitter.com/igmrrf) 😎
 - [Instagram](https://instagram.com/igmrrf) 😎
 - [LinkedIn](https://linkedin.com/in/igmrrf) 😎
-- [Website](https://igmrrf.com)🔗
-- [Facebook](https://facebook.com/igmrrf)😎
-- [Lazy Legion](https://igmrrf.com)😎
-
-  ![Richard Francis's Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark&count_private=true)
