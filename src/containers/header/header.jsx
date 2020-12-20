@@ -11,13 +11,12 @@ export const Head = styled.header`
 `;
 
 const Header = ({ changeTheme, title }) => {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('Light');
 
   const updateTheme = () => {
     changeTheme();
-    if (theme === 'light') setTheme('dark');
-    else setTheme('light');
- 
+    if (theme === 'Light') setTheme('Dark');
+    else setTheme('Light');
   };
   return (
     <Head>
