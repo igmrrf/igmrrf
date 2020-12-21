@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const Button = styled.button`
+  transition: 0.5s ease-in;
   font-size: 1em;
   margin: 1em;
   padding: 0.25em 1.5em;

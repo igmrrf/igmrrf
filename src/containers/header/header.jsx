@@ -5,10 +5,14 @@ import styled from 'styled-components';
 import { Moon, Sun } from 'styled-icons/heroicons-solid';
 
 export const Head = styled.header`
-  text-align: center;
-  border: 2px solid ${(props) => (props.primary ? 'grey`' : 'black')};
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5vw;
+  align-items: center;
+  transition: 0.5s ease-in;
   background: ${(props) => props.theme.ichi};
   color: ${(props) => props.theme.san};
+  box-shadow: 0 4px 12px -4px ${(props) => props.theme.san};
 `;
 
 const Header = ({ changeTheme, title }) => {
