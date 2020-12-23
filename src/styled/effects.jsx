@@ -9,6 +9,15 @@ export const rotate = keyframes`
  }
 `;
 
+export const vanish = keyframes`
+ from{
+transform: scale(0.01)
+ }
+ to{
+transform:scale(1)
+ }
+`;
+
 export const pulse = keyframes`
  from{
    transform: scale(0.95);
