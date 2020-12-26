@@ -17,6 +17,7 @@ class About extends Component {
             this.inputRef.current.focus();
           }}
         />
+        <Input />
       </div>
     );
   }
