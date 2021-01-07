@@ -13,32 +13,21 @@ const typography = {
   h5: "2em",
   h6: "2em",
 };
+
+const extra = { typography, effects };
+
 export const dark = {
   ichi: "#000C18",
   ni: "#2C7D54",
   san: "#0DFC85",
   yan: "white",
+  ...extra,
 };
 
 export const light = {
-  ichi: "white",
-  ni: "#0DFC85",
-  san: "#2C7D54",
-  yan: "#000C18",
-};
-
-const theme = {
   ichi: "#0DFC85",
   ni: "#800080",
   san: "#FFFFFF",
   yan: "#000C18",
-  dark,
-  light,
-  typography,
-  effects,
-  fonts,
-  typography,
-  effects,
+  ...extra,
 };
-
-export default theme;

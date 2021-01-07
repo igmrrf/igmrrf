@@ -4,7 +4,8 @@ import { Color, Colors, Title, StyledComponent } from './banner.styles';
 export default function Banner() {
   return (
     <StyledComponent>
-      <Title>T-L-D-O</Title>
+      <h1>Banner</h1>
+      {/* <Title>T-L-D-O</Title>
       <h2>The Lazy Dev Otaku</h2>
       <p>
         I'm a React Developer, Nodejs Developer, Content Creator, Linux
@@ -21,7 +22,7 @@ export default function Banner() {
         <Color color={'ni'}>ni</Color>
         <Color color={'san'}>san</Color>
         <Color color={'yan'}>yan</Color>
-      </Colors>
+      </Colors> */}
     </StyledComponent>
   );
 }

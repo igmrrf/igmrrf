@@ -11,7 +11,7 @@ export default function Contact() {
   return (
     <React.Fragment>
       <h1>Contact</h1>
-      <Input defaultValue='@probablyUp' inputMode='text' />
+      {/* <Input defaultValue='@probablyUp' inputMode='text' />
       <Input defaultValue='' inputMode='text' />
       <Thing>Hello World</Thing>
       <Thing>How ya doing</Thing>
@@ -32,7 +32,7 @@ export default function Contact() {
       <PasswordInput defaultValue='Big' size='2em' />
       <Rotate speed={'5'}>slower</Rotate>
       <Rotate>normal</Rotate>
-      <Rotate speed='1'>faster</Rotate>
+      <Rotate speed='1'>faster</Rotate> */}
     </React.Fragment>
   );
 }

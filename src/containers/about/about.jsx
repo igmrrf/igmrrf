@@ -1,5 +1,5 @@
-import React, { Component, createRef } from 'react';
-import { Input } from './about.styles';
+import React, { Component, createRef } from "react";
+import { Input } from "./about.styles";
 
 class About extends Component {
   constructor(props) {
@@ -10,14 +10,14 @@ class About extends Component {
     return (
       <div>
         <h1>About</h1>
-        <Input
+        {/* <Input
           ref={this.inputRef}
           placeholder='Hover to focus'
           onMouseEnter={() => {
             this.inputRef.current.focus();
           }}
         />
-        <Input />
+        <Input /> */}
       </div>
     );
   }
