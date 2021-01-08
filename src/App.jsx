@@ -19,13 +19,8 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export default function App() {
-  const [theme, setTheme] = useState(light);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("TLDO");
-    console.log("Checking Theme");
-    if (savedTheme) setTheme(JSON.parse(savedTheme));
-  }, []);
+  const savedTheme = JSON.parse(localStorage.getItem("TLDO")) || light;
+  const [theme, setTheme] = useState(savedTheme);
 
   const changeTheme = () => {
     if (theme === light) setTheme(dark);
