@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
 import { light, dark } from "./styled/theme";
@@ -7,9 +7,10 @@ import Banner from "./containers/banner/banner";
 import About from "./containers/about/about";
 import Stack from "./containers/stack/stack";
 import Projects from "./containers/projects/projects";
-import Contact from "./containers/contact/contact";
 import Footer from "./containers/footer/footer";
-
+import ErrorBoundary from "./error-boundary/error-boundary";
+import LoadingScreen from "./containers/loading/screen";
+import Contact from "./containers/contact/contact";
 const GlobalStyle = createGlobalStyle`
  * {
    margin:0;
@@ -19,14 +20,17 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export default function App() {
-  const savedTheme = JSON.parse(localStorage.getItem("TLDO")) || light;
-  const [theme, setTheme] = useState(savedTheme);
+  const [theme, setTheme] = useState(light);
 
   const changeTheme = () => {
     if (theme === light) setTheme(dark);
     else setTheme(light);
     localStorage.setItem("TLDO", JSON.stringify(theme));
   };
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("TLDO");
+    if (savedTheme) setTheme(JSON.parse(savedTheme));
+  }, []);
 
   return (
     <div
@@ -36,16 +40,20 @@ export default function App() {
         color: theme?.yan,
       }}
     >
-      <GlobalStyle />
-      <ThemeProvider theme={theme}>
-        <Header changeTheme={changeTheme} />
-        <Banner />
-        <About />
-        <Stack />
-        <Projects />
-        <Contact />
-        <Footer />
-      </ThemeProvider>
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingScreen />}>
+          <GlobalStyle />
+          <ThemeProvider theme={theme}>
+            <Header changeTheme={changeTheme} />
+            <Banner />
+            <About />
+            <Stack />
+            <Projects />
+            <Contact />
+            <Footer />
+          </ThemeProvider>
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

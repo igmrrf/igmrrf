@@ -1,7 +1,7 @@
-import React, { Component, createRef } from "react";
+import React, { PureComponent, createRef } from "react";
 import { Input } from "./about.styles";
 
-class About extends Component {
+class About extends PureComponent  {
   constructor(props) {
     super(props);
     this.inputRef = createRef();
