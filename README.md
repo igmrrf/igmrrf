@@ -1,4 +1,5 @@
-# Hey there 👋,
+# Hey there 👋, ![](https://komarev.com/ghpvc/?username=igmrrf&label=VIEWS)
+
 
 <h2 align="center">T-L-D-O</h2>
 <p align="center">I'm a JavaScript (Node, React) Developer, Content Creator, Linux Administrator and Networking Consultant/Analyst.
