@@ -1,38 +1,39 @@
-import React from 'react';
+import React from "react";
 import {
   Input,
   Thing,
   ProppedInput,
   PasswordInput,
   Rotate,
-} from './contact.styles';
+} from "./contact.styles";
 
 export default function Contact() {
   return (
     <React.Fragment>
       <h1>Contact</h1>
-      <Input defaultValue='@probablyUp' inputMode='text' />
-      <Input defaultValue='' inputMode='text' />
+      <Input defaultValue="@probablyUp" inputMode="text" />
+      <Input defaultValue="" inputMode="text" />
       <Thing>Hello World</Thing>
+
       <Thing>How ya doing</Thing>
-      <Thing className='something'>The sun is shining</Thing>
+      <Thing className="something">The sun is shining</Thing>
       <div>Pretty nice day though</div>
       <Thing>Don't you think?</Thing>
-      <div className='something-else'>
+      <div className="something-else">
         <Thing>Splendid</Thing>
       </div>
       <Thing>
-        <label className='child'>This is a child</label>
+        <label className="child">This is a child</label>
       </Thing>
-      <ProppedInput placeholder='Normal Size' />
-      <ProppedInput placeholder='smaller size' size='0.5em' />
-      <ProppedInput placeholder='Bigger size' size='2em' />
-      <PasswordInput defaultValue='Normal' />
-      <PasswordInput defaultValue='Small' size='0.2em' />
-      <PasswordInput defaultValue='Big' size='2em' />
-      <Rotate speed={'5'}>slower</Rotate>
+      <ProppedInput placeholder="Normal Size" />
+      <ProppedInput placeholder="smaller size" size="0.5em" />
+      <ProppedInput placeholder="Bigger size" size="2em" />
+      <PasswordInput defaultValue="Normal" />
+      <PasswordInput defaultValue="Small" size="0.2em" />
+      <PasswordInput defaultValue="Big" size="2em" />
+      <Rotate speed={"5"}>slower</Rotate>
       <Rotate>normal</Rotate>
-      <Rotate speed='1'>faster</Rotate>
+      <Rotate speed="1">faster</Rotate>
     </React.Fragment>
   );
 }
