@@ -7,7 +7,7 @@ Mechanical Engineering while working as a freelancer and contract developer.
 I'm passionate about M-E-R-N stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
 When I'm not writing code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
 
-![Top Languages Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
+![Top Languages Stats](https://github-readme-stats.vercel.app/api/top-langs?username=sapeled3&layout=compact&theme=dark)
 
 ![Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark&count_private=true)
 
