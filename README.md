@@ -3,7 +3,7 @@
 
 <h2 align="center">T-L-D-O</h2>
 <p align="center">I'm a JavaScript (Node, React) Developer, Content Creator, Linux Administrator and Networking Consultant/Analyst.
-Mechanical Engineering while working as a freelancer and contract developer.
+Bsc. holder from the department of Mechanical Engineering while working as a freelancer and contract developer.
 I'm passionate about M-E-R-N stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
 When I'm not writing code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
 
