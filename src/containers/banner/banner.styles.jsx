@@ -4,9 +4,6 @@ import styled from "styled-components";
 export const StyledComponent = styled.div`
   padding: 5vh 5vw;
 `;
-export const Title = styled.h1`
-  text-align: center;
-`;
 
 export const Colors = styled.div`
   display: flex;
