@@ -1,4 +1,6 @@
 import React from "react";
+import { Title } from "../../styled/components/Text";
+import { Container } from "../../styled/layout";
 import {
   Input,
   Thing,
@@ -9,8 +11,8 @@ import {
 
 export default function Contact() {
   return (
-    <React.Fragment>
-      <h1>Contact</h1>
+    <Container>
+      <Title>Contact</Title>
       <Input defaultValue="@probablyUp" inputMode="text" />
       <Input defaultValue="" inputMode="text" />
       <Thing>Hello World</Thing>
@@ -34,6 +36,6 @@ export default function Contact() {
       <Rotate speed={"5"}>slower</Rotate>
       <Rotate>normal</Rotate>
       <Rotate speed="1">faster</Rotate>
-    </React.Fragment>
+    </Container>
   );
 }

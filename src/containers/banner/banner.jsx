@@ -1,10 +1,11 @@
 import React from "react";
-import { Color, Colors, Title, StyledComponent } from "./banner.styles";
+import { Color, Colors, StyledComponent } from "./banner.styles";
+import { Title } from "../../styled/components/Text";
 
 export default function Banner() {
   return (
     <StyledComponent>
-      <Title>T-L-D-O Banner</Title>
+      <Title>T-L-D-O </Title>
       <h2>The Lazy Dev Otaku</h2>
       <p>
         MERN Stack Developer, Analyst and Cryptocurrency Enthusiast. Mechanical
