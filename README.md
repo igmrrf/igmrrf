@@ -1,6 +1,5 @@
 # Hey there 👋, ![](https://komarev.com/ghpvc/?username=igmrrf&label=VIEWS)
 
-
 <h2 align="center">T-L-D-O</h2>
 <p align="center">I'm a JavaScript (Node, React) Developer, Content Creator, Linux Administrator and Networking Consultant/Analyst.
 Bsc. holder from the department of Mechanical Engineering while working as a freelancer and contract developer.
@@ -10,8 +9,6 @@ When I'm not writing code, you can find me actively on twitter learning, writing
 ![Top Languages Stats](https://github-readme-stats.vercel.app/api/top-langs?username=igmrrf&layout=compact&theme=dark)
 
 ![Github Stats](https://github-readme-stats.vercel.app/api?username=igmrrf&show_icons=true&theme=dark&count_private=true)
-
-![Wakatime Stats](https://github-readme-stats.vercel.app/api/wakatime?username=igmrrf)
 
 ### :rocket: Articles
 
