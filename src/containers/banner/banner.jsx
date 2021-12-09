@@ -5,7 +5,7 @@ import { Title } from "../../styled/components/Text";
 export default function Banner() {
   return (
     <StyledComponent>
-      <Title>The Lazy</Title>
+      <Title>Igbirki Francis</Title>
 
       <p>
         First and foremost a JavaScript Developer then a Cryptocurrency Enthusiat and Analyst. Mechanical
