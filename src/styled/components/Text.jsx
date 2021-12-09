@@ -1,6 +1,7 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Title = styled.h1`
+  margin: 20px 30px;
   text-align: center;
   font-weight: 700;
 `;
