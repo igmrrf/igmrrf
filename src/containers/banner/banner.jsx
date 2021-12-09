@@ -5,17 +5,19 @@ import { Title } from "../../styled/components/Text";
 export default function Banner() {
   return (
     <StyledComponent>
-      <Title>T-L-D-O </Title>
-      <h2>The Lazy Dev Otaku</h2>
+      <Title>The Lazy</Title>
+
       <p>
-        MERN Stack Developer, Analyst and Cryptocurrency Enthusiast. Mechanical
-        Engineering (recent grad) while working as a freelancer and contract
-        developer. I'm passionate about the MERN stack, Progressive Web Apps,
-        Headless CMS, Sustainability, Machine Learning, Neural Networks,
-        Artificial Intelligence, S.E.O, Web Performance and Automation. When I'm
-        not writing code, you can find me actively on twitter, writing an
-        article(barely) or watching anime(most likely).
+        First and foremost a JavaScript Developer then a Cryptocurrency Enthusiat and Analyst. Mechanical
+        Engineering (recent grad), currently in search of a role as a remote developer (Frontend or Backend) and
+        working as a freelancer developer. I'm passionate about the MERN stack, Progressive Web Apps, Headless
+        CMS, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
+        When I'm not writing code, you can find me actively on twitter, writing an article(barely) or watching
+        anime(most likely).
       </p>
+      <a href='https://github.com/igmrrf'>Github</a>
+      <a href='https://github.com/igmrrf'>Twitter</a>
+
       <Colors>
         <Color color={"ichi"}>Ichi</Color>
         <Color color={"ni"}>ni</Color>
