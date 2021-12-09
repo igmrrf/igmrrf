@@ -4,11 +4,11 @@ import { ThemeProvider } from "styled-components";
 import { lightTheme, darkTheme } from "./styled/theme";
 import Header from "./containers/header/header";
 import Banner from "./containers/banner/banner";
-import About from "./containers/about/about";
-import Stack from "./containers/stack/stack";
-import Projects from "./containers/projects/projects";
-import Contact from "./containers/contact/contact";
-import Footer from "./containers/footer/footer";
+// import About from "./containers/about/about";
+// import Stack from "./containers/stack/stack";
+// import Projects from "./containers/projects/projects";
+// import Contact from "./containers/contact/contact";
+// import Footer from "./containers/footer/footer";
 
 const GlobalStyle = createGlobalStyle`
  * {
