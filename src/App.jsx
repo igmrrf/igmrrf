@@ -19,7 +19,7 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 export default function App() {
-  const [theme, setTheme] = useState(lightTheme);
+  const [theme, setTheme] = useState(darkTheme);
 
   const changeTheme = () => {
     if (theme === lightTheme) setTheme(darkTheme);
