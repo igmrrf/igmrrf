@@ -50,6 +50,7 @@ jobs:
           plugin_repositories_affiliations: owner
           plugin_repositories_batch: 100
           plugin_stackoverflow: yes
+          plugin_stackoverflow_user: 12100921
           plugin_stackoverflow_limit: 2
           plugin_stackoverflow_lines: 4
           plugin_stackoverflow_lines_snippet: 2
