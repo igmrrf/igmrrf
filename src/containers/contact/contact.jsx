@@ -1,5 +1,5 @@
 import React from "react";
-import { Title } from "../../styled/components/Text";
+import { Title } from "../../components/Text/Text";
 import { Container } from "../../styled/layout";
 import {
   Input,

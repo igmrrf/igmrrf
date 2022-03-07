@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import Button from "../../styled/components/Button";
+import Button from "../../components/Button/Button";
 import styled from "styled-components";
 import { Moon, Sun } from "styled-icons/heroicons-solid";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Color, Colors, StyledComponent } from "./banner.styles";
-import { Title } from "../../styled/components/Text";
+import { Title } from "../../components/Text/Text";
 
 export default function Banner() {
   return (
