@@ -556,7 +556,7 @@ https://github.com/mhassan1/redis-memory-server : Redis Server for testing. The 
                                 <path fill-rule="evenodd" d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm6.5-.25A.75.75 0 017.25 7h1a.75.75 0 01.75.75v2.75h.25a.75.75 0 010 1.5h-2a.75.75 0 010-1.5h.25v-2h-.25a.75.75 0 01-.75-.75zM8 6a1 1 0 100-2 1 1 0 000 2z"/>
                             </svg>
                             <span class="code">b9eb1eae</span>
-                            <span class="code">src/spec/integrations/steps.md</span>
+                            <span class="code">src/spec/steps.md</span>
                             <span class="code"><span class="snippet additions">++11</span> <span class="snippet deletions">--0</span></span>
                         </div>
                     </section>
@@ -571,7 +571,7 @@ https://github.com/mhassan1/redis-memory-server : Redis Server for testing. The 
             </section>
             <footer>
                 <span>These metrics include private contributions</span>
-                <span>Last updated 23 Oct 2022, 10:37:18 (timezone Africa/Lagos) with lowlighter/metrics@3.28.0</span>
+                <span>Last updated 23 Oct 2022, 11:39:30 (timezone Africa/Lagos) with lowlighter/metrics@3.28.0</span>
             </footer>
         </div>
         <div xmlns="http://www.w3.org/1999/xhtml" id="metrics-end"></div>
