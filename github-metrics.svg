@@ -219,14 +219,14 @@
                         <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
                     </mask>
                     <rect mask="url(#languages-bar)" x="0" y="0" width="0" height="8" fill="#d1d5da"/>
-                    <rect mask="url(#languages-bar)" x="0" y="0" width="358.30163944274824" height="8" fill="#f1e05a"/>
-                    <rect mask="url(#languages-bar)" x="358.30163944274824" y="0" width="62.32487614601146" height="8" fill="#563d7c"/>
-                    <rect mask="url(#languages-bar)" x="420.62651558875973" y="0" width="20.241666005110787" height="8" fill="#e34c26"/>
-                    <rect mask="url(#languages-bar)" x="440.8681815938705" y="0" width="9.225601997970276" height="8" fill="#c6538c"/>
-                    <rect mask="url(#languages-bar)" x="450.09378359184075" y="0" width="7.682869421742946" height="8" fill="#3572A5"/>
-                    <rect mask="url(#languages-bar)" x="457.7766530135837" y="0" width="1.459481669180579" height="8" fill="#3178c6"/>
-                    <rect mask="url(#languages-bar)" x="459.2361346827643" y="0" width="0.4017460784040269" height="8" fill="#41b883"/>
-                    <rect mask="url(#languages-bar)" x="459.63788076116833" y="0" width="0.3621192388316852" height="8" fill="#89e051"/>
+                    <rect mask="url(#languages-bar)" x="0" y="0" width="358.3029268220467" height="8" fill="#f1e05a"/>
+                    <rect mask="url(#languages-bar)" x="358.3029268220467" y="0" width="62.324087187813056" height="8" fill="#563d7c"/>
+                    <rect mask="url(#languages-bar)" x="420.62701400985975" y="0" width="20.241409769890893" height="8" fill="#e34c26"/>
+                    <rect mask="url(#languages-bar)" x="440.86842377975063" y="0" width="9.225485212911376" height="8" fill="#c6538c"/>
+                    <rect mask="url(#languages-bar)" x="450.093908992662" y="0" width="7.682772165828576" height="8" fill="#3572A5"/>
+                    <rect mask="url(#languages-bar)" x="457.7766811584906" y="0" width="1.4594631938927078" height="8" fill="#3178c6"/>
+                    <rect mask="url(#languages-bar)" x="459.2361443523833" y="0" width="0.4017409927804069" height="8" fill="#41b883"/>
+                    <rect mask="url(#languages-bar)" x="459.6378853451637" y="0" width="0.3621146548363378" height="8" fill="#89e051"/>
                 </svg>
                 <div class="field center horizontal-wrap fill-width">
                     <div class="field center no-wrap language">
@@ -537,7 +537,7 @@ https://github.com/mhassan1/redis-memory-server : Redis Server for testing. The 
             </section>
             <footer>
                 <span>These metrics include private contributions</span>
-                <span>Last updated 1 Jan 2023, 15:23:56 (timezone Africa/Lagos) with lowlighter/metrics@3.31.0</span>
+                <span>Last updated 1 Jan 2023, 16:25:46 (timezone Africa/Lagos) with lowlighter/metrics@3.31.0</span>
             </footer>
         </div>
         <div xmlns="http://www.w3.org/1999/xhtml" id="metrics-end"></div>
