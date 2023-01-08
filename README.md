@@ -16,11 +16,11 @@ When I'm not writing code, you can find me actively on twitter learning, writing
 
 ## 💼 Currently working at
 
-- [Open World: Freelance](https://igmrrf.com)
+- [Ajian Labs: Engineering](https://ajianlabs.com)
 
 ## 💻 Currently working on
 
-- [Portfolio](https://igmrrf.com)
+- [NFT Print Pro](https://nftprintpro.com)
 - [WishList](https://wishlist.netlify.app)
 
 ### 📫 Where to find me

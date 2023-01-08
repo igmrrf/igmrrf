@@ -104,7 +104,7 @@ const jobs = [
     stack: ['React.js', 'Three.js'],
   },
   {
-    name: 'Anime Quizz',
+    name: 'Anime Quiz',
     githubUrl: 'https://github.com/igmrrf',
     previewUrl: 'https://igmrrf.com',
     tutorialUrl: 'https://igmrrf.com',

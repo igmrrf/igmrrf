@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
+import About from './containers/about/about';
 import Banner from './containers/banner/banner';
+import Contact from './containers/contact/contact';
 import Footer from './containers/footer/footer';
 import Header from './containers/header/header';
+import Projects from './containers/projects/projects';
+import Stack from './containers/stack/stack';
 import { darkTheme, lightTheme } from './styled/theme';
 
 const GlobalStyle = createGlobalStyle`
@@ -33,7 +37,10 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <Header changeTheme={changeTheme} />
         <Banner />
-
+        <About />
+        <Stack />
+        <Projects />
+        <Contact />
         <Footer />
       </ThemeProvider>
     </div>
