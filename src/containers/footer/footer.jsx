@@ -4,7 +4,7 @@ import { Foot } from './footer.styles';
 export default function Footer() {
   return (
     <Foot>
-      <h1>Copyright</h1>
+      <h1>Copyright @ igmrrf</h1>
     </Foot>
   );
 }
