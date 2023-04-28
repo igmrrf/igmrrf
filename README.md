@@ -2,8 +2,8 @@
 
 <h2 align="center">T-L-D-O</h2>
 <p align="center">I'm a JavaScript Developer, Linux and Blockchain Enthusiat with a background in Mechanical Engineering.
-I'm passionate about MERN stack, Progressive Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, S.E.O, Web Performance and Automation.
-When I'm not writing code, you can find me actively on twitter learning, writing an article(barely) or watching anime(most likely).</p>
+I'm passionate about MERN stack, Progressive & Performative Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, Game Development (VR) and Automation.
+When I'm not writing code, you can find me actively on Twitter learning (guess not), writing an article( barely) or watching anime (most likely).</p>
 
 
 
@@ -19,6 +19,7 @@ When I'm not writing code, you can find me actively on twitter learning, writing
 - [NFT Print Pro](https://nftprintpro.com)
 - [Sendrail](https://sendrail.co)
 - [Ajian Labs](https://ajianlabs.com)
+- [Dawn](https://www.linkedin.com/company/dawnaistudy/)
 - [WishList](https://wishlist.netlify.app)
 
 ### 📫 Where to find me
