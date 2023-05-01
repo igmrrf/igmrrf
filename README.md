@@ -1,7 +1,7 @@
 # Hey there 👋, ![](https://komarev.com/ghpvc/?username=igmrrf&label=VIEWS)
 
 <h2 align="center">T-L-D-O</h2>
-[igmrrf](https://igbiriki.com)
+- [igmrrf](https://igbiriki.com)
 <p align="center">I'm a JavaScript Developer, Linux and Blockchain Enthusiat with a background in Mechanical Engineering.
 I'm passionate about MERN stack, Progressive & Performative Web Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, Game Development (VR) and Automation.
 When I'm not writing code, you can find me actively on Twitter learning (guess not), writing an article( barely) or watching anime (most likely).</p>
