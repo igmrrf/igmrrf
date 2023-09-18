@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { createGlobalStyle, ThemeProvider } from 'styled-components';
-import Banner from './containers/banner/banner';
-import Footer from './containers/footer/footer';
-import Header from './containers/header/header';
-import { darkTheme, lightTheme } from './styled/theme';
+import React, { useState } from "react";
+import { createGlobalStyle, ThemeProvider } from "styled-components";
+import Banner from "./containers/banner/banner";
+import Footer from "./containers/footer/footer";
+import Header from "./containers/header/header";
+import { darkTheme, lightTheme } from "./styled/theme";
+import Projects from "./containers/projects/projects";
 
 const GlobalStyle = createGlobalStyle`
  * {
@@ -24,7 +25,7 @@ export default function App() {
   return (
     <div
       style={{
-        transition: '0.5s ease-in',
+        transition: "0.5s ease-in",
         background: theme?.ichi,
         color: theme?.yan,
       }}
@@ -33,7 +34,7 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <Header changeTheme={changeTheme} />
         <Banner />
-
+        <Projects />
         <Footer />
       </ThemeProvider>
     </div>

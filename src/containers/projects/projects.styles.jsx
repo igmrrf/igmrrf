@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 export const Button = styled.button`
   color: palevioletred;
@@ -12,7 +12,9 @@ export const Button = styled.button`
 `;
 
 // Extending styles to override some
-
+export const ProjectsContainer = styled.div`
+  padding: 0 5vw;
+`;
 export const CustomButton = styled(Button)`
   color: red;
   border-color: red;

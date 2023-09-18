@@ -1,9 +1,14 @@
 //Theming
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const StyledComponent = styled.div`
+  // background-color: ${(props) => props.theme.ichi};
+  // // background-image: url("/light.png");
+  // // background-size: 400px 200px;
+  // // background-repeat: no-repeat;
+  // // background-position: center;
   padding: 5vh 5vw;
-  min-height: 80vh;
+  min-height: 50vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -14,6 +19,12 @@ export const Colors = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+export const BannerContainer = styled.main`
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 `;
 export const Color = styled.div.attrs((props) => ({
   color: props.color,

@@ -1,21 +1,45 @@
-import React from 'react';
+import React from "react";
+import { StackContainer, StackContent } from "./stack.styles";
+import { CustomButton } from "../projects/projects.styles";
+import Button from "../../components/Button/Button";
 
 const Stack = ({ data = [] }) => {
   console.log(data);
   return (
-    <div>
+    <StackContainer>
       {data.map((code, index) => (
-        <div
-          key={index}
-          style={{ border: '2px solid red', margin: '20px 10px' }}
-        >
-          <h4>Name: {code.name}</h4>
-          <h4>Github Url: {code.githubUrl}</h4>
-          <h4>Preview Url: {code.previewUrl}</h4>
-          <h4>Stack: {code.stack[0]}</h4>
-        </div>
+        <StackContent key={index}>
+          <h2 style={{ margin: "10px auto" }}>{code.name}</h2>
+          <img
+            src="https://picsum.photos/200/300"
+            width={300}
+            height={300}
+            alt={code.name}
+          />
+
+          <div style={{ margin: 10 }}>
+            <CustomButton as="a" href={code.githubUrl}>
+              {true && "<Code/>"}
+            </CustomButton>
+          </div>
+          <div>
+            <CustomButton as="a" target="_blank" href={code.previewUrl}>
+              Preview
+            </CustomButton>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              maxWidth: "300px",
+              flexWrap: "wrap",
+            }}
+          >
+            {code.stack.length &&
+              code.stack.map((each, i) => <Button index={i}>{each}</Button>)}
+          </div>
+        </StackContent>
       ))}
-    </div>
+    </StackContainer>
   );
 };
 
