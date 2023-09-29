@@ -1,9 +1,18 @@
 # Hey there 👋, ![](https://komarev.com/ghpvc/?username=igmrrf&label=VIEWS)
 
 <h2 align="center">T-L-D-O</h2>
-<p align="center">I'm a Software Engineer, Linux, and Blockchain Enthusiast with a background in Mechanical Engineering.
-I'm passionate about Progressive & Performative Apps, Headless CMS, Sustainability, Machine Learning, Neural Networks, Artificial Intelligence, Game Development (VR), and Process Automation.
-When I'm not writing code, you can find me actively on Twitter learning (guess not), writing an article( barely), or watching anime (most likely).</p>
+<p align="center">I'm a Software Engineer, Blockchain and Neural Network Enthusiast with a background in Mechanical Engineering.
+I'm passionate about Progressive Engineering Experience, Performant Applications, Artificial Intelligence, Game Development (Virtual Reality) and Process Automations.
+When I'm not writing code, you possibly can't find me. 
+  
+<br/>
+# Most likely things you would find me wasting my productive time doing;
+<br/>
+  Scrolling the internet for articles to read, 
+  Learning new software technology that I'd probably never use at work, 
+  Tweaking my Nvim Setup not like I've not got everything I need already or,
+  Might be caught watching anime.
+</p>
 
 
 ### Me
@@ -16,10 +25,10 @@ When I'm not writing code, you can find me actively on Twitter learning (guess n
 
 - [Kunda Box](https://kundabox.com)
 - [NFT Print Pro](https://nftprintpro.com)
+- [Ajian Labs](https://ajianlabs.com)
 
 ## 💻 Currently working on
 - [Ajian Labs](https://ajianlabs.com)
-- [Sendrail](https://sendrail.co)
 - [Dawn](https://www.linkedin.com/company/dawnaistudy/)
 - [WishList](https://wishlist.netlify.app)
 
