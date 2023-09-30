@@ -1,16 +1,20 @@
 # Hey there 👋, ![](https://komarev.com/ghpvc/?username=igmrrf&label=VIEWS)
 
 <h2 align="center">T-L-D-O</h2>
-<p align="center">I'm a Software Engineer, Blockchain and Neural Network Enthusiast with a background in Mechanical Engineering.
-I'm passionate about Progressive Engineering Experience, Performant Applications, Artificial Intelligence, Game Development (Virtual Reality) and Process Automations.
-When I'm not writing code, you possibly can't find me. 
-  
+<p align="center">
+  I'm a Software Engineer, Blockchain and Neural Network Enthusiast with a background in Mechanical Engineering.
+  I'm passionate about Progressive Engineering Experience, Performant Applications, Artificial Intelligence, Game Development (Virtual Reality) and Process Automations.
+  When I'm not writing code, you possibly can't find me.
+</p>
 <br/>
-# Most likely things you would find me wasting my productive time doing;
-<br/>
-  Scrolling the internet for articles to read, 
+### Most likely things you would find me wasting my productive time doing;
+<p>
+  Scrolling the internet for articles to read,
+  <br/>
   Learning new software technology that I'd probably never use at work, 
+  <br/>
   Tweaking my Nvim Setup not like I've not got everything I need already or,
+  <br/>
   Might be caught watching anime.
 </p>
 
