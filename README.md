@@ -6,8 +6,9 @@
   I'm passionate about Progressive Engineering Experience, Performant Applications, Artificial Intelligence, Game Development (Virtual Reality) and Process Automations.
   When I'm not writing code, you possibly can't find me.
 </p>
-<br/>
+
 ### Most likely things you would find me wasting my productive time doing;
+# Hey there 👋, ![](https://komarev.com/ghpvc/?username=igmrrf&label=VIEWS)
 <p>
   Scrolling the internet for articles to read,
   <br/>
