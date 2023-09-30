@@ -1,4 +1,4 @@
-# Hey there 👋, ![](https://komarev.com/ghpvc/?username=igmrrf&label=VIEWS)
+# Hey there 👋,
 
 <h2 align="center">T-L-D-O</h2>
 <p align="center">
@@ -41,4 +41,5 @@
 - [Twitter](https://twitter.com/igmrrf) 😎
 - [Instagram](https://instagram.com/igmrrf) 😎
 - [LinkedIn](https://linkedin.com/in/igmrrf) 😎
+- [YouTube](https://youtube.com/in/igmrrf)
 - [StackOverflow](https://stackoverflow.com/users/12100921/igmrrf) 😎
