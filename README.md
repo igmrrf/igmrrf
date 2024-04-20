@@ -20,19 +20,20 @@
 
 
 ### Me
-[igmrrf](https://igbiriki.com)
+[igmrrf](https://igmrrf.xyz)
 
 ### :rocket: Articles
-[Articles](https://dev.to/igmrrf)
+[Dev.to](https://dev.to/igmrrf)
 
 ## 💼 Currently working at
 
 - [Kunda Box](https://kundabox.com)
-- [NFT Print Pro](https://nftprintpro.com)
+- [NPC Labs](https://npclabs.xyz)
 - [Ajian Labs](https://ajianlabs.com)
 
 ## 💻 Currently working on
-- [Ajian Labs](https://ajianlabs.com)
+- [SmartX](https://smartx.ng)
+- [NFT Print Pro](https://nftprintpro.com)
 - [Dawn](https://www.linkedin.com/company/dawnaistudy/)
 - [WishList](https://wishlist.netlify.app)
 
