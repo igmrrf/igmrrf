@@ -1,3 +1,9 @@
 # https://www.robotstxt.org/robotstxt.html
-User-agent: *
-Disallow:
+user-agent: *
+disallow: /assets/
+
+user-agent: magicsearchbot
+disallow: /uploads/
+
+sitemap: https://igmrrf.xyz/sitemap-file.xml
+
