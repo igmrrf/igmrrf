@@ -10,7 +10,7 @@ export const routes: Routes = [
     },
     {
         title: 'Privacy Policy',
-        path: 'privacy-policy',
+        path: 'muzic/privacy-policy',
         component: PrivacyPolicyComponent,
     },
 ]
