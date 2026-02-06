@@ -3,7 +3,7 @@
 	"version": 1,
 	"newProjectRoot": "projects",
 	"projects": {
-		"igmrrf": {
+		"thelazydo": {
 			"projectType": "application",
 			"schematics": {},
 			"root": "",
@@ -13,7 +13,7 @@
 				"build": {
 					"builder": "@angular-devkit/build-angular:application",
 					"options": {
-						"outputPath": "dist/igmrrf",
+						"outputPath": "dist/thelazydo",
 						"index": "src/index.html",
 						"browser": "src/main.ts",
 						"polyfills": ["zone.js"],
@@ -60,10 +60,10 @@
 					"builder": "@angular-devkit/build-angular:dev-server",
 					"configurations": {
 						"production": {
-							"buildTarget": "igmrrf:build:production"
+							"buildTarget": "thelazydo:build:production"
 						},
 						"development": {
-							"buildTarget": "igmrrf:build:development"
+							"buildTarget": "thelazydo:build:development"
 						}
 					},
 					"defaultConfiguration": "development"

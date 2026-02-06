@@ -4,7 +4,7 @@ import { BannerComponent } from './banner/banner.component'
 
 export const routes: Routes = [
     {
-        title: 'Igmrrf',
+        title: 'The Lazy',
         path: '',
         component: BannerComponent,
     },

@@ -5,5 +5,5 @@ disallow: /assets/
 user-agent: magicsearchbot
 disallow: /uploads/
 
-sitemap: https://igmrrf.xyz/sitemap-file.xml
+sitemap: https://theldo.com/sitemap-file.xml
 

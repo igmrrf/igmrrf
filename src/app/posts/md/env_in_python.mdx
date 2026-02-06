@@ -10,7 +10,7 @@ Before we begin let's look at our little vocabulary
 
     ENVs = Environmental Variables
 
-Haven't really built any major project with Python except writing scripts or solving simple Algorithms. Today I was making changes to my [Facebook_autopost_bot](https://github.com/igmrrf/Facebook_autopost_post) when I realized am gonna need to set this up to enable others use the code and also share it openly on Github without letting out my passwords and configurations.
+Haven't really built any major project with Python except writing scripts or solving simple Algorithms. Today I was making changes to my [Facebook_autopost_bot](https://github.com/thelazydo/Facebook_autopost_post) when I realized am gonna need to set this up to enable others use the code and also share it openly on Github without letting out my passwords and configurations.
 
 Maybe you're already using **ENVs** in your Python scripts or applications, but if your haven't started then now is a good time to consider a change. I believe prior to you readint his, you already know what an ENV is so no need to make this post longer.
 NOTE: ENVs exist outside of your code as part of your server environment— can help you by both streamlining and making more secure the process of running your scripts and applications. Automation and Security are the major reasons for adopting ENVs
@@ -29,7 +29,7 @@ Result: Will show you all the ENVs existing on your machine(object containing a 
 
 Note: This is an edited (shortened) output for the purpose of the blog post length.
 
-    >>> environ({'SHELL': '/bin/bash', 'LSCOLORS': 'ExFxBxDxCxegedabagacad', 'SESSION_MANAGER': 'local/igmrrf:@/tmp/.ICE-unix/2554,unix/igmrrf:/tmp/.ICE-unix/2554', 'QT_ACCESSIBILITY': '1', 'APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL': 'true', 'LANGUAGE': 'en_NG:en', 'QT4_IM_MODULE': 'ibus', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'XMODIFIERS': '@im=ibus', 'DESKTOP_SESSION': 'ubuntu', 'SSH_AGENT_PID': '2467', 'NO_AT_BRIDGE': '1', 'GTK_MODULES': 'gail:atk-bridge', 'DBUS_STARTER_BUS_TYPE': 'session', 'PWD': '/home/igmrrf/Desktop/Writings/ENVs in Python',   'TERM_PROGRAM': 'vscode', '_': '/usr/bin/python3'})
+    >>> environ({'SHELL': '/bin/bash', 'LSCOLORS': 'ExFxBxDxCxegedabagacad', 'SESSION_MANAGER': 'local/thelazydo:@/tmp/.ICE-unix/2554,unix/thelazydo:/tmp/.ICE-unix/2554', 'QT_ACCESSIBILITY': '1', 'APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL': 'true', 'LANGUAGE': 'en_NG:en', 'QT4_IM_MODULE': 'ibus', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'XMODIFIERS': '@im=ibus', 'DESKTOP_SESSION': 'ubuntu', 'SSH_AGENT_PID': '2467', 'NO_AT_BRIDGE': '1', 'GTK_MODULES': 'gail:atk-bridge', 'DBUS_STARTER_BUS_TYPE': 'session', 'PWD': '/home/igmrrf/Desktop/Writings/ENVs in Python',   'TERM_PROGRAM': 'vscode', '_': '/usr/bin/python3'})
 
 ### COMMANDS for Reading and Writing environment variables:
 
@@ -39,9 +39,9 @@ Note: This is an edited (shortened) output for the purpose of the blog post leng
     os.environ['User']
     os.getenv('USER')
 
-    >>> igmrrf
-    >>> igmrrf
-    >>> igmrrf
+    >>> thelazydo
+    >>> thelazydo
+    >>> thelazydo
 
 The commands will print out your current username
 
@@ -125,9 +125,9 @@ Note: _code_ is a command that comes with [VsCode](www.visualstudiocode.com). On
 Then configure the file as follows
 
 ```
-username=igmrrf
+username=thelazydo
 PASSWORD=12345
-URL=https://api.igmrrf.com
+URL=https://api.thelazydo.com
 ```
 
 Then import Python-decouple in Your Python script where you need these variables
@@ -139,7 +139,7 @@ print(config('URL'))
 print(config('USERNAME'))
 
 >>> your_api_endpoint
->>> igmrrf
+>>> thelazydo
 ```
 
 Wasn't that easy? :smile:
