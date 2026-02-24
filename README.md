@@ -1,5 +1,23 @@
-# Hey 👋 
-#### I'm Francis Igbiriki, ![](https://komarev.com/ghpvc/?username=thelazydo&label=VIEWS)
+### 🚀 Software Engineer | Mechanical Engineering & Business Administration
 
-I'm a Software Engineer with backgrounds in Mechanical Engineering and Business Administration
-When I'm not writing code, sorry I mean updating my vim configuration and tui applications you can find me actively on, Twitter (guess not),  writing an on LinkedIn article (barely), or learning a new technology and researching problems and their solutions (most likely).
+I’m an engineer who builds at the intersection of efficiency and business logic. When I'm not writing code and by that, I mean endlessly tweaking my **Vim configuration** and hunting for the perfect **TUI**—you can find me:
+
+* **Twitter/X:** Existing in the void (Guess not).
+* **LinkedIn:** Occasionally sharing insights (Barely).
+* **Learning & Researching:** Diving into documentation to find the "why" behind the "how" (Most likely).
+
+---
+
+### 🛠 Tech Stack & Tools
+
+| Category | Tools |
+| :--- | :--- |
+| **Languages** | Python, JavaScript/TypeScript, Go, Rust & C (OG) |
+| **Environment** | Neovim, Tmux, Fish, TUI Enthusiast running On Wezterm/Ghostty |
+| **Interests** | System Design, Automation, Efficiency |
+
+---
+
+### 📫 Connect with me:
+[<img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white">](https://linkedin.com/in/thelazydo) 
+[<img src="https://img.shields.io/badge/Twitter-%231DA1F2.svg?style=for-the-badge&logo=Twitter&logoColor=white">](https://x.com/thelazydo)
