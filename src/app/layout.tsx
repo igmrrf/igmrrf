@@ -16,12 +16,12 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     template: "%s | igmrrf",
-    default: "igmrrf | Senior Engineer & System Architect",
+    default: "igmrrf | Engineer & System Architect",
   },
   description:
-    "Senior Engineer specializing in high-performance distributed systems, Clean Architecture, and automated RAG pipelines.",
+    "Engineer specializing in high-performance distributed systems, Clean Architecture, and automated RAG pipelines.",
   openGraph: {
-    title: "igmrrf | Senior Engineer",
+    title: "igmrrf | Engineer",
     description:
       "Architecting resilient systems through high-craft engineering and clean technical decoupling.",
     url: "https://igmrrf.dev",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "igmrrf | Senior Engineer",
+    title: "igmrrf | Engineer",
     description:
       "High-performance TypeScript ecosystems and Clean Architecture.",
     creator: "@igmrrf",

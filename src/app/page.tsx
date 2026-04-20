@@ -40,7 +40,7 @@ export default function Home() {
             className="flex items-center gap-3 text-[10px] font-mono tracking-[0.3em] uppercase text-primary"
           >
             <span className="w-8 h-[1px] bg-primary" />
-            System Architect / Senior Engineer
+            System Architect / Engineer
           </motion.div>
           <motion.h1
             variants={item}

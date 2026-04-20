@@ -19,8 +19,8 @@ export default function AboutPage() {
           Francis_Igbiriki
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-medium">
-          Senior Engineer specializing in high-performance distributed systems
-          and Clean Architecture.
+          Engineer specializing in high-performance distributed systems and
+          Clean Architecture.
         </p>
       </div>
 
