@@ -1,6 +1,8 @@
 # Supabase SQL Schema for Blog
 
+
 Run the following SQL in your Supabase SQL Editor to set up the necessary tables for the blog's social features.
+## NOTE: Do this once for every new database deployment
 
 ```sql
 -- Create table for likes
