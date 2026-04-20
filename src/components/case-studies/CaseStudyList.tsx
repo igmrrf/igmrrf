@@ -32,15 +32,27 @@ export function CaseStudyList({ studies }: { studies: any[] }) {
         <motion.article 
           key={study.slug} 
           variants={item}
-          className="group relative flex flex-col gap-8 p-12 border border-border bg-background transition-all hover:bg-muted md:flex-row items-start"
+          className="group relative flex flex-col gap-0 border border-border bg-background transition-all hover:bg-muted md:flex-row items-stretch overflow-hidden"
         >
-          <div className="flex flex-col gap-6 flex-1">
+          <div className="w-full md:w-72 h-48 md:h-auto shrink-0 border-r border-border bg-muted overflow-hidden relative">
+            <img 
+              src={`https://picsum.photos/seed/${study.slug}/800/600`} 
+              alt="" 
+              className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out"
+            />
+            <div className="absolute inset-0 bg-primary/10 mix-blend-multiply" />
+            <div className="absolute top-4 left-4 text-[10px] font-mono font-black px-2 py-1 bg-background/80 backdrop-blur-sm border border-border">
+              IMG_00{idx + 1}.raw
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-6 flex-1 p-12">
             <div className="flex items-center gap-6 text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
               <span className="flex items-center gap-2"><Calendar className="h-3 w-3" /> {study.date}</span>
               <span className="flex items-center gap-2"><Clock className="h-3 w-3" /> 10m_READ</span>
               <span className="text-primary font-black">ID: 00{idx + 1}</span>
             </div>
-            <h2 className="text-4xl font-black group-hover:text-primary transition-colors uppercase italic tracking-tighter leading-none">
+            <h2 className="text-4xl font-black group-hover:text-primary transition-colors uppercase italic tracking-tighter leading-none break-words line-clamp-2">
               <Link href={`/case-studies/${study.slug}`}>
                 <span className="absolute inset-0" />
                 {study.title.replace(/ /g, "_")}

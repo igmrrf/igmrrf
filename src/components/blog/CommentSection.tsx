@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { MessageSquare, Reply, User } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface Comment {
   id: string;
@@ -26,7 +25,9 @@ export function CommentSection({ slug }: CommentSectionProps) {
   useEffect(() => {
     fetch(`/api/blog/comments?slug=${slug}`)
       .then((res) => res.json())
-      .then((data) => setComments(data.comments))
+      .then((data) => {
+        if (data?.comments) setComments(data.comments);
+      })
       .catch((err) => console.error("Failed to fetch comments:", err));
   }, [slug]);
 
@@ -59,7 +60,7 @@ export function CommentSection({ slug }: CommentSectionProps) {
     }
   };
 
-  const rootComments = comments.filter((c) => !c.parent_id);
+  const rootComments = comments?.filter((c) => !c.parent_id);
   const replies = comments.filter((c) => c.parent_id);
 
   return (
@@ -73,7 +74,9 @@ export function CommentSection({ slug }: CommentSectionProps) {
       <div className="flex flex-col gap-6 p-10 border border-border bg-accent/20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-3">
-            <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Author.name</label>
+            <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              Author.name
+            </label>
             <input
               type="text"
               value={authorName}
@@ -84,7 +87,9 @@ export function CommentSection({ slug }: CommentSectionProps) {
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Payload.content</label>
+          <label className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+            Payload.content
+          </label>
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
@@ -109,12 +114,15 @@ export function CommentSection({ slug }: CommentSectionProps) {
           </p>
         ) : (
           rootComments.map((comment) => (
-            <div key={comment.id} className="flex flex-col gap-6 border-l border-border pl-10">
-              <CommentItem 
-                comment={comment} 
-                onReply={() => setReplyTo(comment.id)} 
+            <div
+              key={comment.id}
+              className="flex flex-col gap-6 border-l border-border pl-10"
+            >
+              <CommentItem
+                comment={comment}
+                onReply={() => setReplyTo(comment.id)}
               />
-              
+
               {/* Replies */}
               <div className="flex flex-col gap-6 border-l border-primary/20 pl-10 ml-2">
                 {replies
@@ -122,7 +130,7 @@ export function CommentSection({ slug }: CommentSectionProps) {
                   .map((reply) => (
                     <CommentItem key={reply.id} comment={reply} isReply />
                   ))}
-                
+
                 {replyTo === comment.id && (
                   <div className="flex flex-col gap-4 mt-2">
                     <textarea
@@ -140,7 +148,11 @@ export function CommentSection({ slug }: CommentSectionProps) {
                       </button>
                       <button
                         onClick={() => handleSubmit(comment.id)}
-                        disabled={isSubmitting || !authorName.trim() || !newComment.trim()}
+                        disabled={
+                          isSubmitting ||
+                          !authorName.trim() ||
+                          !newComment.trim()
+                        }
                         className="px-6 py-3 bg-foreground text-background text-[10px] font-mono uppercase tracking-widest hover:bg-foreground/90 disabled:opacity-50 transition-colors"
                       >
                         Push_Reply.commit()
@@ -157,7 +169,15 @@ export function CommentSection({ slug }: CommentSectionProps) {
   );
 }
 
-function CommentItem({ comment, onReply, isReply = false }: { comment: Comment; onReply?: () => void; isReply?: boolean }) {
+function CommentItem({
+  comment,
+  onReply,
+  isReply = false,
+}: {
+  comment: Comment;
+  onReply?: () => void;
+  isReply?: boolean;
+}) {
   return (
     <div className="flex flex-col gap-4 group">
       <div className="flex items-center gap-4">
@@ -165,9 +185,12 @@ function CommentItem({ comment, onReply, isReply = false }: { comment: Comment; 
           <User className="h-5 w-5 text-muted-foreground" />
         </div>
         <div className="flex flex-col">
-          <span className="text-[10px] font-mono font-black uppercase tracking-widest">{comment.author_name}</span>
+          <span className="text-[10px] font-mono font-black uppercase tracking-widest">
+            {comment.author_name}
+          </span>
           <span className="text-[9px] font-mono text-muted-foreground uppercase">
-            {new Date(comment.created_at).toLocaleDateString()} // SEQ_ID:{comment.id.slice(0, 8)}
+            {new Date(comment.created_at).toLocaleDateString()} // SEQ_ID:
+            {comment.id.slice(0, 8)}
           </span>
         </div>
       </div>

@@ -16,12 +16,14 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     template: "%s | igmrrf",
-    default: "igmrrf | Senior Full-Stack Engineer & System Architect",
+    default: "igmrrf | Senior Engineer & System Architect",
   },
-  description: "Senior Full-Stack Engineer specializing in high-performance distributed systems, Clean Architecture, and automated RAG pipelines.",
+  description:
+    "Senior Engineer specializing in high-performance distributed systems, Clean Architecture, and automated RAG pipelines.",
   openGraph: {
     title: "igmrrf | Senior Full-Stack Engineer",
-    description: "Architecting resilient systems through high-craft engineering and clean technical decoupling.",
+    description:
+      "Architecting resilient systems through high-craft engineering and clean technical decoupling.",
     url: "https://igmrrf.dev",
     siteName: "igmrrf Portfolio",
     locale: "en_US",
@@ -30,7 +32,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "igmrrf | Senior Full-Stack Engineer",
-    description: "High-performance TypeScript ecosystems and Clean Architecture.",
+    description:
+      "High-performance TypeScript ecosystems and Clean Architecture.",
     creator: "@igmrrf",
   },
   robots: {
@@ -48,7 +51,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolage.variable} ${jetbrains.variable} antialiased selection:bg-primary selection:text-primary-foreground`}>
+      <body
+        className={`${bricolage.variable} ${jetbrains.variable} antialiased selection:bg-primary selection:text-primary-foreground`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

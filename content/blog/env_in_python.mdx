@@ -1,14 +1,18 @@
 ---
-title: 'Environmental Variables in Python'
-date: '2020-01-01'
-tag: ['env', 'python']
+title: "Environmental Variables in Python"
+summary: "Before we begin let's look at our little vocabulary: ENV = Environmental Variable, ENVs = Environmental Variables. A guide on using ENVs for automation and security in Python scripts."
+date: "2020-01-01"
+tags: ["env", "python"]
+featured: false
 ---
 
 Before we begin let's look at our little vocabulary
 
-    ENV = Environmental Variable
+```text
+ENV = Environmental Variable
 
-    ENVs = Environmental Variables
+ENVs = Environmental Variables
+```
 
 Haven't really built any major project with Python except writing scripts or solving simple Algorithms. Today I was making changes to my [Facebook_autopost_bot](https://github.com/igmrrf/Facebook_autopost_post) when I realized am gonna need to set this up to enable others use the code and also share it openly on Github without letting out my passwords and configurations.
 
@@ -21,27 +25,33 @@ In Python environment variables are implemented using the _os_ package.
 
 Sample Code:
 
-    import os
+```python
+import os
 
-    print(environ)
+print(environ)
+```
 
 Result: Will show you all the ENVs existing on your machine(object containing a lot of information about your machine, os, services etc.)
 
 Note: This is an edited (shortened) output for the purpose of the blog post length.
 
-    >>> environ({'SHELL': '/bin/bash', 'LSCOLORS': 'ExFxBxDxCxegedabagacad', 'SESSION_MANAGER': 'local/igmrrf:@/tmp/.ICE-unix/2554,unix/igmrrf:/tmp/.ICE-unix/2554', 'QT_ACCESSIBILITY': '1', 'APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL': 'true', 'LANGUAGE': 'en_NG:en', 'QT4_IM_MODULE': 'ibus', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'XMODIFIERS': '@im=ibus', 'DESKTOP_SESSION': 'ubuntu', 'SSH_AGENT_PID': '2467', 'NO_AT_BRIDGE': '1', 'GTK_MODULES': 'gail:atk-bridge', 'DBUS_STARTER_BUS_TYPE': 'session', 'PWD': '/home/igmrrf/Desktop/Writings/ENVs in Python',   'TERM_PROGRAM': 'vscode', '_': '/usr/bin/python3'})
+```python
+>>> environ({'SHELL': '/bin/bash', 'LSCOLORS': 'ExFxBxDxCxegedabagacad', 'SESSION_MANAGER': 'local/igmrrf:@/tmp/.ICE-unix/2554,unix/igmrrf:/tmp/.ICE-unix/2554', 'QT_ACCESSIBILITY': '1', 'APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL': 'true', 'LANGUAGE': 'en_NG:en', 'QT4_IM_MODULE': 'ibus', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'XMODIFIERS': '@im=ibus', 'DESKTOP_SESSION': 'ubuntu', 'SSH_AGENT_PID': '2467', 'NO_AT_BRIDGE': '1', 'GTK_MODULES': 'gail:atk-bridge', 'DBUS_STARTER_BUS_TYPE': 'session', 'PWD': '/home/igmrrf/Desktop/Writings/ENVs in Python',   'TERM_PROGRAM': 'vscode', '_': '/usr/bin/python3'})
+```
 
 ### COMMANDS for Reading and Writing environment variables:
 
 ### READING
 
-    os.environ.get('USER')
-    os.environ['User']
-    os.getenv('USER')
+```python
+os.environ.get('USER')
+os.environ['User']
+os.getenv('USER')
 
-    >>> igmrrf
-    >>> igmrrf
-    >>> igmrrf
+>>> igmrrf
+>>> igmrrf
+>>> igmrrf
+```
 
 The commands will print out your current username
 
@@ -55,9 +65,11 @@ To change an ENV
 os.environ['USER'] = 'tldo'
 ```
 
-    os.environ['USER']
+```python
+os.environ['USER']
 
-    >>>tldo
+>>>tldo
+```
 
 ### To Clear an ENV
 
@@ -97,17 +109,23 @@ A package that does this effortlessly is _python-decouple_
 
 Open your terminal & Run
 
-    pip install python-decouple
+```shell
+pip install python-decouple
+```
 
 if your use Linux ubuntu and install python using _sudo apt install python3_ then run
 
-    pip3 install python-decouple
+```shell
+pip3 install python-decouple
+```
 
 A useful package for handling ENVs locally instead of us acccessing our os(_import os_) and manipulating which is a bit complex :wink:
 
 If you've already got it installed, you'll get
 
-    Requirement already satisfied: python-decouple in /home/your_name/.local/lib/python3.8/site-packages (3.3)
+```text
+Requirement already satisfied: python-decouple in /home/your_name/.local/lib/python3.8/site-packages (3.3)
+```
 
 else it will be installed in few seconds
 
@@ -124,7 +142,7 @@ Note: _code_ is a command that comes with [VsCode](www.visualstudiocode.com). On
 
 Then configure the file as follows
 
-```
+```text
 username=igmrrf
 PASSWORD=12345
 URL=https://api.igmrrf.com
@@ -132,7 +150,7 @@ URL=https://api.igmrrf.com
 
 Then import Python-decouple in Your Python script where you need these variables
 
-```
+```python
 from decouple import config
 
 print(config('URL'))

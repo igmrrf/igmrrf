@@ -80,7 +80,7 @@ export default function ProjectsPage() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <h3 className="text-3xl font-black uppercase italic tracking-tighter group-hover:text-primary transition-colors leading-none">
+              <h3 className="text-3xl font-black uppercase italic tracking-tighter group-hover:text-primary transition-colors leading-none break-words line-clamp-2">
                 {project.title.replace(/ /g, "_")}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed font-medium">

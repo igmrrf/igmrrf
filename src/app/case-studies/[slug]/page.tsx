@@ -66,6 +66,18 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
           </div>
         </div>
 
+        <div className="w-full h-[300px] md:h-[500px] border border-border bg-muted overflow-hidden relative group">
+          <img 
+            src={`https://picsum.photos/seed/${study.slug}/1200/800`} 
+            alt="" 
+            className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-700 ease-out"
+          />
+          <div className="absolute inset-0 bg-primary/10 mix-blend-multiply" />
+          <div className="absolute bottom-4 left-4 text-[10px] font-mono font-black px-3 py-1 bg-background border border-border">
+            DETAILED_VIEW.raw
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 border border-border">
           <div className="flex flex-col gap-3 p-10 border-b md:border-b-0 md:border-r border-border bg-accent/20">
             <h4 className="text-[10px] font-mono font-black uppercase tracking-widest text-primary underline underline-offset-8 decoration-primary/30 mb-2">Business_Value</h4>

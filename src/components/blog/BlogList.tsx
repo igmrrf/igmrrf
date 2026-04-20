@@ -46,8 +46,8 @@ export function BlogList({ posts }: { posts: any[] }) {
                   ))}
                 </div>
               </div>
-              <h2 className="text-3xl font-black group-hover:text-primary transition-colors leading-none uppercase italic tracking-tighter">
-                {post.title}
+              <h2 className="text-3xl font-black group-hover:text-primary transition-colors leading-none uppercase italic tracking-tighter break-words line-clamp-2 min-h-[4rem]">
+                {post.title.replace(/ /g, "_")}
               </h2>
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                 {post.summary}

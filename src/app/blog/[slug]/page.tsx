@@ -15,22 +15,26 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  
+
   try {
     const post = await getBlogPostBySlug(slug);
 
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] } as const}
         className="flex flex-col gap-12 max-w-4xl mx-auto"
       >
         <div className="flex flex-col gap-8 pb-12 border-b border-border">
-          <Link 
-            href="/blog" 
+          <Link
+            href="/blog"
             className="inline-flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase text-muted-foreground transition-colors hover:text-primary"
           >
             <ArrowLeft className="h-3 w-3" /> Back_to_Feed.log
@@ -46,17 +50,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </h1>
             <div className="flex flex-wrap items-center gap-6 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
               <span className="flex items-center gap-1.5 px-2 py-1 border border-border bg-accent">
-                <Calendar className="h-4 w-4 text-primary" /> {new Date(post.meta.date).toLocaleDateString()}
+                <Calendar className="h-4 w-4 text-primary" />{" "}
+                {new Date(post.meta.date).toLocaleDateString()}
               </span>
               <div className="flex flex-wrap gap-3">
                 {post.meta.tags.map((tag: string) => (
-                  <span key={tag} className="flex items-center gap-1.5 text-primary">
+                  <span
+                    key={tag}
+                    className="flex items-center gap-1.5 text-primary"
+                  >
                     <Tag className="h-3 w-3" /> {tag}
                   </span>
                 ))}
               </div>
             </div>
-            
+
             <div className="pt-6 flex items-center justify-between border-t border-border mt-4">
               <div className="flex items-center gap-4">
                 <LikeButton slug={slug} />
@@ -68,20 +76,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
         </div>
 
-        <div className="prose prose-slate dark:prose-invert max-w-none pt-8 
+        <div
+          className="prose prose-slate dark:prose-invert max-w-none pt-8 
           prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tighter
           prose-a:text-primary hover:prose-a:underline 
           prose-img:sharp-border prose-pre:sharp-border prose-pre:bg-accent/50 prose-pre:border-border
-          font-medium leading-relaxed">
+          font-medium leading-relaxed"
+        >
           <MDXRemote source={post.content} />
         </div>
 
         <div className="mt-12 flex justify-center py-12 border-y border-border bg-accent/10">
-           <LikeButton slug={slug} />
+          <LikeButton slug={slug} />
         </div>
 
         <CommentSection slug={slug} />
-        
+
         <RecommendedReads currentSlug={slug} tags={post.meta.tags} />
       </motion.div>
     );

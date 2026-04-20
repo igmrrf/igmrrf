@@ -1,7 +1,9 @@
 ---
-title: 'Fixing Failed NPM TEST on Default Ember Boilerplate on Linux'
-date: '2020-01-01'
-tag: ['ember', 'test']
+title: "Fixing Failed NPM TEST on Default Ember Boilerplate on Linux"
+summary: "A guide for Linux users on resolving issues with the default Ember test process that expects Chrome to be installed."
+date: "2020-01-01"
+tags: ["ember", "test"]
+featured: false
 ---
 
 As complicated as the title of this post may sound, there's no big problem. We linux users just lack access to non open source applications except with the use of applications that provide non open source applications which for me is too much of a bother.
@@ -20,22 +22,23 @@ The solution is quite simple, contained 3 very common steps
 
 ### STEP 1:
 
-        Open your project in your favorite IDE or Text Editor which I assume you already have. Then open testem.js file which should be located at ther root of your project
+Open your project in your favorite IDE or Text Editor which I assume you already have. Then open `testem.js` file which should be located at ther root of your project.
 
 ### STEP 2:
 
-       Hit "Ctrl + F", then Write "Chrome"
-
-       Hit "Alt + Enter", to select all
-       appearances of Chrome within the file
+Hit `Ctrl + F`, then Write `Chrome`.
+Hit `Alt + Enter`, to select all appearances of Chrome within the file.
 
 ### STEP 3:
 
-       Type "Firefox" (Which comes pre-installed)
+Type `Firefox` (Which comes pre-installed).
 
-       You can go back to your terminal and run
-       $ npm test
+You can go back to your terminal and run
 
-       // To run your test
+```shell
+$ npm test
+```
+
+// To run your test
 
 And take a cup of coffee for a job well done

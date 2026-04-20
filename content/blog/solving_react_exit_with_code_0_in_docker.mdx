@@ -1,7 +1,9 @@
 ---
-title: 'Resolving "react exit with code 0" when running a React container'
-date: '2020-01-01'
-tag: ['docker', 'react']
+title: "Resolving \"react exit with code 0\" when running a React container"
+summary: "A guide on diagnosing and fixing the common \"react exit with code 0\" error when running React applications inside Docker containers."
+date: "2020-01-01"
+tags: ["docker", "react"]
+featured: false
 ---
 
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/8cd4ymgdi8gdop346ocb.jpeg)
@@ -11,7 +13,9 @@ So, before you'll get this error on your Docker instance I presume you have basi
 
 The error is gotten when you run the below command on a set of projects that include a React App.
 
-    docker-composer up
+```shell
+docker-composer up
+```
 
 or try to start a React App container from an image on your Docker instance.
 
@@ -23,10 +27,13 @@ or try to start a React App container from an image on your Docker instance.
 
 > Add the configuration "tty:true" to your react instance
 
-    	react:
-    			tty: true //NOTE
-    			build: dockerreact
-    			ports: - "3000:3000"
+```yaml
+react:
+  tty: true //NOTE
+  build: dockerreact
+  ports:
+    - "3000:3000"
+```
 
 ### Option 2
 
@@ -34,10 +41,13 @@ or try to start a React App container from an image on your Docker instance.
 
 > Setting "stdin_open:true" to your react instance
 
-    	react:
-    			stdin_open: true //NOTE:
-    			build: dockerreact
-    			ports: - "3000:3000"
+```yaml
+react:
+  stdin_open: true //NOTE:
+  build: dockerreact
+  ports:
+    - "3000:3000"
+```
 
 ### Option 3
 
@@ -45,20 +55,22 @@ or try to start a React App container from an image on your Docker instance.
 
 > Add "CI=true" as a command that should run before "npm install" in your Dockerfile within your React project root directory
 
-    FROM node:14.5
+```dockerfile
+FROM node:14.5
 
-    RUN mkdir -p /usr/src/app
-    WORKDIR /usr/src/app
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-    COPY package.json /usr/src/app
+COPY package.json /usr/src/app
 
-    RUN CI=true //NOTE
+RUN CI=true //NOTE
 
-    RUN npm install
-    COPY . /usr/src/app
+RUN npm install
+COPY . /usr/src/app
 
-    EXPOSE 3000
-    CMD ["npm","start"]
+EXPOSE 3000
+CMD ["npm","start"]
+```
 
 ### Option 4
 
@@ -66,7 +78,9 @@ or try to start a React App container from an image on your Docker instance.
 
 > Use "docker-compose run" instead of "docker-compose up" as this automatically sets either option 1 or 2 as true
 
-    docker-compose run
+```shell
+docker-compose run
+```
 
 NOTE: This is only works on already built docker images
 
@@ -78,12 +92,14 @@ NOTE: This is only works on already built docker images
 
 NOTE: Degradding to 3.3.0 wont solve the error.
 
-    "dependencies": {
-    		"@testing-library/jest-dom": "^4.2.4",
-    		"@testing-library/react": "^9.3.2",
-    		"@testing-library/user-event": "^7.1.2",
-    		"react": "^16.13.1",
-    		"react-dom": "^16.13.1",
-    		"react-scripts": "3.4.0,  //NOTE:
-    		"react-scripts": "3.4.1" //NOT WORKING
-    },
+```json
+"dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.0", //NOTE
+    "react-scripts": "3.4.1" //NOT WORKING
+},
+```

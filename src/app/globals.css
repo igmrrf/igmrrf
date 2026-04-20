@@ -17,29 +17,29 @@
 }
 
 :root {
-  /* Industrial Light - Crisp & Technical */
-  --background: oklch(0.98 0.005 240);
-  --foreground: oklch(0.12 0.015 240);
-  --primary: oklch(0.15 0.02 240);
-  --primary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.94 0.01 240);
-  --muted-foreground: oklch(0.45 0.02 240);
-  --accent: oklch(0.96 0.015 240);
-  --accent-foreground: oklch(0.12 0.015 240);
-  --border: oklch(0.88 0.015 240);
+  /* Industrial Light - Crisp & Technical - Monochrome */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0 0 0);
+  --primary: oklch(0 0 0);
+  --primary-foreground: oklch(1 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.4 0 0);
+  --accent: oklch(0.98 0 0);
+  --accent-foreground: oklch(0 0 0);
+  --border: oklch(0.9 0 0);
 }
 
 .dark {
-  /* Industrial Deep - Architectural Navy/Charcoal */
-  --background: oklch(0.12 0.015 240);
-  --foreground: oklch(0.96 0.01 240);
-  --primary: oklch(0.92 0.01 240);
-  --primary-foreground: oklch(0.1 0.015 240);
-  --muted: oklch(0.18 0.02 240);
-  --muted-foreground: oklch(0.65 0.02 240);
-  --accent: oklch(0.15 0.02 240);
-  --accent-foreground: oklch(0.96 0.01 240);
-  --border: oklch(0.25 0.02 240);
+  /* Industrial Deep - Architectural Black - Monochrome */
+  --background: oklch(0 0 0);
+  --foreground: oklch(1 0 0);
+  --primary: oklch(1 0 0);
+  --primary-foreground: oklch(0 0 0);
+  --muted: oklch(0.1 0 0);
+  --muted-foreground: oklch(0.6 0 0);
+  --accent: oklch(0.08 0 0);
+  --accent-foreground: oklch(1 0 0);
+  --border: oklch(0.2 0 0);
 }
 
 @layer base {
