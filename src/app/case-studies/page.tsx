@@ -4,7 +4,8 @@ import { Terminal } from "lucide-react";
 
 export const metadata = {
   title: "Case Studies | Engineering Narratives",
-  description: "Deep-dive engineering narratives on complex system integrations and architectural decisions.",
+  description:
+    "Deep-dive engineering narratives on complex system integrations and architectural decisions.",
 };
 
 export default async function CaseStudiesPage() {
@@ -17,11 +18,11 @@ export default async function CaseStudiesPage() {
           <Terminal className="h-3 w-3" />
           Archive.get_records()
         </div>
-        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">
+        <h1 className="text-4xl sm:text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">
           Case_Studies
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-medium">
-          Detailed technical narratives exploring distributed systems, 
+          Detailed technical narratives exploring distributed systems,
           architectural trade-offs, and high-value business outcomes.
         </p>
       </div>

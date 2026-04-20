@@ -16,7 +16,7 @@ export default async function BlogPage() {
         <div className="text-[10px] font-mono tracking-[0.4em] uppercase text-primary">
           Intel_Feed.log
         </div>
-        <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
+        <h1 className="text-2xl sm:text-3xl md:text-7xl font-black tracking-tighter uppercase italic">
           Engineering_Insights
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed font-medium">
