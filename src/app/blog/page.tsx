@@ -3,7 +3,8 @@ import { BlogList } from "@/components/blog/BlogList";
 
 export const metadata = {
   title: "Blog | Engineering Insights & Architecture",
-  description: "Deep dives into distributed systems, TypeScript architecture, and AI-driven automation pipelines.",
+  description:
+    "Deep dives into distributed systems, TypeScript architecture, and AI-driven automation pipelines.",
 };
 
 export default async function BlogPage() {
@@ -19,7 +20,8 @@ export default async function BlogPage() {
           Engineering_Insights
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed font-medium">
-          Deep dives into distributed systems, TypeScript architecture, and AI-driven automation pipelines.
+          Deep dives into distributed systems, TypeScript architecture, and
+          AI-driven automation pipelines.
         </p>
       </div>
 

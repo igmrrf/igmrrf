@@ -1,10 +1,18 @@
 "use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { Menu, X, BookText, PenTool, Briefcase, User, MessageSquare } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import React, { useState } from "react";
+import Link from "next/link";
+import {
+  Menu,
+  X,
+  BookText,
+  PenTool,
+  Briefcase,
+  User,
+  MessageSquare,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -24,20 +32,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
       {/* Structural Accent */}
       <div className="fixed top-0 left-0 w-1 h-full bg-border/20 z-0" />
-      
+
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-6 flex h-16 items-center justify-between">
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center space-x-2 group">
               <span className="text-xl font-black tracking-tighter uppercase italic group-hover:text-primary transition-colors">
-                igmrrf<span className="text-primary group-hover:text-foreground">.dev</span>
+                igmrrf
+                <span className="text-primary group-hover:text-foreground">
+                  .dev
+                </span>
               </span>
             </Link>
             <nav className="hidden md:flex items-center space-x-8 text-xs font-mono tracking-widest uppercase">
               {navLinks.map((link) => (
-                <Link 
+                <Link
                   key={link.href}
-                  href={link.href} 
+                  href={link.href}
                   className="transition-all hover:text-primary hover:tracking-[0.2em]"
                 >
                   {link.label}
@@ -46,17 +57,17 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <Link 
-              href="/chat" 
+            <Link
+              href="/chat"
               className="hidden sm:inline-flex items-center justify-center border border-primary px-5 py-2 text-[10px] font-mono tracking-widest uppercase text-primary hover:bg-primary hover:text-primary-foreground transition-all active:scale-95"
             >
               System.init()
             </Link>
-            
+
             <ThemeToggle />
-            
+
             {/* Mobile Menu Toggle */}
-            <button 
+            <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 border border-border bg-accent/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all active:scale-90"
               aria-label="Toggle Menu"
@@ -78,7 +89,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             >
               <nav className="flex flex-col p-8 gap-2">
                 {navLinks.map((link) => (
-                  <Link 
+                  <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMenuOpen(false)}
@@ -88,7 +99,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                     {link.label}
                   </Link>
                 ))}
-                <Link 
+                <Link
                   href="/chat"
                   onClick={() => setIsMenuOpen(false)}
                   className="mt-6 inline-flex items-center justify-center gap-3 border border-primary p-5 text-[10px] font-mono tracking-[0.3em] uppercase text-primary hover:bg-primary hover:text-primary-foreground transition-all"
@@ -113,14 +124,36 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 igmrrf<span className="text-primary">_arch</span>
               </div>
               <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground leading-relaxed max-w-sm">
-                Architecting resilient systems through high-craft engineering and clean technical decoupling.
+                Architecting resilient systems through high-craft engineering
+                and clean technical decoupling.
               </p>
             </div>
             <div className="flex flex-col items-end gap-6">
               <div className="flex items-center space-x-8 text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-                <Link href="https://github.com/igmrrf" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors underline decoration-border underline-offset-4">GHUB</Link>
-                <Link href="https://linkedin.com/in/igmrrf" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors underline decoration-border underline-offset-4">LINK</Link>
-                <Link href="https://x.com/igmrrf" target="_blank" rel="noreferrer" className="hover:text-primary transition-colors underline decoration-border underline-offset-4">TWT</Link>
+                <Link
+                  href="https://github.com/igmrrf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
+                >
+                  GHUB
+                </Link>
+                <Link
+                  href="https://linkedin.com/in/igmrrf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
+                >
+                  LINK
+                </Link>
+                <Link
+                  href="https://x.com/igmrrf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
+                >
+                  TWT
+                </Link>
               </div>
               <p className="text-[10px] font-mono uppercase tracking-tighter text-muted-foreground/50">
                 &copy; {new Date().getFullYear()} igmrrf.v4 // STABLE_BUILD
