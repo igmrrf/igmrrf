@@ -73,7 +73,7 @@ export default async function CaseStudyPage({
           </div>
         </div>
 
-        <div className="w-full h-[300px] md:h-[500px] border border-border bg-muted overflow-hidden relative group">
+        <div className="w-full h-75 md:h-125 border border-border bg-muted overflow-hidden relative group">
           <img
             src={`https://picsum.photos/seed/${study.slug}/1200/800`}
             alt=""
