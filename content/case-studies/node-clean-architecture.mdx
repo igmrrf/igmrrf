@@ -1,0 +1,25 @@
+---
+title: "Enterprise Clean Architecture: Scalable Node.js Systems"
+summary: "A production-grade template implementing Robert C. Martin's Clean Architecture principles using strict TypeScript."
+techStack: ["Node.js", "TypeScript", "Express", "Dependency Injection", "Vitest"]
+businessValue: "Reduces long-term maintenance costs and minimizes the risk of framework lock-in by decoupling business logic from external dependencies like databases and web frameworks."
+technicalTradeOffs: "Accepted higher initial development overhead and boilerplate (e.g., creating DTOs and mappers for every layer) in exchange for exceptional testability and architectural flexibility."
+githubUrl: "https://github.com/igmrrf/Node_Clean_Architecture_TS"
+date: "2024-02-10"
+featured: true
+---
+
+# Enterprise Clean Architecture: Scalable Node.js Systems
+
+## Core Philosophy
+This project demonstrates how to scale Node.js applications by enforcing strict boundaries between the **Domain Layer** (Entities and Use Cases) and the **Infrastructure Layer** (Databases, External APIs, Frameworks).
+
+## Architectural Deep-Dive
+### Decoupling Logic from Frameworks
+The use cases represent the core business logic and remain entirely agnostic of whether the data is coming from a PostgreSQL database, a file system, or a REST API. This is achieved through the use of high-level interfaces that the infrastructure layer implements.
+
+### Type-Safe Dependency Injection
+Using TypeScript, I implemented a dependency injection pattern that ensures compile-time safety when wiring up the application's components, a common pain point in large-scale JavaScript/Node.js codebases.
+
+## Business Impact
+Building systems with this level of decoupling ensures that business rules are preserved even when technical requirements change (e.g., migrating from one database to another), protecting the company's core assets.

@@ -1,0 +1,25 @@
+---
+title: "vi-mongo.nvim: Asynchronous TUI Database Explorer"
+summary: "An integrated MongoDB management interface for Neovim built with Lua and high-performance TUI patterns."
+techStack: ["Lua", "Neovim API", "MongoDB", "Asynchronous Programming"]
+businessValue: "Dramatically improves developer productivity for TUI-focused engineers by eliminating context-switching between the editor and external database clients."
+technicalTradeOffs: "Used Lua coroutines to manage complex asynchronous database operations, significantly reducing UI latency at the expense of more complex state management in a single-threaded runtime."
+githubUrl: "https://github.com/igmrrf/vi-mongo.nvim"
+date: "2024-01-20"
+featured: true
+---
+
+# vi-mongo.nvim: Asynchronous TUI Database Explorer
+
+## The TUI Workflow
+For many developers, staying within the terminal environment is critical for speed and focus. This plugin brings rich database interaction directly into the Neovim editor.
+
+## Architectural Deep-Dive
+### Asynchronous Database Operations
+The core challenge was performing MongoDB queries (which can be slow or involve large amounts of data) without freezing the editor's main thread. By leveraging Lua's coroutines and the Neovim job control API, I implemented a non-blocking request/response cycle.
+
+### Rich UI in a Text Buffer
+Building a functional UI (tree views, query editors, result tables) within a terminal buffer requires precise manipulation of the Neovim API. I developed a system of virtual text and floating windows to provide a modern "IDE-like" experience for database exploration.
+
+## Business Impact
+For teams heavily invested in terminal-based workflows, this plugin streamlines development and debugging by providing immediate, context-aware access to their data.

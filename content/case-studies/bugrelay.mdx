@@ -1,0 +1,25 @@
+---
+title: "BugRelay: Scalable Bug Reporting Infrastructure"
+summary: "A specialized platform bridging the gap between end-users and software companies through a multi-tenant reporting system."
+techStack: ["TypeScript", "Node.js", "React", "Next.js", "Prisma", "PostgreSQL"]
+businessValue: "Reduces the friction of bug reporting for end-users while providing a streamlined, verifiable management system for companies to improve software quality."
+technicalTradeOffs: "Implemented a custom verification system for company ownership instead of standard OAuth to handle the unique 'unclaimed profile' business requirement, sacrificing some initial UX simplicity for long-term data integrity."
+githubUrl: "https://github.com/igmrrf/bugrelay"
+date: "2024-03-15"
+featured: true
+---
+
+# BugRelay: Scalable Bug Reporting Infrastructure
+
+## The Challenge
+Software companies often struggle to collect high-quality bug reports from non-technical users. Conversely, users often find reporting bugs to be a tedious process involving multiple steps and unknown outcomes.
+
+## Architectural Deep-Dive
+### Multi-Tenant Identity & Ownership
+One of the most complex features of BugRelay is the "unclaimed" profile mechanism. We needed a way for users to report bugs against companies that hadn't signed up yet, while ensuring only legitimate representatives could eventually claim and manage those reports.
+
+### Scalable Reporting Pipeline
+To handle diverse reporting formats, I designed a consistent internal schema that normalizes logs, screenshots, and metadata into actionable data for the company's engineering team.
+
+## Business Impact
+By centralizing reports and simplifying the user flow, BugRelay helps companies decrease their time-to-resolution and improves overall user satisfaction.

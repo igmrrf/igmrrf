@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+:root {
+  /* Industrial Light - Crisp & Technical */
+  --background: oklch(0.98 0.005 240);
+  --foreground: oklch(0.12 0.015 240);
+  --primary: oklch(0.15 0.02 240);
+  --primary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.94 0.01 240);
+  --muted-foreground: oklch(0.45 0.02 240);
+  --accent: oklch(0.96 0.015 240);
+  --accent-foreground: oklch(0.12 0.015 240);
+  --border: oklch(0.88 0.015 240);
+}
+
+.dark {
+  /* Industrial Deep - Architectural Navy/Charcoal */
+  --background: oklch(0.12 0.015 240);
+  --foreground: oklch(0.96 0.01 240);
+  --primary: oklch(0.92 0.01 240);
+  --primary-foreground: oklch(0.1 0.015 240);
+  --muted: oklch(0.18 0.02 240);
+  --muted-foreground: oklch(0.65 0.02 240);
+  --accent: oklch(0.15 0.02 240);
+  --accent-foreground: oklch(0.96 0.01 240);
+  --border: oklch(0.25 0.02 240);
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: -19px -19px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tighter leading-tight font-black;
+  }
+}
+
+@layer utilities {
+  .industrial-grid {
+    background-image: 
+      linear-gradient(to right, var(--border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .sharp-border {
+    border-radius: 0;
+    border-width: 1px;
+    border-color: var(--border);
+  }
+}

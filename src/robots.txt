@@ -1,9 +1,0 @@
-# https://www.robotstxt.org/robotstxt.html
-user-agent: *
-disallow: /assets/
-
-user-agent: magicsearchbot
-disallow: /uploads/
-
-sitemap: https://theldo.com/sitemap-file.xml
-
