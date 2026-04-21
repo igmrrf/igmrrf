@@ -1,10 +1,10 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GenerativeModel, GoogleGenerativeAI } from "@google/generative-ai";
 import { AIProvider, Message } from "../types";
 
 export class GeminiProvider implements AIProvider {
   name = "Gemini";
   private genAI: GoogleGenerativeAI;
-  private model: any;
+  private model: GenerativeModel;
 
   constructor(apiKey: string, modelName: string) {
     this.genAI = new GoogleGenerativeAI(apiKey);
@@ -12,21 +12,21 @@ export class GeminiProvider implements AIProvider {
   }
 
   async generateResponse(messages: Message[]): Promise<string> {
-    const systemMessage = messages.find(m => m.role === 'system');
-    const userMessages = messages.filter(m => m.role !== 'system');
-    
+    const systemMessage = messages.find((m) => m.role === "system");
+    const userMessages = messages.filter((m) => m.role !== "system");
+
     // Ensure history starts with a 'user' message and alternates
     const history = [];
     let foundFirstUser = false;
 
     for (const msg of userMessages.slice(0, -1)) {
-      if (msg.role === 'user') {
+      if (msg.role === "user") {
         foundFirstUser = true;
       }
-      
+
       if (foundFirstUser) {
         history.push({
-          role: msg.role === 'user' ? 'user' : 'model',
+          role: msg.role === "user" ? "user" : "model",
           parts: [{ text: msg.content }],
         });
       }
@@ -40,12 +40,11 @@ export class GeminiProvider implements AIProvider {
     });
 
     const lastMessage = userMessages[userMessages.length - 1];
-    const prompt = systemMessage 
+    const prompt = systemMessage
       ? `System Instructions: ${systemMessage.content}\n\nUser: ${lastMessage.content}`
       : lastMessage.content;
 
     const result = await chat.sendMessage(prompt);
-    const response = await result.response;
-    return response.text();
+    return result.response.text();
   }
 }

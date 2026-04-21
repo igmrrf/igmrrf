@@ -10,6 +10,7 @@ import {
   Briefcase,
   User,
   MessageSquare,
+  History,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -19,6 +20,7 @@ interface AppLayoutProps {
 }
 
 const navLinks = [
+  { href: "/experience", label: "Experience", icon: History },
   { href: "/case-studies", label: "Case Studies", icon: BookText },
   { href: "/blog", label: "Blog", icon: PenTool },
   { href: "/projects", label: "Projects", icon: Briefcase },
@@ -152,7 +154,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   rel="noreferrer"
                   className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
                 >
-                  TWT
+                  X
                 </Link>
               </div>
               <p className="text-[10px] font-mono uppercase tracking-tighter text-muted-foreground/50">
