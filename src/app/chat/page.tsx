@@ -15,10 +15,10 @@ export default function ChatPage() {
           <Terminal className="h-3 w-3" />
           Neural_Interface.init()
         </div>
-        <h1 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">
+        <h1 className="text-3xl sm:text-4xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">
           AI_Architect
         </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-medium"> 
+        <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-medium">
           Engage with a Retrieval-Augmented Generation (RAG) agent indexed on my
           case studies, repository structures, and architectural philosophy.
         </p>
