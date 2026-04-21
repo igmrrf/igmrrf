@@ -15,11 +15,25 @@ export class GeminiProvider implements AIProvider {
     const systemMessage = messages.find(m => m.role === 'system');
     const userMessages = messages.filter(m => m.role !== 'system');
     
+    // Ensure history starts with a 'user' message and alternates
+    const history = [];
+    let foundFirstUser = false;
+
+    for (const msg of userMessages.slice(0, -1)) {
+      if (msg.role === 'user') {
+        foundFirstUser = true;
+      }
+      
+      if (foundFirstUser) {
+        history.push({
+          role: msg.role === 'user' ? 'user' : 'model',
+          parts: [{ text: msg.content }],
+        });
+      }
+    }
+
     const chat = this.model.startChat({
-      history: userMessages.slice(0, -1).map(m => ({
-        role: m.role === 'user' ? 'user' : 'model',
-        parts: [{ text: m.content }],
-      })),
+      history,
       generationConfig: {
         maxOutputTokens: 1000,
       },
