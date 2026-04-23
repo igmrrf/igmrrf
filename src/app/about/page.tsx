@@ -1,16 +1,36 @@
+"use client";
+
 import { Github, Linkedin, Twitter, Terminal } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
-export const metadata = {
-  title: "About | Engineering Philosophy",
-  description:
-    "Learn more about igmrrf's background, technical stack, and engineering philosophy.",
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
 export default function AboutPage() {
   return (
-    <div className="flex flex-col gap-24 max-w-4xl mx-auto">
-      <div className="flex flex-col gap-6 border-l-4 border-primary pl-10 py-6 bg-accent/20">
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="flex flex-col gap-24 max-w-6xl mx-auto"
+    >
+      <motion.div
+        variants={item}
+        className="flex flex-col gap-6 border-l-4 border-primary pl-10 py-6 bg-accent/20"
+      >
         <div className="flex items-center gap-3 text-[10px] font-mono tracking-[0.4em] uppercase text-primary">
           <Terminal className="h-3 w-3" />
           Entity.profile_fetch()
@@ -19,24 +39,36 @@ export default function AboutPage() {
           Francis_Igbiriki
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-medium">
-          Engineer specializing in high-performance distributed systems and
-          Clean Architecture.
+          System Architect specializing in high-performance distributed systems
+          and Clean Architecture.
         </p>
-      </div>
+      </motion.div>
 
-      <div
+      <motion.div
+        variants={item}
         className="prose prose-slate dark:prose-invert max-w-none 
         prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tighter
         prose-strong:text-primary font-medium leading-relaxed"
       >
         <h2>Engineering_Philosophy</h2>
         <p>
-          I believe that code should be more than just functional; it should be{" "}
+          I operate under the core maxim that{" "}
+          <strong>"Value Begets Peace"</strong>. I believe that code should be
+          more than just functional; it should be{" "}
           <strong>maintainable, scalable, and business-centric</strong>. This is
           why I'm an advocate for <strong>Clean Architecture</strong>
           and strict type systems. By decoupling business logic from
           infrastructure, we create systems that can evolve with the needs of
           the organization without crumbling under technical debt.
+        </p>
+        <p>
+          My approach is rooted in a unique cross-disciplinary genesis:
+          combining the physical logic of{" "}
+          <strong>Mechanical Engineering</strong>, the strategic dynamics of{" "}
+          <strong>Business Administration (MBA)</strong>, and the digital
+          abstraction of <strong>Computer Science</strong>. This triad allows me
+          to architect products where software seamlessly integrates with
+          physical supply chains and commercial imperatives.
         </p>
 
         <h2>Technical_Stack.json</h2>
@@ -48,20 +80,47 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mt-8">
           {[
             {
-              label: "Architecture",
-              items: ["DDD", "Clean Architecture", "Microservices"],
+              label: "Languages",
+              items: [
+                "TypeScript",
+                "Go",
+                "Rust",
+                "Python",
+                "C/C++",
+                "Solidity",
+                "Lua",
+              ],
             },
             {
               label: "Frontend",
-              items: ["Next.js", "RSC", "Tailwind CSS", "Framer Motion"],
+              items: [
+                "React",
+                "Next.js",
+                "Flutter",
+                "React Native",
+                "Tailwind CSS",
+              ],
             },
             {
               label: "Backend",
-              items: ["Node.js", "TypeScript", "PostgreSQL", "Prisma"],
+              items: [
+                "Node.js",
+                "Nest.js",
+                "Go (Gin)",
+                "FastAPI",
+                "Rust (Tokio)",
+              ],
             },
             {
-              label: "AI Systems",
-              items: ["RAG Pipelines", "LLM Orchestration", "Vector DBs"],
+              label: "Infrastructure",
+              items: [
+                "PostgreSQL",
+                "MongoDB",
+                "Redis",
+                "Docker",
+                "CI/CD",
+                "Neo4j",
+              ],
             },
           ].map((stack, i) => (
             <div key={i} className="p-6 border border-border bg-accent/20">
@@ -84,13 +143,26 @@ export default function AboutPage() {
 
         <h2 className="mt-16">Kernel_Activity</h2>
         <p>
-          When I'm not architecting systems, you can find me contributing to
-          open-source, building specialized Neovim plugins, or exploring the
-          latest in terminal-based developer productivity tools.
+          I am a <strong>Terminal Maximalist</strong>. I deliberately bypass
+          resource-heavy IDEs for a highly customized, keyboard-driven workflow
+          centered around
+          <strong> Neovim, Tmux, and Lua</strong>. This extreme optimization
+          allows for micro-efficiencies and absolute control over the
+          computational environment.
         </p>
-      </div>
+        <p>
+          When I'm not architecting systems, you can find me contributing to
+          open-source, building specialized Neovim plugins like{" "}
+          <code>vi-mongo.nvim</code>, or sharing architectural solutions on{" "}
+          <strong>Stack Overflow</strong>, where I maintain authority on deep
+          debugging for LSP configurations and modern framework friction points.
+        </p>
+      </motion.div>
 
-      <div className="flex flex-wrap gap-px bg-border border border-border">
+      <motion.div
+        variants={item}
+        className="flex flex-wrap gap-px bg-border border border-border"
+      >
         {[
           { label: "GHUB", icon: Github, href: "https://github.com/igmrrf" },
           {
@@ -110,7 +182,7 @@ export default function AboutPage() {
             {social.label}
           </Link>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

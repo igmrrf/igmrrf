@@ -23,7 +23,6 @@ const navLinks = [
   { href: "/experience", label: "Experience", icon: History },
   { href: "/case-studies", label: "Case Studies", icon: BookText },
   { href: "/blog", label: "Blog", icon: PenTool },
-  { href: "/projects", label: "Projects", icon: Briefcase },
   { href: "/about", label: "About", icon: User },
 ];
 
@@ -129,6 +128,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 Architecting resilient systems through high-craft engineering
                 and clean technical decoupling.
               </p>
+              <a 
+                href="mailto:francis.igbiriki@gmail.com" 
+                className="text-[10px] font-mono uppercase tracking-widest text-primary hover:underline w-fit"
+              >
+                francis.igbiriki@gmail.com
+              </a>
             </div>
             <div className="flex flex-col items-end gap-6">
               <div className="flex items-center space-x-8 text-[10px] font-mono tracking-widest uppercase text-muted-foreground">

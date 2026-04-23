@@ -30,7 +30,7 @@ export default async function BlogPostPage({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] } as const}
-        className="flex flex-col gap-12 max-w-4xl mx-auto"
+        className="flex flex-col gap-12 max-w-6xl mx-auto"
       >
         <div className="flex flex-col gap-8 pb-12 border-b border-border">
           <Link

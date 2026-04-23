@@ -1,4 +1,4 @@
-import { getAllCaseStudies } from "@/lib/mdx";
+import { getAllCaseStudies, getAllBlogPosts } from "@/lib/mdx";
 
 export interface DocumentChunk {
   id: string;
@@ -6,7 +6,7 @@ export interface DocumentChunk {
   metadata: {
     source: string;
     title: string;
-    type: 'case-study' | 'code' | 'about';
+    type: 'case-study' | 'blog' | 'code' | 'about';
   };
 }
 
@@ -15,11 +15,8 @@ export async function prepareChunksFromCaseStudies(): Promise<DocumentChunk[]> {
   const chunks: DocumentChunk[] = [];
 
   for (const study of studies) {
-    // Simple chunking strategy: split by sections or fixed length
-    // For this prototype, we'll chunk by approximately 1000 characters
     const text = `# ${study.title}\n\nSummary: ${study.summary}\n\nBusiness Value: ${study.businessValue}\n\nTechnical Trade-offs: ${study.technicalTradeOffs}\n\nDate: ${study.date}\n\nTech Stack: ${study.techStack.join(', ')}`;
     
-    // In a real RAG, we'd add more granular chunks from the content itself
     chunks.push({
       id: `cs-${study.slug}`,
       text: text,
@@ -27,6 +24,27 @@ export async function prepareChunksFromCaseStudies(): Promise<DocumentChunk[]> {
         source: study.slug,
         title: study.title,
         type: 'case-study'
+      }
+    });
+  }
+
+  return chunks;
+}
+
+export async function prepareChunksFromBlog(): Promise<DocumentChunk[]> {
+  const posts = await getAllBlogPosts();
+  const chunks: DocumentChunk[] = [];
+
+  for (const post of posts) {
+    const text = `# ${post.title}\n\nSummary: ${post.summary}\n\nDate: ${post.date}\n\nTags: ${post.tags.join(', ')}`;
+    
+    chunks.push({
+      id: `blog-${post.slug}`,
+      text: text,
+      metadata: {
+        source: post.slug,
+        title: post.title,
+        type: 'blog'
       }
     });
   }

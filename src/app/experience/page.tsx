@@ -1,22 +1,47 @@
-'use client';
+"use client";
 
-import { Briefcase, Download, ExternalLink, Terminal, Award, GraduationCap, Code2 } from "lucide-react";
+import {
+  Briefcase,
+  Download,
+  ExternalLink,
+  Terminal,
+  Award,
+  GraduationCap,
+} from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 export default function ExperiencePage() {
   const resumePath = "/Francis Igbiriki - Software Engineer - Resume.pdf";
   const encodedResumePath = encodeURI(resumePath);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
       className="flex flex-col gap-24 max-w-6xl mx-auto"
     >
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 border-l-4 border-primary pl-10 py-6 bg-accent/20">
+      <motion.div
+        variants={item}
+        className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 border-l-4 border-primary pl-10 py-6 bg-accent/20"
+      >
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-3 text-[10px] font-mono tracking-[0.4em] uppercase text-primary">
             <Terminal className="h-3 w-3" />
@@ -26,7 +51,8 @@ export default function ExperiencePage() {
             Experience
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-medium">
-            Software Engineer and Founder with 7 years’ experience architecting scalable Fintech and Web3 solutions for 500k+ users.
+            System Architect and Founder with 7 years’ experience architecting
+            scalable Fintech and Web3 solutions for 500k+ users.
           </p>
         </div>
 
@@ -40,20 +66,23 @@ export default function ExperiencePage() {
           </span>
           <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
         </Link>
-      </div>
+      </motion.div>
 
       {/* Experience Feed */}
       <section className="flex flex-col gap-12">
-        <div className="flex items-center gap-4">
+        <motion.div variants={item} className="flex items-center gap-4">
           <div className="h-px flex-1 bg-border" />
-          <h2 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-primary">Work_History.log</h2>
+          <h2 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-primary">
+            Work_History.log
+          </h2>
           <div className="h-px flex-1 bg-border" />
-        </div>
+        </motion.div>
 
         <div className="flex flex-col border border-border">
           {experiences.map((exp, i) => (
-            <div
+            <motion.div
               key={i}
+              variants={item}
               className="group grid grid-cols-1 md:grid-cols-12 border-b border-border last:border-b-0 transition-colors hover:bg-muted/30"
             >
               <div className="md:col-span-3 p-10 border-r-0 md:border-r border-border bg-accent/10 flex flex-col gap-2">
@@ -82,7 +111,10 @@ export default function ExperiencePage() {
 
                 <ul className="flex flex-col gap-4">
                   {exp.highlights.map((highlight, j) => (
-                    <li key={j} className="text-sm text-muted-foreground leading-relaxed font-medium flex gap-3">
+                    <li
+                      key={j}
+                      className="text-sm text-muted-foreground leading-relaxed font-medium flex gap-3"
+                    >
                       <span className="text-primary mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-primary" />
                       {highlight}
                     </li>
@@ -100,39 +132,51 @@ export default function ExperiencePage() {
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
       {/* Skills Matrix */}
       <section className="flex flex-col gap-12">
-        <div className="flex items-center gap-4">
+        <motion.div variants={item} className="flex items-center gap-4">
           <div className="h-px flex-1 bg-border" />
-          <h2 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-primary">Core_Capabilities.sys</h2>
+          <h2 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-primary">
+            Core_Capabilities.sys
+          </h2>
           <div className="h-px flex-1 bg-border" />
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-border">
           {Object.entries(skills).map(([category, list], i) => (
-            <div key={i} className="p-10 border-r border-b border-border bg-accent/5 flex flex-col gap-6">
+            <motion.div
+              key={i}
+              variants={item}
+              className="p-10 border-r border-b border-border bg-accent/5 flex flex-col gap-6"
+            >
               <h4 className="text-[10px] font-mono font-black uppercase tracking-widest text-primary underline decoration-primary/30 underline-offset-8">
-                {category.replace(/([A-Z])/g, ' $1')}
+                {category.replace(/([A-Z])/g, " $1")}
               </h4>
               <div className="flex flex-wrap gap-x-4 gap-y-2">
                 {list.map((skill) => (
-                  <span key={skill} className="text-xs font-bold uppercase tracking-tight italic text-foreground/80">
+                  <span
+                    key={skill}
+                    className="text-xs font-bold uppercase tracking-tight italic text-foreground/80"
+                  >
                     {skill}
                   </span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
       {/* Education & Recognition */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-border border border-border">
+      <motion.section
+        variants={item}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-border border border-border"
+      >
         {/* Education */}
         <div className="bg-background p-12 flex flex-col gap-10">
           <div className="flex items-center gap-3 text-[10px] font-mono tracking-widest uppercase text-primary">
@@ -142,9 +186,15 @@ export default function ExperiencePage() {
             {education.map((edu, i) => (
               <div key={i} className="flex flex-col gap-4">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-mono text-muted-foreground uppercase">{edu.period}</span>
-                  <h3 className="text-2xl font-black uppercase tracking-tighter italic">{edu.school}</h3>
-                  <span className="text-sm font-bold text-primary">{edu.degree}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                    {edu.period}
+                  </span>
+                  <h3 className="text-2xl font-black uppercase tracking-tighter italic">
+                    {edu.school}
+                  </h3>
+                  <span className="text-sm font-bold text-primary">
+                    {edu.degree}
+                  </span>
                 </div>
                 <div className="text-[10px] font-mono text-muted-foreground leading-relaxed uppercase tracking-wider">
                   Minor: {edu.minor.join(" / ")}
@@ -161,27 +211,43 @@ export default function ExperiencePage() {
           </div>
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-mono text-muted-foreground uppercase">Nov 2019</span>
-              <h3 className="text-xl font-black uppercase tracking-tighter italic">2nd Runner Up: NDDC Hackathon</h3>
-              <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">NDDC Headquarters</p>
+              <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                Nov 2019
+              </span>
+              <h3 className="text-xl font-black uppercase tracking-tighter italic">
+                Winner: NDDC Hackathon
+              </h3>
+              <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+                NDDC Headquarters
+              </p>
             </div>
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-mono text-muted-foreground uppercase">Jun 2014</span>
-              <h3 className="text-xl font-black uppercase tracking-tighter italic">Diploma - Desktop Publishing</h3>
-              <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Ebitare Computer Training Institute</p>
+              <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                Active
+              </span>
+              <h3 className="text-xl font-black uppercase tracking-tighter italic">
+                Stack Overflow Authority
+              </h3>
+              <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+                Top contributor for Neovim LSP & Biome.js configs
+              </p>
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer CTA */}
-      <div className="flex flex-col items-center gap-8 py-20 border border-border bg-accent/20 relative overflow-hidden group">
+      <motion.div
+        variants={item}
+        className="flex flex-col items-center gap-8 py-20 border border-border bg-accent/20 relative overflow-hidden group"
+      >
         <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
         <h4 className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-primary">
           End_of_Stream.eof
         </h4>
         <p className="text-sm text-center max-w-md text-muted-foreground px-10 font-medium leading-relaxed">
-          Combining Mechanical Engineering fundamentals with MBA strategic insights to drive innovation in high-scale systems.
+          Combining Mechanical Engineering fundamentals with MBA strategic
+          insights to drive innovation in high-scale systems.
         </p>
         <div className="flex gap-4">
           <Link
@@ -198,7 +264,7 @@ export default function ExperiencePage() {
             LinkedIn <ExternalLink className="h-3 w-3" />
           </Link>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -212,21 +278,42 @@ const experiences = [
     highlights: [
       "Engineered system-wide optimizations reducing API response times by 89% and server resource usage by 50% through advanced query aggregation, Redis caching, and dependency injection refactoring.",
       "Architected and delivered a gamified onboarding experience integrating Stripe and OAuth, resulting in an 18% visitor conversion rate.",
-      "Integrated Mixpanel and Zoho telemetry to drive data-backed UI redesigns targeting lesson booking flow drop-offs."
+      "Integrated Mixpanel and Zoho telemetry to drive data-backed UI redesigns targeting lesson booking flow drop-offs.",
     ],
     stack: ["Node.js", "Redis", "Stripe", "OAuth", "Mixpanel", "Zoho"],
   },
   {
-    role: "Co-Founder",
+    role: "Founder",
+    company: "Ajian Labs",
+    location: "Remote",
+    period: "Apr 2024 - Present",
+    highlights: [
+      "Contributing to deep research and rapid prototyping of scalable product architectures.",
+      "Aligning with core operational philosophy: Discover (risk reduction), Design (persona mapping), and Build (automated testing/visual regression).",
+      "Advising on high-performance system implementations and technical debt reduction strategies.",
+    ],
+    stack: ["TypeScript", "Architecture", "Rapid Prototyping"],
+  },
+  {
+    role: "Head of Product",
     company: "NPC Labs",
     location: "New Jersey",
-    period: "Dec 2022 - Mar 2025",
+    period: "Dec 2022 - March 2025",
     highlights: [
+      "Directing product vision for a decentralized IP distribution platform serving 5 million active users.",
       "Secured partnership to patent proprietary NFC technology for 'phygital' asset logistics.",
       "Migrated infrastructure to Layer-2 (Base, Polygon) and built failover systems to maintain 99% uptime.",
-      "Orchestrated core MVP securing $250k initial funding with CI/CD pipelines (GitHub Actions, Docker) and monitoring (Sentry, PostHog)."
+      "Orchestrated core MVP securing $250k initial funding with CI/CD pipelines (GitHub Actions, Docker) and monitoring (Sentry, PostHog).",
     ],
-    stack: ["Solidity", "Base", "Polygon", "Docker", "Sentry", "PostHog"],
+    stack: [
+      "Web3",
+      "Solidity",
+      "Base",
+      "Polygon",
+      "Docker",
+      "Sentry",
+      "PostHog",
+    ],
   },
   {
     role: "Software Engineer",
@@ -236,9 +323,16 @@ const experiences = [
     highlights: [
       "Architected a custom Ethereum-Classic local testnet containerized via Docker for gas-free testing.",
       "Optimized high-volume media rendering via server-side image processing (Sharp/FFmpeg) for adaptive generation.",
-      "Revitalized legacy Node.js/MongoDB backend by refactoring 'callback hell' into modern Async/Await patterns."
+      "Revitalized legacy Node.js/MongoDB backend by refactoring 'callback hell' into modern Async/Await patterns.",
     ],
-    stack: ["Ethereum-Classic", "Docker", "Sharp", "FFmpeg", "MongoDB", "Node.js"],
+    stack: [
+      "Ethereum-Classic",
+      "Docker",
+      "Sharp",
+      "FFmpeg",
+      "MongoDB",
+      "Node.js",
+    ],
   },
   {
     role: "Software Engineer",
@@ -248,7 +342,7 @@ const experiences = [
     highlights: [
       "Engineered fully automated credit decisioning pipeline with real-time identity verification and credit scoring.",
       "Architected a campaign automation engine (Termii & Kue) reducing merchant operational costs by ~90%.",
-      "Led insurance implementation into multi-tenant lending system, increasing lending pool by 60%."
+      "Led insurance implementation into multi-tenant lending system, increasing lending pool by 60%.",
     ],
     stack: ["Node.js", "PostgreSQL", "Termii", "Kue", "Identity Verification"],
   },
@@ -259,16 +353,46 @@ const experiences = [
     period: "Jul 2021 - Apr 2022",
     highlights: [
       "Spearheaded server design using Node.js, integrating AI-driven meal recommendations (Lu Service).",
-      "Engineered comprehensive testing suite (Mocha, Jest, Supertest) and automation scripts for base code generation."
+      "Engineered comprehensive testing suite (Mocha, Jest, Supertest) and automation scripts for base code generation.",
     ],
     stack: ["Node.js", "Mocha", "Jest", "Supertest", "AI/ML"],
   },
 ];
 
 const skills = {
-  Languages: ["C/C++", "C#", "Rust", "Go", "TypeScript", "JavaScript", "Python", "Solidity", "Lua"],
-  Frameworks: ["Next.js", "React", "React Native", "Flutter", "Vue.js", "Nest.js", "Express.js", "FastAPI", "TailwindCSS"],
-  Infrastructure: ["PostgreSQL", "MongoDB", "MySQL", "Redis", "Docker", "GitHub Actions", "Layer-2 (Base/Polygon)"],
+  Languages: [
+    "TypeScript",
+    "Go",
+    "Rust",
+    "Python",
+    "C/C++",
+    "Solidity",
+    "C#",
+    "SQL",
+    "Lua",
+  ],
+  Frameworks: [
+    "Node.js (Express, Nest.js)",
+    "Go (Gin)",
+    "Python (FastAPI)",
+    "Rust (Tokio)",
+    "React",
+    "Next.js",
+    "Flutter",
+    "React Native",
+    "TailwindCSS",
+  ],
+  Infrastructure: [
+    "PostgreSQL",
+    "MongoDB",
+    "MySQL",
+    "Redis",
+    "Neo4j",
+    "SQLite",
+    "Docker",
+    "GitHub Actions",
+    "Layer-2 (Base/Polygon)",
+  ],
 };
 
 const education = [
@@ -276,12 +400,22 @@ const education = [
     school: "Miva Open University",
     degree: "Masters Business Administration",
     period: "Sep 2025 - Present",
-    minor: ["Disruptive Innovation", "Digital Transformation", "Supply Chain", "Leadership"]
+    minor: [
+      "Disruptive Innovation",
+      "Digital Transformation",
+      "Supply Chain",
+      "Leadership",
+    ],
   },
   {
     school: "Niger Delta University",
     degree: "Bachelor of Science, Mechanical Engineering",
     period: "Dec 2015 - Jul 2021",
-    minor: ["Numerical Methods", "Computational Logic", "Control Systems", "Engineering Statistics"]
-  }
+    minor: [
+      "Numerical Methods",
+      "Computational Logic",
+      "Control Systems",
+      "Engineering Statistics",
+    ],
+  },
 ];

@@ -5,7 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://igmrrf.dev';
 
   // Core routes
-  const routes = ['', '/blog', '/case-studies', '/projects', '/about', '/chat'].map(
+  const routes = ['', '/blog', '/case-studies', '/about', '/chat', '/experience'].map(
     (route) => ({
       url: `${baseUrl}${route}`,
       lastModified: new Date(),
@@ -15,7 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   );
 
   // MDX Case Studies
-  const caseStudies = getCaseStudySlugs().map((slug) => ({
+  const caseStudyRoutes = getCaseStudySlugs().map((slug) => ({
     url: `${baseUrl}/case-studies/${slug.replace(/\.mdx?$/, '')}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
@@ -30,5 +30,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...routes, ...caseStudies, ...blogPosts];
+  return [...routes, ...caseStudyRoutes, ...blogPosts];
 }
