@@ -49,8 +49,8 @@ export default async function CaseStudyPage({
             <Github className="h-3 w-3" /> View_Source
           </Link>
         </div>
-        <h1 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-none">
-          {meta.title.replace(/ /g, "_")}
+        <h1 className="text-4xl md:text-7xl font-black uppercase italic tracking-tighter leading-none break-words">
+          {meta.title.replace(/ /g, "_\u200B")}
         </h1>
         <p className="text-xl text-muted-foreground font-medium max-w-2xl leading-relaxed">
           {meta.summary}

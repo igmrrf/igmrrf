@@ -54,7 +54,7 @@ export function CaseStudyList({
                 </Link>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black group-hover:text-primary transition-colors leading-none uppercase italic tracking-tighter break-words">
-                {study.title.replace(/ /g, "_")}
+                {study.title.replace(/ /g, "_\u200B")}
               </h2>
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                 {study.summary}

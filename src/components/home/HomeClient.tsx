@@ -83,10 +83,10 @@ export default function HomeClient({
               <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             </Link>
             <Link
-              href="/chat"
+              href="/stack"
               className="px-8 py-4 border border-border font-mono text-xs tracking-widest uppercase hover:bg-muted transition-colors"
             >
-              Connect.stream()
+              Connect.stack()
             </Link>
           </motion.div>
         </div>
@@ -194,8 +194,8 @@ export default function HomeClient({
             >
               <div className="flex flex-col gap-4 flex-1">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter group-hover:text-primary transition-colors italic">
-                    {project.title.replace(/ /g, "_")}
+                  <h3 className="text-2xl font-black uppercase tracking-tighter group-hover:text-primary transition-colors italic break-words">
+                    {project.title.replace(/ /g, "_\u200B")}
                   </h3>
                   <Link
                     href={project.githubUrl}

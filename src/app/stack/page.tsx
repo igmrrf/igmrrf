@@ -10,7 +10,7 @@ export default function StackPage() {
   const data = parseTechStack();
 
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden">
+    <div className="w-screen relative left-1/2 -translate-x-1/2 flex flex-col h-[75vh] md:h-[85vh] overflow-hidden border-y border-border">
       <div className="flex-grow w-full relative">
         <TechStackViewer data={data} />
       </div>

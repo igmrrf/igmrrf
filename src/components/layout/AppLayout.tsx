@@ -39,9 +39,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center space-x-2 group">
               <span className="text-xl font-black tracking-tighter uppercase italic group-hover:text-primary transition-colors">
-                igmrrf
+                The
                 <span className="text-primary group-hover:text-foreground">
-                  .dev
+                  _LDO
                 </span>
               </span>
             </Link>
@@ -122,14 +122,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
             <div className="flex flex-col gap-6">
               <div className="text-2xl font-black tracking-tighter uppercase italic">
-                igmrrf<span className="text-primary">_arch</span>
+                The<span className="text-primary">_LDO</span>
               </div>
               <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground leading-relaxed max-w-sm">
                 Architecting resilient systems through high-craft engineering
                 and clean technical decoupling.
               </p>
-              <a 
-                href="mailto:francis.igbiriki@gmail.com" 
+              <a
+                href="mailto:francis.igbiriki@gmail.com"
                 className="text-[10px] font-mono uppercase tracking-widest text-primary hover:underline w-fit"
               >
                 francis.igbiriki@gmail.com
@@ -143,15 +143,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   rel="noreferrer"
                   className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
                 >
-                  GHUB
+                  GITHUB
                 </Link>
                 <Link
-                  href="https://linkedin.com/in/igmrrf"
+                  href="https://linkedin.com/in/thelazydo"
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
                 >
-                  LINK
+                  LINKEDIN
                 </Link>
                 <Link
                   href="https://x.com/igmrrf"
@@ -163,7 +163,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 </Link>
               </div>
               <p className="text-[10px] font-mono uppercase tracking-tighter text-muted-foreground/50">
-                &copy; {new Date().getFullYear()} igmrrf.v4 // STABLE_BUILD
+                &copy; {new Date().getFullYear()} igmrrf.v0.1.9 // BETA_BUILD
               </p>
             </div>
           </div>

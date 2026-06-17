@@ -15,23 +15,23 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | igmrrf",
-    default: "igmrrf | Engineer & System Architect",
+    template: "%s | The LDO",
+    default: "The LDO | Engineer & System Architect",
   },
   description:
     "Engineer specializing in high-performance distributed systems, Clean Architecture, and automated RAG pipelines.",
   openGraph: {
-    title: "igmrrf | Engineer",
+    title: "The LDO | Engineer",
     description:
       "Architecting resilient systems through high-craft engineering and clean technical decoupling.",
-    url: "https://igmrrf.dev",
-    siteName: "igmrrf Portfolio",
+    url: "https://theldo.com",
+    siteName: "The LDO",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "igmrrf | Engineer",
+    title: "The LDO | Engineer",
     description:
       "High-performance TypeScript ecosystems and Clean Architecture.",
     creator: "@igmrrf",
