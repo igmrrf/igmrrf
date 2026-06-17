@@ -38,7 +38,7 @@ function TesseractCore({ isDark }: { isDark: boolean }) {
 
   // Define 24 faces of the hypercube
   const facesIndex = React.useMemo(() => {
-    const f = [];
+    const f: number[] = [];
     const axesPairs = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
     
     axesPairs.forEach(([var1, var2]) => {
@@ -46,7 +46,7 @@ function TesseractCore({ isDark }: { isDark: boolean }) {
       
       for (let fixedVal1 of [-1, 1]) {
         for (let fixedVal2 of [-1, 1]) {
-          const faceVerts = [];
+          const faceVerts: number[] = [];
           // Winding order
           const variations = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
           
@@ -127,8 +127,8 @@ function TesseractCore({ isDark }: { isDark: boolean }) {
       {/* Solid Faces */}
       <mesh ref={meshRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={16} array={positions} itemSize={3} />
-          <bufferAttribute attach="index" array={facesIndex} count={facesIndex.length} itemSize={1} />
+          <bufferAttribute attach="attributes-position" count={16} args={[positions, 3]} />
+          <bufferAttribute attach="index" count={facesIndex.length} args={[facesIndex, 1]} />
         </bufferGeometry>
         <meshBasicMaterial 
           color="#000000"
@@ -142,9 +142,9 @@ function TesseractCore({ isDark }: { isDark: boolean }) {
       {/* Wireframe Edges */}
       <lineSegments ref={lineRef}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={16} array={positions} itemSize={3} />
-          <bufferAttribute attach="attributes-color" count={16} array={colors} itemSize={3} />
-          <bufferAttribute attach="index" array={edgesIndex} count={edgesIndex.length} itemSize={1} />
+          <bufferAttribute attach="attributes-position" count={16} args={[positions, 3]} />
+          <bufferAttribute attach="attributes-color" count={16} args={[colors, 3]} />
+          <bufferAttribute attach="index" count={edgesIndex.length} args={[edgesIndex, 1]} />
         </bufferGeometry>
         <lineBasicMaterial vertexColors={true} transparent opacity={0.8} />
       </lineSegments>
