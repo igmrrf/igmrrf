@@ -1,166 +1,116 @@
-"use client";
+'use client';
 
-import React, { useMemo, useEffect, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Text } from '@react-three/drei';
+import { useTheme } from 'next-themes';
+import * as THREE from 'three';
 
-export default function WordSphereView({ data }: { data: any }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [radius, setRadius] = useState(250);
+function WordNode({ word, index, count, radius, isDark }: { word: any, index: number, count: number, radius: number, isDark: boolean }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
 
-  // Interactive rotation state controlled by mouse drag
-  const rotationRef = useRef({ x: 0, y: 0 });
-  const isDragging = useRef(false);
-  const hasDragged = useRef(false);
-  const lastMousePos = useRef({ x: 0, y: 0 });
-
-  // Auto-rotation state
-  const autoRotationRef = useRef({ x: 0, y: 0 });
-
-  const words = useMemo(() => {
-    return data.nodes.filter((n: any) => n.id !== "root" && n.id !== n.name);
-  }, [data]);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const handleResize = () => {
-      if (containerRef.current) {
-        const width = containerRef.current.getBoundingClientRect().width;
-        // Keep it nicely padded on mobile screens
-        setRadius(Math.min(250, width / 2 - 20));
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const points = useMemo(() => {
-    if (radius === 0) return [];
-    const pts = [];
+  // Compute Fibonacci sphere position
+  const pos = useMemo(() => {
     const phi = Math.PI * (3 - Math.sqrt(5));
-    for (let i = 0; i < words.length; i++) {
-      const y = 1 - (i / (words.length - 1)) * 2;
-      const r = Math.sqrt(1 - y * y);
-      const theta = phi * i;
-      const x = Math.cos(theta) * r;
-      const z = Math.sin(theta) * r;
-      pts.push({ word: words[i], x: x * radius, y: y * radius, z: z * radius });
+    const y = 1 - (index / (count - 1)) * 2;
+    const r = Math.sqrt(1 - y * y);
+    const theta = phi * index;
+    
+    return new THREE.Vector3(
+      Math.cos(theta) * r * radius,
+      y * radius,
+      Math.sin(theta) * r * radius
+    );
+  }, [index, count, radius]);
+
+  // Make text always face the camera
+  useFrame(({ camera }) => {
+    if (meshRef.current) {
+      meshRef.current.quaternion.copy(camera.quaternion);
     }
-    return pts;
-  }, [words]);
+  });
 
-  useEffect(() => {
-    let animationId: number;
-    const animate = () => {
-      // Auto rotate slowly if not dragging
-      if (!isDragging.current) {
-        autoRotationRef.current.x += 0.002;
-        autoRotationRef.current.y += 0.001;
-      }
-
-      const rx = rotationRef.current.x + autoRotationRef.current.x;
-      const ry = rotationRef.current.y + autoRotationRef.current.y;
-
-      const container = document.getElementById("wordsphere-inner");
-      if (container) {
-        container.style.transform = `rotateX(${-ry}rad) rotateY(${rx}rad)`;
-      }
-
-      // We handle individual word facing the camera by counter-rotating them
-      const items = document.querySelectorAll(".wordsphere-item");
-      items.forEach((item: any) => {
-        item.style.transform = `translate(-50%, -50%) rotateY(${-rx}rad) rotateX(${ry}rad)`;
-      });
-
-      animationId = requestAnimationFrame(animate);
-    };
-    animate();
-    return () => cancelAnimationFrame(animationId);
-  }, []);
-
-  const handlePointerDown = (e: React.PointerEvent) => {
-    isDragging.current = true;
-    hasDragged.current = false;
-    lastMousePos.current = { x: e.clientX, y: e.clientY };
-    if (containerRef.current) containerRef.current.style.cursor = "grabbing";
-  };
-
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging.current) return;
-    const deltaX = e.clientX - lastMousePos.current.x;
-    const deltaY = e.clientY - lastMousePos.current.y;
-
-    if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
-      hasDragged.current = true;
-    }
-
-    rotationRef.current.x += deltaX * 0.01;
-    rotationRef.current.y += deltaY * 0.01;
-
-    lastMousePos.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const handlePointerUp = () => {
-    isDragging.current = false;
-    if (containerRef.current) containerRef.current.style.cursor = "grab";
-  };
+  const baseLightness = isDark ? 60 : 35;
+  const hoverLightness = isDark ? 80 : 20;
+  const color = `hsl(${(index * 137.5) % 360}, 70%, ${hovered ? hoverLightness : baseLightness}%)`;
+  const fontSize = word.val > 5 ? 1.5 : 1;
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full bg-gray-50 dark:bg-zinc-950 flex items-center justify-center overflow-hidden pt-16 cursor-grab touch-none"
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+    <Text
+      ref={meshRef as any}
+      position={pos}
+      fontSize={fontSize}
+      color={color}
+      anchorX="center"
+      anchorY="middle"
+      onPointerOver={() => {
+        setHovered(true);
+        document.body.style.cursor = 'pointer';
+      }}
+      onPointerOut={() => {
+        setHovered(false);
+        document.body.style.cursor = 'auto';
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        window.open(`https://www.google.com/search?q=${word.name}+technology`, '_blank');
+      }}
+      outlineWidth={0.04}
+      outlineColor={isDark ? "#000000" : "#ffffff"}
     >
-      <div className="absolute bottom-4 left-4 text-xs font-mono bg-white/10 text-white px-2 py-1 rounded">
-        Drag to Spin 3D Sphere
-      </div>
+      {word.name}
+    </Text>
+  );
+}
 
-      <div
-        id="wordsphere-inner"
-        className="relative bg-gray-50 dark:bg-zinc-950"
-        style={{
-          width: 0,
-          height: 0,
-          transformStyle: "preserve-3d",
-        }}
-      >
-        {points.map((p, i) => {
-          return (
-            <div
-              key={i}
-              className="absolute top-0 left-0 bg-gray-50 dark:bg-zinc-950"
-              style={{
-                transform: `translate3d(${p.x}px, ${p.y}px, ${p.z}px)`,
-                transformStyle: "preserve-3d",
-              }}
-            >
-              <div
-                className="wordsphere-item absolute top-0 left-0 whitespace-nowrap font-bold hover:text-blue-400 cursor-pointer transition-colors"
-                style={{
-                  color: `hsl(${(i * 137.5) % 360}, 70%, 60%)`,
-                  textShadow: "0 0 10px rgba(0,0,0,0.8)",
-                  fontSize: p.word.val > 5 ? "1.5rem" : "1rem",
-                }}
-                onClick={(e) => {
-                  if (hasDragged.current) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return;
-                  }
-                  window.open(
-                    `https://www.google.com/search?q=${p.word.name}+technology`,
-                    "_blank",
-                  );
-                }}
-                title={`Search ${p.word.name}`}
-              >
-                {p.word.name}
-              </div>
-            </div>
-          );
-        })}
+function SphereScene({ words, isDark }: { words: any[], isDark: boolean }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  // Auto rotate the whole sphere slowly
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.1;
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {words.map((word, i) => (
+        <WordNode 
+          key={i} 
+          word={word} 
+          index={i} 
+          count={words.length} 
+          radius={12} 
+          isDark={isDark} 
+        />
+      ))}
+    </group>
+  );
+}
+
+export default function WordSphereView({ data }: { data: any }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
+  const words = useMemo(() => {
+    return data.nodes.filter((n: any) => n.id !== 'root' && n.id !== n.name);
+  }, [data]);
+
+  return (
+    <div className="w-full h-full pt-16 relative bg-transparent">
+      <Canvas camera={{ position: [0, 0, 30], fov: 60 }}>
+        <ambientLight intensity={0.5} />
+        <SphereScene words={words} isDark={isDark} />
+        <OrbitControls 
+          enableZoom={false} 
+          enablePan={false} 
+          rotateSpeed={0.5}
+        />
+      </Canvas>
+      <div className="absolute bottom-4 left-4 text-xs font-mono bg-zinc-200 dark:bg-white/10 text-zinc-800 dark:text-white px-3 py-2 rounded pointer-events-none">
+        Drag to Spin 3D Sphere
       </div>
     </div>
   );

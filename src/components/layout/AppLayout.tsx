@@ -11,9 +11,11 @@ import {
   User,
   MessageSquare,
   History,
+  Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ParticleBackground } from "@/components/backgrounds/ParticleBackground";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -28,13 +30,26 @@ const navLinks = [
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showParticles, setShowParticles] = useState(true);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-hidden">
-      {/* Structural Accent */}
-      <div className="fixed top-0 left-0 w-1 h-full bg-border/20 z-0" />
+    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-x-hidden">
+      {/* 3D WebGL Background */}
+      {showParticles && <ParticleBackground />}
 
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
+      {/* Floating Particle Toggle */}
+      <button
+        onClick={() => setShowParticles(!showParticles)}
+        className="fixed bottom-6 right-6 z-50 p-3 rounded-full border border-border bg-background/50 backdrop-blur-xl shadow-2xl text-muted-foreground hover:text-primary transition-all active:scale-90 flex items-center justify-center group hover:bg-background"
+        title={showParticles ? "Disable Particle Matrix" : "Enable Particle Matrix"}
+      >
+        <Sparkles size={18} className={showParticles ? "text-primary" : "opacity-30"} />
+      </button>
+
+      {/* Structural Accent */}
+      <div className="fixed top-0 left-0 w-1 h-full bg-border/20 z-0 pointer-events-none" />
+
+      <header className="fixed top-0 left-0 z-50 w-full border-b border-border bg-background/40 backdrop-blur-xl">
         <div className="container mx-auto px-6 flex h-16 items-center justify-between">
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center space-x-2 group">
@@ -113,7 +128,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </AnimatePresence>
       </header>
 
-      <main className="flex-1 container mx-auto px-6 py-12 md:py-20 relative z-10">
+      <main className="flex-1 container mx-auto px-6 py-12 md:py-20 mt-16 relative z-10">
         {children}
       </main>
 

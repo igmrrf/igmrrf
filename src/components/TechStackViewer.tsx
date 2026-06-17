@@ -45,11 +45,11 @@ export default function TechStackViewer({ data }: TechStackViewerProps) {
               onClick={() => setCurrentView(view.id)}
               className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-full text-[10px] md:text-sm font-semibold transition-all whitespace-nowrap min-w-[33%] md:min-w-0 ${
                 isActive
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "text-gray-600 dark:text-zinc-400 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white"
+                  ? "bg-foreground text-background shadow-md"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Icon size={18} className={isActive ? "text-blue-100" : ""} />
+              <Icon size={18} className={isActive ? "" : ""} />
               {view.label}
             </button>
           );

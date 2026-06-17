@@ -2,8 +2,11 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import { useTheme } from 'next-themes';
 
 export default function RadialMindMapView({ data }: { data: any }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
@@ -119,7 +122,7 @@ export default function RadialMindMapView({ data }: { data: any }) {
       nodeEnter.append("circle")
         .attr("r", (d: any) => d.depth === 0 ? 8 : d.depth === 1 ? 6 : 4)
         .attr("fill", (d: any) => d._children ? "#3b82f6" : colorScale(d.data.category || d.data.name))
-        .attr("stroke", "rgba(255,255,255,0.5)")
+        .attr("stroke", "var(--stroke-color)")
         .attr("stroke-width", 2)
         .style("cursor", "pointer")
         .on("click", (event, d: any) => {
@@ -137,7 +140,7 @@ export default function RadialMindMapView({ data }: { data: any }) {
           update(d);
         })
         .on("mouseover", function() { d3.select(this).attr("stroke", "#3b82f6").attr("stroke-width", 4); })
-        .on("mouseout", function() { d3.select(this).attr("stroke", "rgba(255,255,255,0.5)").attr("stroke-width", 2); });
+        .on("mouseout", function() { d3.select(this).attr("stroke", "var(--stroke-color)").attr("stroke-width", 2); });
 
       const textNode = nodeEnter.append("text")
         .attr("dy", "0.31em")
@@ -164,7 +167,7 @@ export default function RadialMindMapView({ data }: { data: any }) {
         .on("mouseout", function() { d3.select(this).attr("fill", "currentColor"); });
         
       textNode.clone(true).lower()
-        .attr("stroke", "rgba(0,0,0,0.8)")
+        .attr("stroke", "var(--bg-color)")
         .attr("stroke-width", 3)
         .attr("stroke-linejoin", "round");
 
@@ -203,9 +206,16 @@ export default function RadialMindMapView({ data }: { data: any }) {
   }, [data, dimensions]);
 
   return (
-    <div ref={containerRef} className="w-full h-full bg-gray-50 dark:bg-zinc-950 pt-16 cursor-grab active:cursor-grabbing text-zinc-800 dark:text-zinc-200 relative">
-      <svg ref={svgRef} width="100%" height="100%"></svg>
-      <div className="absolute bottom-4 left-4 text-xs font-mono bg-black/50 text-white px-3 py-2 rounded flex flex-col gap-1">
+    <div 
+      ref={containerRef} 
+      className="w-full h-full pt-16 cursor-grab active:cursor-grabbing text-zinc-800 dark:text-zinc-200 relative bg-transparent"
+      style={{
+        '--bg-color': isDark ? '#09090b' : '#f9fafb',
+        '--stroke-color': isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)'
+      } as React.CSSProperties}
+    >
+      <svg ref={svgRef} width="100%" height="100%" style={{ backgroundColor: 'transparent' }}></svg>
+      <div className="absolute bottom-4 left-4 text-xs font-mono bg-zinc-200 dark:bg-black/50 text-zinc-800 dark:text-white px-3 py-2 rounded flex flex-col gap-1 pointer-events-none">
         <span>🖱️ Scroll to Zoom • Drag to Pan</span>
         <span>👉 Click nodes to Expand / Collapse</span>
         <span>🔗 Click outer items to Search</span>

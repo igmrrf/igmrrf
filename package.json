@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "@supabase/supabase-js": "^2.104.0",
     "@tailwindcss/typography": "^0.5.19",
     "clsx": "^2.1.1",
