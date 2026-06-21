@@ -26,6 +26,7 @@ const navLinks = [
   { href: "/case-studies", label: "Case Studies", icon: BookText },
   { href: "/blog", label: "Blog", icon: PenTool },
   { href: "/about", label: "About", icon: User },
+  { href: "/stack", label: "Stack", icon: Briefcase },
 ];
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
@@ -41,9 +42,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <button
         onClick={() => setShowParticles(!showParticles)}
         className="fixed bottom-6 right-6 z-50 p-3 rounded-full border border-border bg-background/50 backdrop-blur-xl shadow-2xl text-muted-foreground hover:text-primary transition-all active:scale-90 flex items-center justify-center group hover:bg-background"
-        title={showParticles ? "Disable Particle Matrix" : "Enable Particle Matrix"}
+        title={
+          showParticles ? "Disable Particle Matrix" : "Enable Particle Matrix"
+        }
       >
-        <Sparkles size={18} className={showParticles ? "text-primary" : "opacity-30"} />
+        <Sparkles
+          size={18}
+          className={showParticles ? "text-primary" : "opacity-30"}
+        />
       </button>
 
       {/* Structural Accent */}

@@ -1,14 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  Code2,
-  Database,
-  ShieldCheck,
-  Zap,
-  Github,
-} from "lucide-react";
+import { ArrowRight, Github } from "lucide-react";
 import { motion } from "framer-motion";
 import { CaseStudy } from "@/schemas/portfolio";
 import { Hero3DIcon } from "./Hero3DIcon";
@@ -78,17 +71,17 @@ export default function HomeClient({
             </motion.p>
             <motion.div variants={item} className="flex flex-wrap gap-4 pt-6">
               <MagneticButton
-                href="/case-studies"
+                href="/stack"
                 className="px-8 py-4 font-mono text-xs tracking-widest uppercase"
               >
-                Execute.case_studies(){" "}
+                Connect.stack()
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </MagneticButton>
               <Link
-                href="/stack"
+                href="/case-studies"
                 className="px-8 py-4 border border-border font-mono text-xs tracking-widest uppercase hover:bg-muted transition-colors"
               >
-                Connect.stack()
+                Execute.case_studies(){" "}
               </Link>
             </motion.div>
           </div>
