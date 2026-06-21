@@ -14,7 +14,6 @@ import { CaseStudy } from "@/schemas/portfolio";
 import { Hero3DIcon } from "./Hero3DIcon";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { HologramCard } from "@/components/ui/HologramCard";
-import { ScrollDrivenModel } from "@/components/backgrounds/ScrollDrivenModel";
 
 const container = {
   hidden: { opacity: 0 },
@@ -43,7 +42,6 @@ export default function HomeClient({
 }) {
   return (
     <>
-      <ScrollDrivenModel />
       <motion.div
         variants={container}
         initial="hidden"
