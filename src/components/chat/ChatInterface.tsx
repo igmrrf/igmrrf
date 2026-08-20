@@ -207,7 +207,9 @@ export const ChatInterface = () => {
       className={cn(
         "flex flex-col transition-all duration-200",
         isFullscreen
-          ? "fixed inset-0 z-[100] h-[100dvh] w-screen bg-background/85 backdrop-blur-md text-foreground overflow-hidden select-text relative"
+          ? currentWallpaper
+            ? "fixed inset-0 z-[9999] h-[100dvh] w-screen bg-transparent text-foreground overflow-hidden select-text"
+            : "fixed inset-0 z-[9999] h-[100dvh] w-screen bg-background text-foreground overflow-hidden select-text"
           : "relative h-[78vh] max-w-4xl mx-auto border border-border bg-background/90 backdrop-blur-md shadow-2xl"
       )}
     >
@@ -444,26 +446,12 @@ export const ChatInterface = () => {
   if (isFullscreen && isMounted) {
     return (
       <>
-        {/* Placeholder in normal document flow while fullscreen is active */}
+        {/* Invisible spacer in normal document flow while fullscreen is active */}
         <div
           ref={containerRef}
-          className="h-[78vh] max-w-4xl mx-auto border border-dashed border-border/60 bg-accent/10 flex flex-col items-center justify-center gap-3 text-muted-foreground p-8 text-center"
-        >
-          <Terminal className="h-8 w-8 text-primary opacity-60 animate-pulse" />
-          <p className="text-xs font-mono uppercase tracking-widest text-foreground font-bold">
-            Neural Session active in fullscreen mode
-          </p>
-          <p className="text-[11px] font-mono text-muted-foreground">
-            Press <kbd className="px-1.5 py-0.5 bg-accent border border-border text-foreground font-bold">ESC</kbd> or click below to restore window.
-          </p>
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="mt-2 px-4 py-2 border border-primary bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-mono font-bold tracking-widest uppercase transition-colors"
-          >
-            Restore Window
-          </button>
-        </div>
+          aria-hidden="true"
+          className="h-[78vh] max-w-4xl mx-auto border border-transparent pointer-events-none opacity-0"
+        />
         {createPortal(chatMarkup, document.body)}
       </>
     );
