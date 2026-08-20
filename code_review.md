@@ -29,6 +29,11 @@ This pull request / commit encompasses a major refactor and enhancement across m
 - **Sitemap & Robots**: Added dynamic `robots.ts` and refreshed `sitemap.ts` with all dynamic case studies and blog routes.
 - **Metadata**: Enhanced OpenGraph and Twitter card metadata for `/about`, `/experience`, `/case-studies`, and `/blog`.
 
+### 1.5 Chat Interface Fullscreen & Markdown
+- **Markdown & Syntax Highlighting**: Added `react-markdown` with `remark-gfm` and custom renderers in [`ChatMessageMarkdown.tsx`](file:///Users/igmrrf/Desktop/Basket/igmrrf/src/components/chat/ChatMessageMarkdown.tsx) supporting tables, blockquotes, lists, links, headers, and code blocks with clipboard copying.
+- **Fullscreen Mode**: Added fullscreen expansion toggle (`Maximize2`/`Minimize2`), keyboard shortcut (`Escape` listener), and body scroll lock for a distraction-free AI architectural consultation terminal.
+- **Suggested Starters & Reset**: Added quick-prompt suggestions and session reset capabilities.
+
 ---
 
 ## 2. Code Quality & Conventions Review

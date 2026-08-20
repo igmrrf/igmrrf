@@ -1,130 +1,262 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Terminal, ShieldAlert } from "lucide-react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import {
+  Send,
+  Loader2,
+  Terminal,
+  ShieldAlert,
+  Maximize2,
+  Minimize2,
+  RotateCcw,
+  Sparkles,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ChatMessageMarkdown } from "./ChatMessageMarkdown";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+const INITIAL_MESSAGES: Message[] = [
+  {
+    role: "assistant",
+    content:
+      "Hello, I am the AI System Architect representing Francis Igbiriki (igmrrf). Ask me anything about his technical background, case studies (BugRelay, Funckage, OneRemit), Clean Architecture patterns, or system scalability trade-offs.",
+  },
+];
+
+const SUGGESTED_PROMPTS = [
+  "Explain the BugRelay Clean Architecture pattern",
+  "How does Funckage optimize package management?",
+  "What are the trade-offs between Groq, Gemini, and OpenAI?",
+  "Tell me about your experience in FinTech & Distributed Systems",
+];
+
 export const ChatInterface = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content:
-        "Hello, I am the AI System Architect representing Francis Igbiriki (igmrrf). Ask me anything about his technical background, case studies (BugRelay, Funckage, OneRemit), Clean Architecture patterns, or system scalability trade-offs.",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isGenerating]);
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isGenerating) return;
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isGenerating, scrollToBottom]);
 
-    const userMessage: Message = { role: "user", content: input.trim() };
-    const nextMessages = [...messages, userMessage];
-
-    // Optimistically update messages with empty assistant placeholder
-    setMessages([...nextMessages, { role: "assistant", content: "" }]);
-    setInput("");
-    setIsGenerating(true);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages }),
-      });
-
-      if (!response.ok || !response.body) {
-        throw new Error(`HTTP error ${response.status}`);
+  // Handle Fullscreen Esc key and body scroll lock
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isFullscreen) {
+        setIsFullscreen(false);
       }
+    };
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let accumulated = "";
+    if (isFullscreen) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isFullscreen]);
 
-        const textChunk = decoder.decode(value, { stream: true });
-        accumulated += textChunk;
+  const toggleFullscreen = () => {
+    setIsFullscreen((prev) => !prev);
+    setTimeout(() => {
+      inputRef.current?.focus();
+      scrollToBottom();
+    }, 50);
+  };
 
+  const handleReset = () => {
+    if (isGenerating) return;
+    setMessages(INITIAL_MESSAGES);
+    setInput("");
+    inputRef.current?.focus();
+  };
+
+  const handleSendPrompt = (promptText: string) => {
+    if (isGenerating || !promptText.trim()) return;
+    setInput(promptText);
+    // Submit via synthetic or direct call
+    executeChat(promptText.trim());
+  };
+
+  const executeChat = useCallback(
+    async (userText: string) => {
+      if (!userText || isGenerating) return;
+
+      const userMessage: Message = { role: "user", content: userText };
+      const nextMessages = [...messages, userMessage];
+
+      // Optimistically update messages with empty assistant placeholder
+      setMessages([...nextMessages, { role: "assistant", content: "" }]);
+      setInput("");
+      setIsGenerating(true);
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: nextMessages }),
+        });
+
+        if (!response.ok || !response.body) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulated = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const textChunk = decoder.decode(value, { stream: true });
+          accumulated += textChunk;
+
+          setMessages((prev) => {
+            const next = [...prev];
+            if (next.length > 0) {
+              next[next.length - 1] = {
+                role: "assistant",
+                content: accumulated,
+              };
+            }
+            return next;
+          });
+        }
+      } catch (error) {
+        console.error("Stream reader error:", error);
         setMessages((prev) => {
           const next = [...prev];
-          if (next.length > 0) {
+          if (
+            next.length > 0 &&
+            next[next.length - 1].role === "assistant" &&
+            !next[next.length - 1].content
+          ) {
             next[next.length - 1] = {
               role: "assistant",
-              content: accumulated,
+              content:
+                "// PIPELINE_ERROR // Failed to connect to the AI stream. Please ensure your AI API key is configured in .env.local.",
             };
           }
           return next;
         });
+      } finally {
+        setIsGenerating(false);
+        setTimeout(() => inputRef.current?.focus(), 50);
       }
-    } catch (error) {
-      console.error("Stream reader error:", error);
-      setMessages((prev) => {
-        const next = [...prev];
-        if (next.length > 0 && next[next.length - 1].role === "assistant" && !next[next.length - 1].content) {
-          next[next.length - 1] = {
-            role: "assistant",
-            content:
-              "// PIPELINE_ERROR // Failed to connect to the AI stream. Please ensure your AI API key is configured in .env.local.",
-          };
-        }
-        return next;
-      });
-    } finally {
-      setIsGenerating(false);
-    }
+    },
+    [messages, isGenerating]
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isGenerating) return;
+    await executeChat(input.trim());
   };
 
   return (
-    <div className="flex flex-col h-[75vh] max-w-4xl mx-auto border border-border bg-background/90 backdrop-blur-md shadow-2xl">
+    <div
+      className={cn(
+        "flex flex-col transition-all duration-200",
+        isFullscreen
+          ? "fixed inset-0 z-50 h-screen w-screen bg-background/95 backdrop-blur-xl border-0 shadow-none m-0"
+          : "relative h-[78vh] max-w-4xl mx-auto border border-border bg-background/90 backdrop-blur-md shadow-2xl"
+      )}
+    >
       {/* Terminal Bar Header */}
-      <div className="flex items-center justify-between px-6 py-3.5 border-b border-border bg-accent/20">
-        <div className="flex items-center gap-2.5">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-accent/30 shrink-0 select-none">
+        <div className="flex items-center gap-3">
           <Terminal className="h-4 w-4 text-primary" />
-          <span className="font-mono text-xs font-black uppercase tracking-wider text-foreground">
-            neural_session // rag_stream_active
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-black uppercase tracking-wider text-foreground">
+              neural_session // rag_stream
+            </span>
+            {isFullscreen && (
+              <span className="hidden sm:inline-block px-1.5 py-0.2 bg-primary/10 border border-primary/30 text-primary font-mono text-[9px] uppercase tracking-widest font-bold">
+                FULLSCREEN_MODE
+              </span>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-mono text-muted-foreground uppercase">
-            Guardrails_Active
-          </span>
+
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-mono text-muted-foreground uppercase">
+              Guardrails_Active
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1 border-l border-border/80 pl-3">
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={isGenerating || messages.length <= 1}
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors disabled:opacity-30 disabled:pointer-events-none"
+              title="Reset conversation"
+              aria-label="Reset conversation"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"
+              title={isFullscreen ? "Exit Fullscreen (Esc)" : "Enter Fullscreen"}
+              aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="h-3.5 w-3.5 text-primary" />
+              ) : (
+                <Maximize2 className="h-3.5 w-3.5" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Messages Stream */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6" ref={scrollRef}>
+      <div
+        className={cn(
+          "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6",
+          isFullscreen && "max-w-4xl mx-auto w-full px-4 sm:px-8 py-8"
+        )}
+        ref={scrollRef}
+      >
         {messages.map((m, i) => {
           const isRestricted = m.content.includes("// ACCESS_RESTRICTED //");
-          const isCurrentStreaming = isGenerating && i === messages.length - 1 && m.role === "assistant";
+          const isCurrentStreaming =
+            isGenerating && i === messages.length - 1 && m.role === "assistant";
 
           return (
             <div
               key={i}
               className={cn(
-                "flex gap-4 max-w-[85%]",
-                m.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
+                "flex gap-3 sm:gap-4",
+                m.role === "user" ? "ml-auto flex-row-reverse max-w-[85%]" : "mr-auto max-w-[92%] sm:max-w-[88%]"
               )}
             >
               <div
                 className={cn(
-                  "w-7 h-7 border flex items-center justify-center shrink-0 text-xs font-mono font-bold",
+                  "w-7 h-7 border flex items-center justify-center shrink-0 text-xs font-mono font-bold select-none",
                   m.role === "user"
                     ? "bg-primary text-primary-foreground border-primary"
                     : isRestricted
@@ -140,67 +272,106 @@ export const ChatInterface = () => {
                   "AI"
                 )}
               </div>
+
               <div
                 className={cn(
-                  "p-4 border text-sm leading-relaxed",
+                  "p-4 border text-sm leading-relaxed overflow-hidden",
                   m.role === "user"
-                    ? "bg-primary text-primary-foreground border-primary"
+                    ? "bg-primary text-primary-foreground border-primary font-mono text-xs"
                     : isRestricted
                     ? "bg-rose-950/20 border-rose-500/30 text-rose-200"
                     : "bg-background/80 border-border text-foreground/90"
                 )}
               >
-                <div className="text-[9px] font-mono uppercase tracking-widest opacity-60 mb-1.5 flex items-center justify-between">
+                <div className="text-[9px] font-mono uppercase tracking-widest opacity-60 mb-2 flex items-center justify-between select-none">
                   <span>{m.role === "user" ? "Client_Prompt" : "System_Response"}</span>
                   {isCurrentStreaming && (
-                    <span className="text-primary font-bold animate-pulse text-[8px]">
-                      ● STREAMING
+                    <span className="text-primary font-bold animate-pulse text-[8px] flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
+                      STREAMING
                     </span>
                   )}
                 </div>
-                <div className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
-                  {m.content}
-                  {isCurrentStreaming && (
-                    <span className="inline-block w-2 h-4 ml-1 bg-primary align-middle animate-pulse" />
-                  )}
-                </div>
+
+                {m.role === "user" ? (
+                  <div className="whitespace-pre-wrap font-mono text-xs">{m.content}</div>
+                ) : (
+                  <ChatMessageMarkdown
+                    content={m.content}
+                    isStreaming={isCurrentStreaming}
+                  />
+                )}
               </div>
             </div>
           );
         })}
+
+        {/* Suggested Prompts when conversation is fresh */}
+        {messages.length === 1 && !isGenerating && (
+          <div className="pt-4 border-t border-border/40">
+            <div className="flex items-center gap-2 mb-3 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+              <Sparkles className="h-3 w-3 text-primary" />
+              <span>Suggested Inquiries</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {SUGGESTED_PROMPTS.map((prompt, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleSendPrompt(prompt)}
+                  className="text-left p-2.5 text-xs font-mono border border-border/60 bg-accent/20 hover:bg-accent hover:border-primary text-foreground/80 hover:text-foreground transition-all duration-150 flex items-start gap-2"
+                >
+                  <span className="text-primary font-bold select-none">&gt;</span>
+                  <span>{prompt}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input Prompt Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="p-4 border-t border-border bg-accent/10 flex gap-3 items-center"
+      <div
+        className={cn(
+          "border-t border-border bg-accent/15 shrink-0",
+          isFullscreen && "p-4 sm:py-6"
+        )}
       >
-        <div className="flex-1 flex items-center border border-border bg-background focus-within:border-primary px-3 py-1 transition-colors">
-          <span className="text-primary font-mono text-xs font-bold mr-2 select-none">
-            $&gt;
-          </span>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isGenerating}
-            placeholder="Ask about Clean Architecture, system trade-offs, or case studies..."
-            className="w-full py-2 bg-transparent text-xs font-mono text-foreground focus:outline-none placeholder:text-muted-foreground/60 disabled:opacity-50"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={isGenerating || !input.trim()}
-          className="bg-primary text-primary-foreground px-5 py-2.5 font-mono text-[10px] uppercase tracking-widest font-black transition-all hover:bg-primary/90 disabled:opacity-40 active:scale-95 flex items-center gap-2 shrink-0"
-        >
-          {isGenerating ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Send className="h-3.5 w-3.5" />
+        <form
+          onSubmit={handleSubmit}
+          className={cn(
+            "p-3 sm:p-4 flex gap-2 sm:gap-3 items-center",
+            isFullscreen && "max-w-4xl mx-auto w-full p-0"
           )}
-          <span className="hidden sm:inline">Send</span>
-        </button>
-      </form>
+        >
+          <div className="flex-1 flex items-center border border-border bg-background focus-within:border-primary px-3 py-1 transition-colors">
+            <span className="text-primary font-mono text-xs font-bold mr-2 select-none">
+              $&gt;
+            </span>
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isGenerating}
+              placeholder="Ask about Clean Architecture, system design, or case studies..."
+              className="w-full py-2 bg-transparent text-xs font-mono text-foreground focus:outline-none placeholder:text-muted-foreground/60 disabled:opacity-50"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isGenerating || !input.trim()}
+            className="bg-primary text-primary-foreground px-4 sm:px-6 py-2.5 font-mono text-[10px] uppercase tracking-widest font-black transition-all hover:bg-primary/90 disabled:opacity-40 active:scale-95 flex items-center gap-2 shrink-0"
+          >
+            {isGenerating ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Send className="h-3.5 w-3.5" />
+            )}
+            <span className="hidden sm:inline">Send</span>
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
