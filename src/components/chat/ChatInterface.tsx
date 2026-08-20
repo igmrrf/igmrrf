@@ -32,8 +32,8 @@ const INITIAL_MESSAGES: Message[] = [
 const SUGGESTED_PROMPTS = [
   "Explain the BugRelay Clean Architecture pattern",
   "How does Funckage optimize package management?",
-  "What are the trade-offs between Groq, Gemini, and OpenAI?",
-  "Tell me about your experience in FinTech & Distributed Systems",
+  "What architectural solutions were built at NPC Labs for Web3?",
+  "Tell me about your experience scaling FinTech at OneRemit & VeendHQ",
 ];
 
 export const ChatInterface = () => {
