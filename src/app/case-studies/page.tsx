@@ -14,7 +14,8 @@ export default async function CaseStudiesPage() {
   return (
     <div className="flex flex-col gap-16 max-w-6xl mx-auto">
       <div className="flex flex-col gap-6 border-l-4 border-primary pl-8 py-4">
-        <div className="text-[10px] font-mono tracking-[0.4em] uppercase text-primary">
+        <div className="flex items-center gap-2.5 text-[10px] font-mono tracking-[0.4em] uppercase text-primary font-bold">
+          <Terminal className="h-3.5 w-3.5" />
           Entity.case_studies()
         </div>
         <h1 className="text-2xl sm:text-3xl md:text-7xl font-black tracking-tighter uppercase italic">

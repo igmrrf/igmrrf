@@ -1,8 +1,8 @@
 import { AIProvider, Message } from "../types";
 import { createSSEToTextStream } from "../streamUtils";
 
-export class OpenAIProvider implements AIProvider {
-  name = "OpenAI";
+export class GroqProvider implements AIProvider {
+  name = "Groq";
   private apiKey: string;
   private modelName: string;
 
@@ -12,7 +12,7 @@ export class OpenAIProvider implements AIProvider {
   }
 
   async generateResponse(messages: Message[]): Promise<string> {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,13 +25,14 @@ export class OpenAIProvider implements AIProvider {
           content: m.content,
         })),
         temperature: 0.6,
+        max_tokens: 1024,
       }),
     });
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
       throw new Error(
-        `OpenAI Error (${response.status}): ${error?.error?.message || response.statusText}`
+        `Groq Error (${response.status}): ${error?.error?.message || response.statusText}`
       );
     }
 
@@ -40,7 +41,7 @@ export class OpenAIProvider implements AIProvider {
   }
 
   async generateStream(messages: Message[]): Promise<ReadableStream<Uint8Array>> {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,6 +54,7 @@ export class OpenAIProvider implements AIProvider {
           content: m.content,
         })),
         temperature: 0.6,
+        max_tokens: 1024,
         stream: true,
       }),
     });
@@ -60,7 +62,7 @@ export class OpenAIProvider implements AIProvider {
     if (!response.ok || !response.body) {
       const error = await response.json().catch(() => ({}));
       throw new Error(
-        `OpenAI Streaming Error (${response.status}): ${error?.error?.message || response.statusText}`
+        `Groq Streaming Error (${response.status}): ${error?.error?.message || response.statusText}`
       );
     }
 

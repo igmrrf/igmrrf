@@ -2,15 +2,15 @@ import { MetadataRoute } from 'next';
 import { getCaseStudySlugs, getBlogPostSlugs } from '@/lib/mdx';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://igmrrf.dev';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://theldo.com';
 
   // Core routes
-  const routes = ['', '/blog', '/case-studies', '/about', '/chat', '/experience'].map(
+  const routes = ['', '/case-studies', '/experience', '/blog', '/about', '/chat', '/stack'].map(
     (route) => ({
       url: `${baseUrl}${route}`,
       lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 1.0,
+      changeFrequency: (route === '' || route === '/blog' ? 'weekly' : 'monthly') as 'weekly' | 'monthly',
+      priority: route === '' ? 1.0 : 0.8,
     })
   );
 
@@ -19,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}/case-studies/${slug.replace(/\.mdx?$/, '')}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
-    priority: 0.8,
+    priority: 0.85,
   }));
 
   // MDX Blog Posts
@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}/blog/${slug.replace(/\.mdx?$/, '')}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
-    priority: 0.7,
+    priority: 0.75,
   }));
 
   return [...routes, ...caseStudyRoutes, ...blogPosts];

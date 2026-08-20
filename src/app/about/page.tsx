@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Linkedin, Twitter, Terminal } from "lucide-react";
+import { Github, Linkedin, Twitter, Terminal, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -46,17 +46,17 @@ export default function AboutPage() {
 
       <motion.div
         variants={item}
-        className="prose prose-slate dark:prose-invert max-w-none 
+        className="prose dark:prose-invert max-w-none 
         prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tighter
         prose-strong:text-primary font-medium leading-relaxed"
       >
         <h2>Engineering_Philosophy</h2>
         <p>
           I operate under the core maxim that{" "}
-          <strong>"Value Begets Peace"</strong>. I believe that code should be
+          <strong>&quot;Value Begets Peace&quot;</strong>. I believe that code should be
           more than just functional; it should be{" "}
           <strong>maintainable, scalable, and business-centric</strong>. This is
-          why I'm an advocate for <strong>Clean Architecture</strong>
+          why I&apos;m an advocate for <strong>Clean Architecture</strong>
           and strict type systems. By decoupling business logic from
           infrastructure, we create systems that can evolve with the needs of
           the organization without crumbling under technical debt.
@@ -73,7 +73,7 @@ export default function AboutPage() {
 
         <h2>Technical_Stack.json</h2>
         <p>
-          With years of experience in the TypeScript ecosystem, I've built
+          With years of experience in the TypeScript ecosystem, I&apos;ve built
           everything from complex fintech integrations to high-performance TUI
           tools. I specialize in:
         </p>
@@ -140,6 +140,14 @@ export default function AboutPage() {
             </div>
           ))}
         </div>
+        <div className="not-prose mt-4 flex justify-end">
+          <Link
+            href="/stack"
+            className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-primary hover:underline group"
+          >
+            Explore Interactive Tech Stack Matrix & Graph <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
 
         <h2 className="mt-16">Kernel_Activity</h2>
         <p>
@@ -151,7 +159,7 @@ export default function AboutPage() {
           computational environment.
         </p>
         <p>
-          When I'm not architecting systems, you can find me contributing to
+          When I&apos;m not architecting systems, you can find me contributing to
           open-source, building specialized Neovim plugins like{" "}
           <code>vi-mongo.nvim</code>, or sharing architectural solutions on{" "}
           <strong>Stack Overflow</strong>, where I maintain authority on deep

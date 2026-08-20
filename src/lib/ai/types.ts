@@ -6,10 +6,11 @@ export interface Message {
 export interface AIProvider {
   name: string;
   generateResponse(messages: Message[]): Promise<string>;
+  generateStream(messages: Message[]): Promise<ReadableStream<Uint8Array>>;
 }
 
 export interface AIConfig {
-  provider: 'gemini' | 'openai' | 'anthropic';
+  provider: 'groq' | 'gemini' | 'openai';
   apiKey: string;
   modelName: string;
 }

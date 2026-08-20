@@ -7,6 +7,7 @@ import {
   BlogPost,
   BlogPostSchema,
 } from "@/schemas/portfolio";
+import { estimateReadingTime } from "./readingTime";
 
 const CASE_STUDIES_PATH = path.join(process.cwd(), "content/case-studies");
 const BLOG_PATH = path.join(process.cwd(), "content/blog");
@@ -27,22 +28,24 @@ export async function getCaseStudyBySlug(slug: string) {
 
   const { data, content } = matter(fileContent);
   const validatedData = CaseStudySchema.parse(data);
+  const readingTime = estimateReadingTime(content);
 
   return {
     meta: validatedData,
     content,
     slug: realSlug,
+    readingTime: readingTime.text,
   };
 }
 
 export async function getAllCaseStudies(): Promise<
-  (CaseStudy & { slug: string })[]
+  (CaseStudy & { slug: string; readingTime: string })[]
 > {
   const slugs = getCaseStudySlugs();
   const studies = await Promise.all(
     slugs.map(async (slug) => {
-      const { meta, slug: realSlug } = await getCaseStudyBySlug(slug);
-      return { ...meta, slug: realSlug };
+      const { meta, slug: realSlug, readingTime } = await getCaseStudyBySlug(slug);
+      return { ...meta, slug: realSlug, readingTime };
     }),
   );
 
@@ -65,22 +68,24 @@ export async function getBlogPostBySlug(slug: string) {
 
   const { data, content } = matter(fileContent);
   const validatedData = BlogPostSchema.parse(data);
+  const readingTime = estimateReadingTime(content);
 
   return {
     meta: validatedData,
     content,
     slug: realSlug,
+    readingTime: readingTime.text,
   };
 }
 
 export async function getAllBlogPosts(): Promise<
-  (BlogPost & { slug: string })[]
+  (BlogPost & { slug: string; readingTime: string })[]
 > {
   const slugs = getBlogPostSlugs();
   const posts = await Promise.all(
     slugs.map(async (slug) => {
-      const { meta, slug: realSlug } = await getBlogPostBySlug(slug);
-      return { ...meta, slug: realSlug };
+      const { meta, slug: realSlug, readingTime } = await getBlogPostBySlug(slug);
+      return { ...meta, slug: realSlug, readingTime };
     }),
   );
 

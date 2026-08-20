@@ -1,35 +1,44 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import ForceGraph3D from "react-force-graph-3d";
-import ForceGraph2D from "react-force-graph-2d";
+import React, { useRef, useEffect, useState } from "react";
+import ForceGraph2D, { ForceGraphMethods, NodeObject } from "react-force-graph-2d";
 import { useTheme } from "next-themes";
-// @ts-ignore
-import SpriteText from "three-spritetext";
-import * as THREE from "three";
-import { Box, Square } from "lucide-react";
+import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+
+export interface CustomNode extends NodeObject {
+  id: string;
+  name: string;
+  group: number;
+  val: number;
+  category?: string;
+  x?: number;
+  y?: number;
+}
+
+export interface CustomLink {
+  source: string | CustomNode;
+  target: string | CustomNode;
+}
 
 interface TechGraphProps {
   data: {
-    nodes: any[];
-    links: any[];
+    nodes: CustomNode[];
+    links: CustomLink[];
   };
 }
 
-export default function TechGraph({ data }: TechGraphProps) {
-  const fg3DRef = useRef<any>(null);
-  const fg2DRef = useRef<any>(null);
+export default function NodeGraphView({ data }: TechGraphProps) {
+  const fg2DRef = useRef<ForceGraphMethods<CustomNode, CustomLink> | undefined>(undefined);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const [viewMode, setViewMode] = useState<"2d" | "3d">("3d");
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
-  const isDark = theme === "dark";
+  const isDark = resolvedTheme === "dark";
 
   useEffect(() => {
     const handleResize = () => {
       setDimensions({
         width: window.innerWidth,
-        height: window.innerHeight - 80,
+        height: window.innerHeight - 120,
       });
     };
 
@@ -39,123 +48,132 @@ export default function TechGraph({ data }: TechGraphProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleZoomIn = () => {
+    if (fg2DRef.current) {
+      fg2DRef.current.zoom(fg2DRef.current.zoom() * 1.3, 400);
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (fg2DRef.current) {
+      fg2DRef.current.zoom(fg2DRef.current.zoom() / 1.3, 400);
+    }
+  };
+
+  const handleResetZoom = () => {
+    if (fg2DRef.current) {
+      fg2DRef.current.centerAt(0, 0, 800);
+      fg2DRef.current.zoom(1, 800);
+    }
+  };
+
   return (
-    <div className="w-full h-[calc(100vh-80px)] overflow-hidden relative">
-      {/* Floating Toggle Button */}
-      <div className="absolute top-20 right-4 z-50 flex bg-white dark:bg-zinc-900 rounded-lg shadow-md border border-gray-200 dark:border-zinc-800 p-1">
+    <div className="w-full h-full overflow-hidden relative">
+      {/* Zoom Controls */}
+      <div className="absolute top-20 right-6 z-30 flex flex-col gap-1.5 bg-background/90 backdrop-blur-md p-1.5 border border-border">
         <button
-          onClick={() => setViewMode("2d")}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            viewMode === "2d"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:bg-muted"
-          }`}
+          onClick={handleZoomIn}
+          className="p-2 border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          title="Zoom In"
+          aria-label="Zoom In"
         >
-          <Square size={16} />
-          2D View
+          <ZoomIn size={14} />
         </button>
         <button
-          onClick={() => setViewMode("3d")}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            viewMode === "3d"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:bg-muted"
-          }`}
+          onClick={handleZoomOut}
+          className="p-2 border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          title="Zoom Out"
+          aria-label="Zoom Out"
         >
-          <Box size={16} />
-          3D View
+          <ZoomOut size={14} />
+        </button>
+        <button
+          onClick={handleResetZoom}
+          className="p-2 border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          title="Reset View"
+          aria-label="Reset View"
+        >
+          <RotateCcw size={14} />
         </button>
       </div>
 
-      {viewMode === "3d" ? (
-        <ForceGraph3D
-          ref={fg3DRef}
-          graphData={data}
-          nodeLabel="name"
-          nodeAutoColorBy="group"
-          nodeRelSize={6}
-          width={dimensions.width}
-          height={dimensions.height}
-          onNodeClick={(node: any) => {
-            const distance = 80;
-            const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
-            fg3DRef.current?.cameraPosition(
-              {
-                x: node.x * distRatio,
-                y: node.y * distRatio,
-                z: node.z * distRatio,
-              },
-              node,
-              2000,
+      <ForceGraph2D
+        ref={fg2DRef}
+        graphData={data}
+        nodeLabel="name"
+        nodeAutoColorBy="group"
+        nodeRelSize={5}
+        width={dimensions.width}
+        height={dimensions.height}
+        onNodeClick={(node: CustomNode) => {
+          if (node.id === "root" || !node.category) {
+            if (typeof node.x === "number" && typeof node.y === "number") {
+              fg2DRef.current?.centerAt(node.x, node.y, 800);
+              fg2DRef.current?.zoom(2.5, 800);
+            }
+          } else {
+            window.open(
+              `https://www.google.com/search?q=${encodeURIComponent(
+                node.name + " technology"
+              )}`,
+              "_blank"
             );
-          }}
-          linkColor={() =>
-            isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.15)"
           }
-          backgroundColor="rgba(0,0,0,0)"
-          nodeThreeObject={(node: any) => {
-            const group = new THREE.Group();
+        }}
+        linkColor={() =>
+          isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)"
+        }
+        backgroundColor="rgba(0,0,0,0)"
+        nodeCanvasObject={(node: CustomNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
+          const isRoot = node.id === "root";
+          const isCategory = !isRoot && !node.category;
+          const label = node.name;
+          const nodeRadius = isRoot ? 10 : isCategory ? 7 : 4;
+          const fontSize = isRoot
+            ? Math.max(14 / globalScale, 4)
+            : isCategory
+            ? Math.max(11 / globalScale, 3)
+            : Math.max(9 / globalScale, 2);
 
-            const geometry = new THREE.SphereGeometry(node.val, 16, 16);
-            const material = new THREE.MeshLambertMaterial({
-              color: node.color || (isDark ? "#e4e4e7" : "#18181b"),
-              transparent: true,
-              opacity: 0.9,
-            });
-            const sphere = new THREE.Mesh(geometry, material);
-            group.add(sphere);
+          ctx.font = `${isRoot || isCategory ? "bold" : "normal"} ${fontSize}px JetBrains Mono, monospace`;
 
-            const sprite = new SpriteText(node.name);
-            sprite.color = isDark ? "#e4e4e7" : "#18181b";
-            sprite.textHeight = node.val > 5 ? 4 : 2;
-            sprite.position.y = node.val + (node.val > 5 ? 4 : 2);
+          const nx = node.x ?? 0;
+          const ny = node.y ?? 0;
 
-            if (node.val <= 5) {
-              sprite.material.opacity = 0.6;
-              sprite.material.transparent = true;
-            }
+          // Draw node circle
+          ctx.beginPath();
+          ctx.arc(nx, ny, nodeRadius, 0, 2 * Math.PI, false);
+          ctx.fillStyle = isRoot
+            ? isDark
+              ? "#ffffff"
+              : "#000000"
+            : isCategory
+            ? isDark
+              ? "#a1a1aa"
+              : "#52525b"
+            : isDark
+            ? "#71717a"
+            : "#a1a1aa";
+          ctx.fill();
 
-            group.add(sprite);
+          // Border on nodes
+          ctx.lineWidth = 1.5 / globalScale;
+          ctx.strokeStyle = isDark ? "#27272a" : "#e4e4e7";
+          ctx.stroke();
 
-            return group;
-          }}
-        />
-      ) : (
-        <ForceGraph2D
-          ref={fg2DRef}
-          graphData={data}
-          nodeLabel="name"
-          nodeAutoColorBy="group"
-          nodeRelSize={6}
-          width={dimensions.width}
-          height={dimensions.height}
-          onNodeClick={(node: any) => {
-            fg2DRef.current?.centerAt(node.x, node.y, 1000);
-            fg2DRef.current?.zoom(8, 2000);
-          }}
-          linkColor={() =>
-            isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.15)"
+          // Render label
+          if (globalScale > 0.8 || isRoot || isCategory) {
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = isDark ? "#f4f4f5" : "#18181b";
+            ctx.fillText(label, nx, ny + nodeRadius + fontSize + 1);
           }
-          backgroundColor="rgba(0,0,0,0)"
-          nodeCanvasObject={(node: any, ctx, globalScale) => {
-            const label = node.name;
-            const fontSize = Math.max(12 / globalScale, 2);
-            ctx.font = `${fontSize}px Inter, Sans-Serif`;
+        }}
+      />
 
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI, false);
-            ctx.fillStyle = node.color || (isDark ? "#e4e4e7" : "#18181b");
-            ctx.fill();
-
-            if (globalScale > 1.2 || node.val > 5) {
-              ctx.textAlign = "center";
-              ctx.textBaseline = "middle";
-              ctx.fillStyle = isDark ? "#e4e4e7" : "#18181b";
-              ctx.fillText(label, node.x, node.y + node.val + 2 + fontSize);
-            }
-          }}
-        />
-      )}
+      <div className="absolute bottom-4 left-6 text-[10px] font-mono bg-background/80 backdrop-blur-xs text-muted-foreground border border-border px-3 py-1.5 pointer-events-none">
+        • Click any node to inspect & search • Scroll to zoom • Drag to pan
+      </div>
     </div>
   );
 }

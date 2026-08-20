@@ -2,62 +2,70 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Menu,
   X,
   BookText,
   PenTool,
-  Briefcase,
   User,
-  MessageSquare,
   History,
-  Sparkles,
+  Bot,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { ParticleBackground } from "@/components/backgrounds/ParticleBackground";
+import { WallpaperSelector } from "@/components/theme/WallpaperSelector";
+import { useWallpaper } from "@/components/theme/WallpaperProvider";
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
 
 const navLinks = [
+  { href: "/case-studies", label: "Work", icon: BookText },
   { href: "/experience", label: "Experience", icon: History },
-  { href: "/case-studies", label: "Case Studies", icon: BookText },
   { href: "/blog", label: "Blog", icon: PenTool },
   { href: "/about", label: "About", icon: User },
-  { href: "/stack", label: "Stack", icon: Briefcase },
 ];
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showParticles, setShowParticles] = useState(true);
+  const pathname = usePathname();
+  const { currentWallpaper, opacity } = useWallpaper();
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground relative overflow-x-hidden">
-      {/* 3D WebGL Background */}
-      {showParticles && <ParticleBackground />}
+    <div
+      className={`min-h-screen flex flex-col ${
+        currentWallpaper ? "bg-transparent" : "bg-background"
+      } text-foreground relative overflow-x-hidden selection:bg-primary selection:text-primary-foreground`}
+    >
+      {/* Dynamic Terminal Wallpaper Background with 0.90 Opacity Effect */}
+      {currentWallpaper && (
+        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700 ease-out scale-100"
+            style={{
+              backgroundImage: `url(${currentWallpaper.url})`,
+            }}
+          />
+          {/* Calibrated Terminal Opacity Backdrop Overlay */}
+          <div
+            className="absolute inset-0 bg-background transition-opacity duration-300 backdrop-blur-[2px]"
+            style={{ opacity }}
+          />
+        </div>
+      )}
 
-      {/* Floating Particle Toggle */}
-      <button
-        onClick={() => setShowParticles(!showParticles)}
-        className="fixed bottom-6 right-6 z-50 p-3 rounded-full border border-border bg-background/50 backdrop-blur-xl shadow-2xl text-muted-foreground hover:text-primary transition-all active:scale-90 flex items-center justify-center group hover:bg-background"
-        title={
-          showParticles ? "Disable Particle Matrix" : "Enable Particle Matrix"
-        }
-      >
-        <Sparkles
-          size={18}
-          className={showParticles ? "text-primary" : "opacity-30"}
-        />
-      </button>
+      {/* Floating Wallpaper & Styling Controller */}
+      <WallpaperSelector />
 
-      {/* Structural Accent */}
+      {/* Structural Accent Line */}
       <div className="fixed top-0 left-0 w-1 h-full bg-border/20 z-0 pointer-events-none" />
 
-      <header className="fixed top-0 left-0 z-50 w-full border-b border-border bg-background/40 backdrop-blur-xl">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-md transition-colors">
         <div className="container mx-auto px-6 flex h-16 items-center justify-between">
-          <div className="flex items-center gap-12">
+          <div className="flex items-center gap-10">
             <Link href="/" className="flex items-center space-x-2 group">
               <span className="text-xl font-black tracking-tighter uppercase italic group-hover:text-primary transition-colors">
                 The
@@ -66,24 +74,37 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 </span>
               </span>
             </Link>
+
             <nav className="hidden md:flex items-center space-x-8 text-xs font-mono tracking-widest uppercase">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="transition-all hover:text-primary hover:tracking-[0.2em]"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive =
+                  pathname === link.href ||
+                  (link.href !== "/" && pathname.startsWith(link.href));
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`transition-all hover:text-primary py-1 border-b-2 ${
+                      isActive
+                        ? "text-primary border-primary font-bold"
+                        : "text-muted-foreground border-transparent hover:border-border"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
+
           <div className="flex items-center gap-4">
             <Link
               href="/chat"
-              className="hidden sm:inline-flex items-center justify-center border border-primary px-5 py-2 text-[10px] font-mono tracking-widest uppercase text-primary hover:bg-primary hover:text-primary-foreground transition-all active:scale-95"
+              className="hidden sm:inline-flex items-center gap-2 border border-primary/80 bg-primary/5 hover:bg-primary px-3.5 py-1.5 text-[10px] font-mono tracking-widest uppercase text-primary hover:text-primary-foreground transition-all active:scale-95 font-bold shadow-xs"
+              title="Chat with the AI Architect about systems, architectures, and case studies"
             >
-              System.init()
+              <Bot className="h-3.5 w-3.5" />
+              <span>Ask AI Architect</span>
             </Link>
 
             <ThemeToggle />
@@ -99,7 +120,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           </div>
         </div>
 
-        {/* Mobile Navigation Overlay - Absolute */}
+        {/* Mobile Navigation Overlay */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
@@ -107,26 +128,33 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="md:hidden absolute top-16 left-0 w-full border-b border-border bg-background/95 backdrop-blur-xl z-[100] shadow-2xl"
+              className="md:hidden absolute top-16 left-0 w-full border-b border-border bg-background/95 backdrop-blur-xl z-50 shadow-2xl"
             >
               <nav className="flex flex-col p-8 gap-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-4 text-xs font-mono tracking-[0.2em] uppercase py-4 border-b border-border/30 hover:text-primary transition-all group"
-                  >
-                    <link.icon className="h-4 w-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
-                    {link.label}
-                  </Link>
-                ))}
+                {navLinks.map((link) => {
+                  const isActive =
+                    pathname === link.href ||
+                    (link.href !== "/" && pathname.startsWith(link.href));
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex items-center gap-4 text-xs font-mono tracking-[0.2em] uppercase py-4 border-b border-border/30 transition-all group ${
+                        isActive ? "text-primary font-bold" : "hover:text-primary"
+                      }`}
+                    >
+                      <link.icon className="h-4 w-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity" />
+                      {link.label}
+                    </Link>
+                  );
+                })}
                 <Link
                   href="/chat"
                   onClick={() => setIsMenuOpen(false)}
-                  className="mt-6 inline-flex items-center justify-center gap-3 border border-primary p-5 text-[10px] font-mono tracking-[0.3em] uppercase text-primary hover:bg-primary hover:text-primary-foreground transition-all"
+                  className="mt-6 inline-flex items-center justify-center gap-2.5 border border-primary bg-primary/10 p-4 text-xs font-mono tracking-[0.2em] uppercase text-primary hover:bg-primary hover:text-primary-foreground transition-all font-bold"
                 >
-                  <MessageSquare className="h-4 w-4" /> System.init()
+                  <Bot className="h-4 w-4" /> Ask AI Architect
                 </Link>
               </nav>
             </motion.div>
@@ -134,14 +162,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </AnimatePresence>
       </header>
 
+      {/* Main Content Area */}
       <main className="flex-1 container mx-auto px-6 py-12 md:py-20 mt-16 relative z-10">
         {children}
       </main>
 
-      <footer className="border-t border-border bg-accent/30 py-16">
+      {/* Footer */}
+      <footer className="border-t border-border bg-accent/20 py-16 relative z-10 backdrop-blur-xs">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5">
               <div className="text-2xl font-black tracking-tighter uppercase italic">
                 The<span className="text-primary">_LDO</span>
               </div>
@@ -156,8 +186,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 francis.igbiriki@gmail.com
               </a>
             </div>
-            <div className="flex flex-col items-end gap-6">
-              <div className="flex items-center space-x-8 text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+            <div className="flex flex-col items-start md:items-end gap-6">
+              <div className="flex flex-wrap items-center gap-6 sm:gap-8 text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+                <Link
+                  href="/stack"
+                  className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
+                >
+                  TECH STACK
+                </Link>
                 <Link
                   href="https://github.com/igmrrf"
                   target="_blank"
@@ -167,7 +203,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   GITHUB
                 </Link>
                 <Link
-                  href="https://linkedin.com/in/thelazydo"
+                  href="https://linkedin.com/in/igmrrf"
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
@@ -180,11 +216,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   rel="noreferrer"
                   className="hover:text-primary transition-colors underline decoration-border underline-offset-4"
                 >
-                  X
+                  X (TWITTER)
                 </Link>
               </div>
-              <p className="text-[10px] font-mono uppercase tracking-tighter text-muted-foreground/50">
-                &copy; {new Date().getFullYear()} igmrrf.v0.1.9 // BETA_BUILD
+              <p className="text-[10px] font-mono uppercase tracking-tighter text-muted-foreground/60">
+                &copy; {new Date().getFullYear()} igmrrf // SYSTEM_STABLE
               </p>
             </div>
           </div>

@@ -1,1 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200" width="200" height="200"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><rect width="200" height="200" fill="url('#gradient')"></rect><defs><linearGradient id="gradient" gradientTransform="rotate(258 0.5 0.5)"><stop offset="0%" stop-color="#ceaa96"></stop><stop offset="100%" stop-color="#8fa983"></stop></linearGradient></defs><g><g fill="#445272" transform="matrix(10.34072131147541,0,0,10.34072131147541,71.82192427177898,176.9879608298755)" stroke="#8fa983" stroke-width="0.9"><path d="M4.39-10.57L4.39 0L1.09 0L1.09-10.57L4.39-10.57ZM0.90-13.29L0.90-13.29Q0.90-13.99 1.41-14.44Q1.91-14.89 2.72-14.89Q3.54-14.89 4.04-14.44Q4.55-13.99 4.55-13.29Q4.55-12.59 4.04-12.14Q3.54-11.69 2.72-11.69Q1.91-11.69 1.41-12.14Q0.90-12.59 0.90-13.29Z"></path></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <style>
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #ffffff; stroke: #e4e4e7; }
+      .fg { stroke: #09090b; }
+      .grid-line { stroke: #e4e4e7; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #09090b; stroke: #27272a; }
+      .fg { stroke: #ffffff; }
+      .grid-line { stroke: #27272a; }
+    }
+  </style>
+  <rect class="bg" x="16" y="16" width="480" height="480" rx="96" fill="#09090b" stroke="#27272a" stroke-width="14"/>
+  <g transform="translate(48, 48)">
+    <path class="fg" d="M 60 140 L 140 208 L 60 276" fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="square" stroke-linejoin="miter"/>
+    <path class="fg" d="M 180 140 L 180 276 L 228 276" fill="none" stroke="#ffffff" stroke-width="30" stroke-linecap="square" stroke-linejoin="miter"/>
+    <path class="fg" d="M 252 140 L 252 276 M 252 140 L 286 140 C 316 140 334 165 334 208 C 334 251 316 276 286 276 L 252 276" fill="none" stroke="#ffffff" stroke-width="30" stroke-linecap="square" stroke-linejoin="miter"/>
+    <line x1="60" y1="330" x2="160" y2="330" stroke="#10b981" stroke-width="24" stroke-linecap="square"/>
+  </g>
+  <circle cx="410" cy="102" r="14" fill="#10b981"/>
+</svg>

@@ -2,40 +2,48 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { Network, Globe2, GitMerge } from "lucide-react";
+import { LayoutGrid, Network, GitMerge } from "lucide-react";
+import { ParsedTechStack } from "@/lib/parseTechStack";
+import StackMatrixView from "./views/StackMatrixView";
 
-// Dynamically load all views to prevent SSR and bundle bloat
+// Dynamically load canvas/d3 views to prevent SSR mismatch
 const NodeGraphView = dynamic(() => import("./views/NodeGraphView"), {
   ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center font-mono text-xs text-muted-foreground">
+      Initializing 2D Graph...
+    </div>
+  ),
 });
-const WordSphereView = dynamic(() => import("./views/WordSphereView"), {
-  ssr: false,
-});
+
 const RadialMindMapView = dynamic(() => import("./views/RadialMindMapView"), {
   ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center font-mono text-xs text-muted-foreground">
+      Initializing Radial Map...
+    </div>
+  ),
 });
 
-export type ViewType = "nodegraph" | "wordsphere" | "radial";
+export type ViewType = "matrix" | "nodegraph" | "radial";
 
 interface TechStackViewerProps {
-  data: {
-    graph: any;
-    hierarchy: any;
-  };
+  data: ParsedTechStack;
 }
 
 export default function TechStackViewer({ data }: TechStackViewerProps) {
-  const [currentView, setCurrentView] = useState<ViewType>("nodegraph");
+  const [currentView, setCurrentView] = useState<ViewType>("matrix");
 
   const views = [
-    { id: "nodegraph", label: "Node Graph", icon: Network },
-    { id: "wordsphere", label: "Word Sphere", icon: Globe2 },
-    { id: "radial", label: "Radial Map", icon: GitMerge },
-  ] as const;
+    { id: "matrix" as const, label: "Matrix Grid", icon: LayoutGrid },
+    { id: "nodegraph" as const, label: "2D Graph", icon: Network },
+    { id: "radial" as const, label: "Radial Map", icon: GitMerge },
+  ];
 
   return (
     <div className="w-full h-full flex flex-col relative">
-      <div className="absolute top-2 left-2 right-2 md:top-4 md:left-1/2 md:right-auto md:-translate-x-1/2 z-50 flex bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md md:rounded-full rounded-xl shadow-lg border border-gray-200/50 dark:border-zinc-800/50 p-1.5 overflow-x-auto scrollbar-hide">
+      {/* Top View Selector Bar */}
+      <div className="absolute top-2 left-4 right-4 md:top-4 md:left-1/2 md:right-auto md:-translate-x-1/2 z-30 flex bg-background/90 backdrop-blur-md border border-border p-1 shadow-lg">
         {views.map((view) => {
           const Icon = view.icon;
           const isActive = currentView === view.id;
@@ -43,13 +51,13 @@ export default function TechStackViewer({ data }: TechStackViewerProps) {
             <button
               key={view.id}
               onClick={() => setCurrentView(view.id)}
-              className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-full text-[10px] md:text-sm font-semibold transition-all whitespace-nowrap min-w-[33%] md:min-w-0 ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap ${
                 isActive
-                  ? "bg-foreground text-background shadow-md"
+                  ? "bg-primary text-primary-foreground font-black shadow-sm"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Icon size={18} className={isActive ? "" : ""} />
+              <Icon size={14} />
               {view.label}
             </button>
           );
@@ -57,9 +65,11 @@ export default function TechStackViewer({ data }: TechStackViewerProps) {
       </div>
 
       {/* View Content */}
-      <div className="grow w-full h-full">
+      <div className="grow w-full h-full pt-4">
+        {currentView === "matrix" && (
+          <StackMatrixView hierarchy={data.hierarchy} />
+        )}
         {currentView === "nodegraph" && <NodeGraphView data={data.graph} />}
-        {currentView === "wordsphere" && <WordSphereView data={data.graph} />}
         {currentView === "radial" && (
           <RadialMindMapView data={data.hierarchy} />
         )}

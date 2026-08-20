@@ -11,11 +11,10 @@ export class GeminiProvider implements AIProvider {
     this.model = this.genAI.getGenerativeModel({ model: modelName });
   }
 
-  async generateResponse(messages: Message[]): Promise<string> {
+  private buildChat(messages: Message[]) {
     const systemMessage = messages.find((m) => m.role === "system");
     const userMessages = messages.filter((m) => m.role !== "system");
 
-    // Ensure history starts with a 'user' message and alternates
     const history = [];
     let foundFirstUser = false;
 
@@ -35,16 +34,43 @@ export class GeminiProvider implements AIProvider {
     const chat = this.model.startChat({
       history,
       generationConfig: {
-        maxOutputTokens: 1000,
+        maxOutputTokens: 1024,
       },
     });
 
     const lastMessage = userMessages[userMessages.length - 1];
     const prompt = systemMessage
-      ? `System Instructions: ${systemMessage.content}\n\nUser: ${lastMessage.content}`
-      : lastMessage.content;
+      ? `System Instructions: ${systemMessage.content}\n\nUser: ${lastMessage?.content || ""}`
+      : lastMessage?.content || "";
 
+    return { chat, prompt };
+  }
+
+  async generateResponse(messages: Message[]): Promise<string> {
+    const { chat, prompt } = this.buildChat(messages);
     const result = await chat.sendMessage(prompt);
     return result.response.text();
+  }
+
+  async generateStream(messages: Message[]): Promise<ReadableStream<Uint8Array>> {
+    const { chat, prompt } = this.buildChat(messages);
+    const result = await chat.sendMessageStream(prompt);
+    const encoder = new TextEncoder();
+
+    return new ReadableStream<Uint8Array>({
+      async start(controller) {
+        try {
+          for await (const chunk of result.stream) {
+            const text = chunk.text();
+            if (text) {
+              controller.enqueue(encoder.encode(text));
+            }
+          }
+          controller.close();
+        } catch (err) {
+          controller.error(err);
+        }
+      },
+    });
   }
 }

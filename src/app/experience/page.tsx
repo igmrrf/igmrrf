@@ -254,7 +254,7 @@ export default function ExperiencePage() {
             href="/chat"
             className="px-8 py-4 border border-primary text-primary font-mono text-[10px] tracking-widest uppercase hover:bg-primary hover:text-primary-foreground transition-all active:scale-95"
           >
-            System.init()
+            Ask_AI_Architect()
           </Link>
           <Link
             href="https://linkedin.com/in/igmrrf"
