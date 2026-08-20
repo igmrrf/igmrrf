@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMounted } from "@/hooks/useIsMounted";
+import { useWallpaper } from "@/components/theme/WallpaperProvider";
 import { ChatMessageMarkdown } from "./ChatMessageMarkdown";
 
 interface Message {
@@ -41,6 +42,7 @@ export const ChatInterface = () => {
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const { currentWallpaper, opacity } = useWallpaper();
   const isMounted = useIsMounted();
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -178,12 +180,34 @@ export const ChatInterface = () => {
       className={cn(
         "flex flex-col transition-all duration-200",
         isFullscreen
-          ? "fixed inset-0 z-[100] h-[100dvh] w-screen bg-background text-foreground overflow-hidden select-text"
+          ? "fixed inset-0 z-[100] h-[100dvh] w-screen bg-background/85 backdrop-blur-md text-foreground overflow-hidden select-text relative"
           : "relative h-[78vh] max-w-4xl mx-auto border border-border bg-background/90 backdrop-blur-md shadow-2xl"
       )}
     >
+      {/* Dynamic Wallpaper Background in Fullscreen */}
+      {isFullscreen && currentWallpaper && (
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700 ease-out scale-100"
+            style={{
+              backgroundImage: `url(${currentWallpaper.url})`,
+            }}
+          />
+          {/* Calibrated Terminal Opacity Backdrop Overlay */}
+          <div
+            className="absolute inset-0 bg-background transition-opacity duration-300 backdrop-blur-[2px]"
+            style={{ opacity }}
+          />
+        </div>
+      )}
+
       {/* Terminal Bar Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-accent/40 shrink-0 select-none z-10">
+      <div
+        className={cn(
+          "flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border shrink-0 select-none z-10",
+          isFullscreen ? "bg-background/80 backdrop-blur-md" : "bg-accent/40"
+        )}
+      >
         <div className="flex items-center gap-3">
           <Terminal className="h-4 w-4 text-primary" />
           <div className="flex items-center gap-2">
@@ -249,7 +273,7 @@ export const ChatInterface = () => {
       {/* Messages Stream */}
       <div
         className={cn(
-          "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6",
+          "flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 z-10 relative",
           isFullscreen && "max-w-4xl mx-auto w-full px-4 sm:px-8 py-8"
         )}
         ref={scrollRef}
@@ -348,8 +372,8 @@ export const ChatInterface = () => {
       {/* Input Prompt Form */}
       <div
         className={cn(
-          "border-t border-border bg-background shrink-0 z-10",
-          isFullscreen ? "p-4 sm:py-5 border-t border-border/80 shadow-2xl" : "bg-accent/15"
+          "border-t border-border shrink-0 z-10 relative",
+          isFullscreen ? "bg-background/85 backdrop-blur-md p-4 sm:py-5 border-t border-border/80 shadow-2xl" : "bg-accent/15"
         )}
       >
         <form
