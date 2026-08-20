@@ -7,9 +7,9 @@ I’m an engineer who builds at the intersection of efficiency and business logi
 ### 🛠 Tech Stack & Tools
 | Category | Tools |
 | :--- | :--- |
-| **Languages** | Rust, TypeScript, Go, C/C++, Lua, C# |
-| **Environment** | Neovim, Ghostty, Fish, Linux/Mac|
-| **Interests** | System Design, Automation, Efficiency |
+| **Languages** | Rust, TypeScript, Python, Go, C/C++. C#, Lua, Solidity |
+| **Environment** | Neovim, Ghostty, Fish/Bash/Zsh, Linux/Mac |
+| **Interests** | System Design, Agricultural Automation & Efficiency |
 ---
 ### 📫 Connect with me:
 [<img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white">](https://linkedin.com/in/igmrrf) 
