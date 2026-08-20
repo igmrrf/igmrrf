@@ -44,6 +44,8 @@ export const ChatInterface = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const { currentWallpaper, opacity } = useWallpaper();
   const isMounted = useIsMounted();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const savedScrollY = useRef<number>(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,11 +59,43 @@ export const ChatInterface = () => {
     scrollToBottom();
   }, [messages, isGenerating, scrollToBottom]);
 
+  const exitFullscreen = useCallback(() => {
+    setIsFullscreen(false);
+    setTimeout(() => {
+      if (containerRef.current) {
+        containerRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      } else {
+        window.scrollTo({ top: savedScrollY.current, behavior: "smooth" });
+      }
+      inputRef.current?.focus({ preventScroll: true });
+    }, 50);
+  }, []);
+
+  const enterFullscreen = useCallback(() => {
+    savedScrollY.current = window.scrollY;
+    setIsFullscreen(true);
+    setTimeout(() => {
+      inputRef.current?.focus({ preventScroll: true });
+      scrollToBottom();
+    }, 60);
+  }, [scrollToBottom]);
+
+  const toggleFullscreen = useCallback(() => {
+    if (isFullscreen) {
+      exitFullscreen();
+    } else {
+      enterFullscreen();
+    }
+  }, [isFullscreen, exitFullscreen, enterFullscreen]);
+
   // Handle Fullscreen Esc key and body scroll lock
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isFullscreen) {
-        setIsFullscreen(false);
+        exitFullscreen();
       }
     };
 
@@ -76,21 +110,13 @@ export const ChatInterface = () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isFullscreen]);
-
-  const toggleFullscreen = () => {
-    setIsFullscreen((prev) => !prev);
-    setTimeout(() => {
-      inputRef.current?.focus();
-      scrollToBottom();
-    }, 60);
-  };
+  }, [isFullscreen, exitFullscreen]);
 
   const handleReset = () => {
     if (isGenerating) return;
     setMessages(INITIAL_MESSAGES);
     setInput("");
-    inputRef.current?.focus();
+    inputRef.current?.focus({ preventScroll: true });
   };
 
   const handleSendPrompt = (promptText: string) => {
@@ -163,7 +189,7 @@ export const ChatInterface = () => {
         });
       } finally {
         setIsGenerating(false);
-        setTimeout(() => inputRef.current?.focus(), 50);
+        setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 50);
       }
     },
     [messages, isGenerating]
@@ -177,6 +203,7 @@ export const ChatInterface = () => {
 
   const chatMarkup = (
     <div
+      ref={isFullscreen ? undefined : containerRef}
       className={cn(
         "flex flex-col transition-all duration-200",
         isFullscreen
@@ -418,7 +445,10 @@ export const ChatInterface = () => {
     return (
       <>
         {/* Placeholder in normal document flow while fullscreen is active */}
-        <div className="h-[78vh] max-w-4xl mx-auto border border-dashed border-border/60 bg-accent/10 flex flex-col items-center justify-center gap-3 text-muted-foreground p-8 text-center">
+        <div
+          ref={containerRef}
+          className="h-[78vh] max-w-4xl mx-auto border border-dashed border-border/60 bg-accent/10 flex flex-col items-center justify-center gap-3 text-muted-foreground p-8 text-center"
+        >
           <Terminal className="h-8 w-8 text-primary opacity-60 animate-pulse" />
           <p className="text-xs font-mono uppercase tracking-widest text-foreground font-bold">
             Neural Session active in fullscreen mode
