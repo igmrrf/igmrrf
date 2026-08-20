@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
   Send,
   Loader2,
@@ -12,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIsMounted } from "@/hooks/useIsMounted";
 import { ChatMessageMarkdown } from "./ChatMessageMarkdown";
 
 interface Message {
@@ -39,6 +41,7 @@ export const ChatInterface = () => {
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const isMounted = useIsMounted();
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -78,7 +81,7 @@ export const ChatInterface = () => {
     setTimeout(() => {
       inputRef.current?.focus();
       scrollToBottom();
-    }, 50);
+    }, 60);
   };
 
   const handleReset = () => {
@@ -91,7 +94,6 @@ export const ChatInterface = () => {
   const handleSendPrompt = (promptText: string) => {
     if (isGenerating || !promptText.trim()) return;
     setInput(promptText);
-    // Submit via synthetic or direct call
     executeChat(promptText.trim());
   };
 
@@ -171,17 +173,17 @@ export const ChatInterface = () => {
     await executeChat(input.trim());
   };
 
-  return (
+  const chatMarkup = (
     <div
       className={cn(
         "flex flex-col transition-all duration-200",
         isFullscreen
-          ? "fixed inset-0 z-50 h-screen w-screen bg-background/95 backdrop-blur-xl border-0 shadow-none m-0"
+          ? "fixed inset-0 z-[100] h-[100dvh] w-screen bg-background text-foreground overflow-hidden select-text"
           : "relative h-[78vh] max-w-4xl mx-auto border border-border bg-background/90 backdrop-blur-md shadow-2xl"
       )}
     >
       {/* Terminal Bar Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-accent/30 shrink-0 select-none">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-accent/40 shrink-0 select-none z-10">
         <div className="flex items-center gap-3">
           <Terminal className="h-4 w-4 text-primary" />
           <div className="flex items-center gap-2">
@@ -189,7 +191,7 @@ export const ChatInterface = () => {
               neural_session // rag_stream
             </span>
             {isFullscreen && (
-              <span className="hidden sm:inline-block px-1.5 py-0.2 bg-primary/10 border border-primary/30 text-primary font-mono text-[9px] uppercase tracking-widest font-bold">
+              <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 bg-primary/10 border border-primary/30 text-primary font-mono text-[9px] uppercase tracking-widest font-bold">
                 FULLSCREEN_MODE
               </span>
             )}
@@ -204,7 +206,7 @@ export const ChatInterface = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-1 border-l border-border/80 pl-3">
+          <div className="flex items-center gap-2 border-l border-border/80 pl-3">
             <button
               type="button"
               onClick={handleReset}
@@ -219,14 +221,25 @@ export const ChatInterface = () => {
             <button
               type="button"
               onClick={toggleFullscreen}
-              className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-bold uppercase tracking-wider border transition-colors",
+                isFullscreen
+                  ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "border-border/80 text-muted-foreground hover:text-foreground hover:bg-accent/60"
+              )}
               title={isFullscreen ? "Exit Fullscreen (Esc)" : "Enter Fullscreen"}
               aria-label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
             >
               {isFullscreen ? (
-                <Minimize2 className="h-3.5 w-3.5 text-primary" />
+                <>
+                  <Minimize2 className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-mono">Exit (ESC)</span>
+                </>
               ) : (
-                <Maximize2 className="h-3.5 w-3.5" />
+                <>
+                  <Maximize2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline text-[10px] font-mono">Fullscreen</span>
+                </>
               )}
             </button>
           </div>
@@ -251,7 +264,9 @@ export const ChatInterface = () => {
               key={i}
               className={cn(
                 "flex gap-3 sm:gap-4",
-                m.role === "user" ? "ml-auto flex-row-reverse max-w-[85%]" : "mr-auto max-w-[92%] sm:max-w-[88%]"
+                m.role === "user"
+                  ? "ml-auto flex-row-reverse max-w-[85%]"
+                  : "mr-auto max-w-[94%] sm:max-w-[90%]"
               )}
             >
               <div
@@ -333,8 +348,8 @@ export const ChatInterface = () => {
       {/* Input Prompt Form */}
       <div
         className={cn(
-          "border-t border-border bg-accent/15 shrink-0",
-          isFullscreen && "p-4 sm:py-6"
+          "border-t border-border bg-background shrink-0 z-10",
+          isFullscreen ? "p-4 sm:py-5 border-t border-border/80 shadow-2xl" : "bg-accent/15"
         )}
       >
         <form
@@ -374,4 +389,31 @@ export const ChatInterface = () => {
       </div>
     </div>
   );
+
+  if (isFullscreen && isMounted) {
+    return (
+      <>
+        {/* Placeholder in normal document flow while fullscreen is active */}
+        <div className="h-[78vh] max-w-4xl mx-auto border border-dashed border-border/60 bg-accent/10 flex flex-col items-center justify-center gap-3 text-muted-foreground p-8 text-center">
+          <Terminal className="h-8 w-8 text-primary opacity-60 animate-pulse" />
+          <p className="text-xs font-mono uppercase tracking-widest text-foreground font-bold">
+            Neural Session active in fullscreen mode
+          </p>
+          <p className="text-[11px] font-mono text-muted-foreground">
+            Press <kbd className="px-1.5 py-0.5 bg-accent border border-border text-foreground font-bold">ESC</kbd> or click below to restore window.
+          </p>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="mt-2 px-4 py-2 border border-primary bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-mono font-bold tracking-widest uppercase transition-colors"
+          >
+            Restore Window
+          </button>
+        </div>
+        {createPortal(chatMarkup, document.body)}
+      </>
+    );
+  }
+
+  return chatMarkup;
 };
