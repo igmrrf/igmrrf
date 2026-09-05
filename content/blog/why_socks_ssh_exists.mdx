@@ -66,4 +66,8 @@ The tunnel is a property of *how you ran the app*, not of the app. That feels ri
 
 Sometimes the clean design is the one nobody adopts. A global patch with an explicit opt-in list was, here, more honest than an elegant abstraction that requires rewriting the integration you are trying to debug.
 
-**Repository:** [github.com/igmrrf/socks-ssh](https://github.com/igmrrf/socks-ssh)
+## One npm script, zero call sites touched
+
+If you can SSH into an allowlisted box, adoption is a script and an environment variable — `NODE_OPTIONS='--import socks-ssh/register'` plus `SOCKS_PROXY_HOSTS`. Every request to a host you did not name behaves exactly as though the package is not installed.
+
+On npm as `socks-ssh`; source, redaction defaults and host-key pinning at **[github.com/igmrrf/socks-ssh](https://github.com/igmrrf/socks-ssh)**. Also written up as a [case study](/case-studies/socks-ssh).

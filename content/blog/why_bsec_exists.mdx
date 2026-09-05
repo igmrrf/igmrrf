@@ -73,4 +73,8 @@ Cargo, Homebrew, GitHub binaries, Docker and GHCR, `.deb`/`.rpm`/AUR/snap, winge
 
 That is a lot of packaging for a side project, and it is not completionism. A secrets tool that one person on the team cannot install is a secrets tool the team routes around — and the route around it is the DM.
 
-**Repository:** [github.com/igmrrf/clienv](https://github.com/igmrrf/clienv)
+## Read the security model before the install steps
+
+I mean that as the actual recommendation. The README's security section is longer than its installation section on purpose, and it states plainly what TTL, max-reads and revocation gate — and what they cannot retract once someone holds the ciphertext. Choose the tool after reading it, not before.
+
+One note that trips people up: the binary is `bsec`, the repository is **[github.com/igmrrf/clienv](https://github.com/igmrrf/clienv)**. The threat model in brief: [case study](/case-studies/bsec).

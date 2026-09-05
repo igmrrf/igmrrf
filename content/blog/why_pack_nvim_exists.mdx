@@ -61,4 +61,8 @@ When a platform absorbs a capability your tool was built to provide, the tool do
 
 For a plugin manager in 2026, what is left is the interface — and the interface was always the part worth building.
 
-**Repository:** [github.com/igmrrf/pack.nvim](https://github.com/igmrrf/pack.nvim)
+## Requires Neovim 0.12, and that is the whole compatibility story
+
+On 0.12, `pack.nvim` is the interface layer over `vim.pack`: a dashboard that shows what is behind, changelogs before you update, lazy loading, and `x` to disable a plugin without editing your config. On anything older it prints a warning and does nothing — a deliberate answer, not a gap I have yet to fill.
+
+Install spec, dashboard keys and `:checkhealth pack`: **[github.com/igmrrf/pack.nvim](https://github.com/igmrrf/pack.nvim)**. Brief version: [case study](/case-studies/pack-nvim).

@@ -67,4 +67,8 @@ Packages that do one thing completely are undervalued next to packages that do m
 
 This one does a single fintech primitive, tells you which of three things it learned, and admits when it cannot answer.
 
-**Repository:** [github.com/igmrrf/fedsdk](https://github.com/igmrrf/fedsdk)
+## Pick the cost profile you are willing to pay
+
+`import { validateABA } from 'fedsdk/validate'` when you want arithmetic at the edge. The full package server-side when you need to know the institution is real. Neither one makes a network call, and both are typed and MIT-licensed.
+
+On npm as `fedsdk`; source at **[github.com/igmrrf/fedsdk](https://github.com/igmrrf/fedsdk)**. The trade-offs, abbreviated: [case study](/case-studies/fedsdk).

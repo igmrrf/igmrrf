@@ -64,6 +64,87 @@ Timing: 45 min total. Get off this slide inside 60 seconds.
 -->
 
 ---
+layout: titled
+class: accent-blue
+---
+
+<Eyebrow text="Who's talking" />
+
+# I move money for a living.
+
+<div class="grid grid-cols-3 gap-4 mt-7">
+
+<Card tone="blue" title="Day job">
+<p class="!text-[0.8rem]">
+<strong>Senior Software Architect, OneRemit</strong> — cross-border payouts.
+RBAC, TOTP step-up, PAN encryption, session lifecycle, KYC webhooks.
+</p>
+<p class="!text-[0.74rem] !mt-2 df-dim">
+Access control and data protection are my Jira board, not my reading list.
+</p>
+</Card>
+
+<Card tone="green" title="The jurisdictions">
+<p class="!text-[0.8rem]">
+Payments that cross African borders, which is how <strong>NDPA and POPIA</strong>
+reach me — as compliance reviews, not slideware. Before this: Lingawa,
+NPC&nbsp;Labs, VeendHQ.
+</p>
+<p class="!text-[0.74rem] !mt-2 df-dim">
+Fintech and edtech since 2018. TypeScript, Go, Rust, Python.
+</p>
+</Card>
+
+<Card tone="yellow" title="Off the clock">
+<p class="!text-[0.8rem]">
+<strong>bsec</strong>, a Rust CLI for team secrets, and a dozen other open-source
+projects — including the hardened reference app this talk is built on.
+</p>
+<p class="!text-[0.74rem] !mt-2 df-dim">
+Mechanical engineering, then an MBA, then all of this.
+</p>
+</Card>
+
+</div>
+
+<div class="mt-8 flex items-end justify-between gap-10">
+  <p v-click class="!text-[1rem] max-w-[54ch] !mt-0">
+    I am not a security researcher. I am an application engineer who kept finding
+    these bugs in my own code — <strong>including all three of the ones I am
+    about to show you.</strong>
+  </p>
+  <div class="flex flex-col gap-1.5 text-[0.8rem] items-end flex-none">
+    <span class="df-mono font-bold text-[var(--df-text)]">Francis Igbiriki</span>
+    <span class="df-mono df-dim">@igmrrf</span>
+    <span class="df-mono df-dim">theldo.com/talks</span>
+  </div>
+</div>
+
+<!--
+KEEP THIS UNDER 40 SECONDS. Credentials are a tax the audience pays before they
+will trust you — pay it fast and get back to the content. Do not read the cards.
+
+Three things only:
+
+1. "I work on payments. When I get access control wrong, someone loses money."
+
+2. "I ship across African jurisdictions, so layer five of this talk — the
+   sovereignty question — is a compliance review I have actually sat through.
+   It is not a slide I made for this room."
+
+3. The click. Say it close to these words: "I am not here as a security
+   researcher. Three of the bugs in this deck are mine, and I found them
+   reviewing my own code to prepare this talk."
+
+That third line is doing the real work. It sets the contract for the whole deck:
+a practitioner showing you their scar tissue, not a vendor showing you a threat
+landscape. The three confession slides later all cash the cheque you write here.
+
+Do NOT list the open-source projects out loud. They are on the slide for the
+people who photograph it.
+-->
+
+---
 layout: statement
 class: accent-red
 ---
@@ -150,7 +231,7 @@ class: accent-blue
 # In every other layer of the stack, we separated instructions from data.
 
 <div v-click class="mt-10 grid grid-cols-2 gap-4 max-w-[42rem] mx-auto text-left">
-  <Card tone="green" title="Solved, 2002">
+  <Card tone="green" title="Solved, last century">
     <div class="df-mono text-[0.8rem]">SELECT * FROM u WHERE id = <span class="text-[var(--df-green-soft)]">?</span></div>
     <p class="!text-[0.78rem] !mt-2">Prepared statements. Data can never become command.</p>
   </Card>
@@ -776,6 +857,11 @@ canary check means 'no evidence of a loud leak', not 'we're safe.' The false
 negative rate is the whole ballgame and nobody publishes it."
 
 Precision here is what separates you from a vendor pitch.
+
+Concrete, if pushed — both of these walk past the monitor from the last slide:
+  - the model lower-cases the token (the check is case-sensitive)
+  - the model puts markdown inside it: CANARY-3fa2-**9c81**-4d77-...
+Neither is exotic. Both are one sentence of prompt away.
 -->
 
 ---
@@ -783,9 +869,9 @@ layout: titled
 class: accent-blue
 ---
 
-<Eyebrow text="The map" />
+<Eyebrow text="The map · OWASP LLM Top 10, 2025 list" />
 
-# OWASP Top 10 for LLMs — where each control lands
+# Where each of these controls lands
 
 <div class="grid grid-cols-2 gap-x-8 gap-y-2.5 mt-7 text-[0.82rem]">
 
@@ -864,7 +950,7 @@ class: accent-red
 
 <Card tone="green" title="What each flag removes">
 
-```yaml {2|3-4|6-8}{lines:true}
+```yaml {2|3-5|6-8}{lines:true}
 user: "10001:10001"      # not root
 read_only: true          # no dropped payloads
 cap_drop: [ALL]          # no privilege escalation
@@ -917,12 +1003,12 @@ class: accent-green
 <div class="df-file">.semgrep/ai-security.yml</div>
 
 ```yaml
-- id: per-chunk-canary-check
-  message: >-
-    Canary compared against a single stream chunk. A token split across
-    chunks will never match — use createCanaryMonitor().
-  pattern: $CHUNK.includes($CANARY)
-  severity: WARNING
+rules:
+  - id: per-chunk-canary-check
+    languages: [typescript]
+    severity: WARNING
+    message: Canary tested per-chunk; a split token never matches. Use createCanaryMonitor().
+    pattern: $CHUNK.includes(canaryToken)
 ```
 
 </div>
@@ -952,13 +1038,20 @@ class: accent-red
 $ ./security-scan.sh
 ✅ No hardcoded secrets detected in source tree.
 
-$ grep -o "sk-[a-z-]*" app/src/hooks/useSecureAIStream.ts
+$ grep -oE "sk-[a-z0-9-]+" app/src/hooks/useSecureAIStream.ts
 sk-prod-99214810294       # ← sitting right there
 ```
 
 <p class="!mt-6 !text-[0.95rem]">
-The pattern was <code class="!text-[var(--df-red-soft)]">sk-[a-zA-Z0-9]{20,}</code>.
-The hyphen ends the character class after four characters. Never matched.
+My pattern was <code class="!text-[var(--df-red-soft)]">sk-[a-zA-Z0-9]{16,}</code> —
+no hyphen in the class. So the secret's own hyphen ends the run at
+<code>prod</code>, four characters in, and <code>{16,}</code> never reaches its
+minimum.
+</p>
+
+<p class="!mt-3 !text-[0.95rem] df-dim">
+Add one character to the class and the one-line audit from the top finds it:
+<code>sk-[a-zA-Z0-9<span class="text-[var(--df-green-soft)]">_-</span>]{16,}</code>
 </p>
 
 </div>
@@ -977,6 +1070,11 @@ looking."
 
 Actionable close: plant a canary secret in a fixture and assert your scanner
 catches it. In CI.
+
+If someone counts characters: the key is 19 chars, 16 of them after the "sk-"
+prefix. So {16,} sits exactly on the boundary — {17,} would have missed it too.
+The lesson is that the character class was wrong, not the quantifier. Only go
+here if asked; it muddies the slide.
 -->
 
 ---
@@ -1157,7 +1255,8 @@ DEMO RUNBOOK — app must already be running before you walk on stage.
    → System prompt, DB password and API key stream into the transcript. Pause.
 2. Flip to Hardened. Click the same button.
    → Text starts rendering, then cuts mid-word with the canary alert.
-   SAY: "That's the rolling-window monitor from six slides ago, in the browser."
+   SAY: "That's the rolling-window monitor from the prompt-injection section,
+        running in the browser."
 3. Click "Privileged Tool Call" ($5,000 transfer).
    → Passkey modal. Approve it. Show the audit trail tab.
 

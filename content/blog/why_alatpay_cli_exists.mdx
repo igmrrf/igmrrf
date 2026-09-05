@@ -61,4 +61,8 @@ They also cannot help you until you have already received a real webhook, which 
 
 The right answer is probably both. The mock is what I needed first.
 
-**Repository:** [github.com/igmrrf/alatpaycli](https://github.com/igmrrf/alatpaycli)
+## Try it on the loop it was built for
+
+Start the mock server, point your handler at it, and run `alatpay listen` alongside. If your canonical string is wrong or a middleware ate the raw body, you find out in seconds — with the failing payload on screen — instead of after a deploy and a real transaction.
+
+All three pieces live in one repository: **[github.com/igmrrf/alatpaycli](https://github.com/igmrrf/alatpaycli)**. Condensed version: [the case study](/case-studies/alatpay-cli).

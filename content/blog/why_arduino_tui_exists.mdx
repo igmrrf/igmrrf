@@ -54,4 +54,8 @@ Some tools should be rewritten. Some should be wrapped.
 
 The test I use: does the thing you would be replacing derive its correctness from being *official* — from being the reference implementation, from defining the format rather than parsing it? If so, wrap it. You cannot out-maintain the people who set the standard, and competing with them means inheriting a job you did not want.
 
-**Repository:** [github.com/igmrrf/arduino-tui](https://github.com/igmrrf/arduino-tui)
+## Installed with its own prerequisite
+
+`cargo install arduino-tui` if `arduino-cli` is already on your `PATH`. The Homebrew tap if you would rather the prerequisite arrive with the tool — which is the path I actually recommend, for the reason in the section above.
+
+Source and install instructions: **[github.com/igmrrf/arduino-tui](https://github.com/igmrrf/arduino-tui)**. If you only came for the wrap-versus-rewrite test, it is also in [the case study](/case-studies/arduino-tui).
