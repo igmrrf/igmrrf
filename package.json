@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:decks && next build",
     "start": "next start",
     "lint": "eslint",
+    "build:decks": "node scripts/build-decks.mjs",
     "previews": "node scripts/capture-previews.mjs"
   },
   "dependencies": {

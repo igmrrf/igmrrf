@@ -6,11 +6,14 @@ import {
   CaseStudySchema,
   BlogPost,
   BlogPostSchema,
+  Talk,
+  TalkSchema,
 } from "@/schemas/portfolio";
 import { estimateReadingTime } from "./readingTime";
 
 const CASE_STUDIES_PATH = path.join(process.cwd(), "content/case-studies");
 const BLOG_PATH = path.join(process.cwd(), "content/blog");
+const TALKS_PATH = path.join(process.cwd(), "content/talks");
 
 export function getCaseStudySlugs() {
   if (!fs.existsSync(CASE_STUDIES_PATH)) {
@@ -90,6 +93,46 @@ export async function getAllBlogPosts(): Promise<
   );
 
   return posts.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+}
+
+export function getTalkSlugs() {
+  if (!fs.existsSync(TALKS_PATH)) {
+    fs.mkdirSync(TALKS_PATH, { recursive: true });
+  }
+  return fs.readdirSync(TALKS_PATH).filter((path) => /\.mdx?$/.test(path));
+}
+
+export async function getTalkBySlug(slug: string) {
+  const realSlug = slug.replace(/\.mdx?$/, "");
+  const filePath = path.join(TALKS_PATH, `${realSlug}.mdx`);
+  const fileContent = fs.readFileSync(filePath, "utf8");
+
+  const { data, content } = matter(fileContent);
+  const validatedData = TalkSchema.parse(data);
+  const readingTime = estimateReadingTime(content);
+
+  return {
+    meta: validatedData,
+    content,
+    slug: realSlug,
+    readingTime: readingTime.text,
+  };
+}
+
+export async function getAllTalks(): Promise<
+  (Talk & { slug: string; readingTime: string })[]
+> {
+  const slugs = getTalkSlugs();
+  const talks = await Promise.all(
+    slugs.map(async (slug) => {
+      const { meta, slug: realSlug, readingTime } = await getTalkBySlug(slug);
+      return { ...meta, slug: realSlug, readingTime };
+    }),
+  );
+
+  return talks.sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 }

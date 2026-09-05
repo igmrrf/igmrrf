@@ -1,0 +1,20 @@
+{
+  "name": "deck-devfest-2026-your-ai-app-is-leaking",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "qr": "node scripts/generate-qr.mjs",
+    "build": "npm run qr && slidev build",
+    "export": "npm run qr && slidev export --format pdf --output ../../public/decks/devfest-2026-your-ai-app-is-leaking.pdf"
+  },
+  "dependencies": {
+    "@slidev/cli": "^52.19.1",
+    "@slidev/theme-default": "^0.25.0",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.49.0",
+    "qrcode": "^1.5.4"
+  }
+}

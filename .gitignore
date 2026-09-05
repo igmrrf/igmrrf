@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Compiled Slidev decks — build artefacts, rebuilt by scripts/build-decks.mjs.
+# Only the compiled SPA directories are ignored: the exported PDF next to them
+# is committed on purpose, because `slidev export` needs playwright-chromium
+# and the deploy build cannot produce it.
+/public/decks/*/
+decks/*/node_modules/
