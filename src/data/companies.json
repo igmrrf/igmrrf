@@ -1,0 +1,49 @@
+{
+  "oneremit": {
+    "name": "OneRemit",
+    "url": "https://oneremit.co",
+    "tagline": "Fast payments from Africa to the world. Oneremit handles international payouts for businesses, students and individuals."
+  },
+  "lingawa": {
+    "name": "Lingawa",
+    "url": "https://lingawa.com",
+    "tagline": "Speak your native language with pride. Fun, immersive online Yoruba and Igbo lessons for adults and kids."
+  },
+  "npc-labs": {
+    "name": "NPC Labs",
+    "url": "https://npclabs.xyz",
+    "tagline": "Scale your digital assets with physical products — on-chain IP distribution for creators."
+  },
+  "ajian-labs": {
+    "name": "Ajian Labs",
+    "url": "https://ajianlabs.com",
+    "tagline": "A modern Managing-as-a-Service provider — an incubator and marketplace for standing up an engineering team."
+  },
+  "kunda-box": {
+    "name": "Kunda Box",
+    "url": "https://kundabox.com",
+    "tagline": "Leading the transition to tokenized real-world assets."
+  },
+  "veendhq": {
+    "name": "VeendHQ Inc.",
+    "url": "https://veendhq.com",
+    "tagline": "Collateral-free credit for family expenses, school fees, rent and small business — repaid straight from salary."
+  },
+  "akaani": {
+    "name": "Akaani",
+    "tagline": "Food-tech ordering and recommendation platform. No longer operating a public site."
+  },
+  "vomoz": {
+    "name": "Vomoz Limited",
+    "url": "https://vomoz.com",
+    "tagline": "Reliable, scalable and secure software solutions for businesses of all sizes."
+  },
+  "afridash": {
+    "name": "Afridash Limited",
+    "tagline": "Nigerian web agency where I cut my teeth on React. The domain is no longer an active site."
+  },
+  "freelance": {
+    "name": "Freelance",
+    "tagline": "Independent contract work for Nigerian clients — PWA upgrades, pixel-perfect UI builds and legacy DevOps."
+  }
+}

@@ -1,0 +1,63 @@
+---
+title: "Why aikomail Exists"
+summary: "Email verification is sold as a boolean. It is really five checks of decreasing confidence, and the last one exists to tell you the others were meaningless."
+date: "2026-02-20"
+tags: ["go", "email", "smtp", "dns", "backend"]
+featured: false
+---
+
+Hard bounces are how mail providers decide you are a spammer.
+
+Not spam complaints — those matter too, but bounces are the fast path. Send to enough addresses that do not exist and your domain's reputation degrades, and reputation is far easier to lose than to rebuild. The dead rows in your database are not the damage. The damage is that your password-reset emails stop arriving for everyone.
+
+So you verify addresses before sending. The commercial APIs do this well, at per-check pricing that makes sense for a signup form and stops making sense the moment you are verifying a list.
+
+I wanted the check without the meter running.
+
+## The thing I got wrong first
+
+My initial version returned a boolean. Valid or not.
+
+That is how verification is packaged and sold, and it is wrong — not imprecise, *wrong*, because it collapses five kinds of knowledge into one bit and the kinds are not equivalent.
+
+The checks form a chain, and each link is weaker than the one before it:
+
+**1. Syntax validation.** Local, instant, and definitive when it fails. `not an email` is not an email.
+
+**2. MX record lookup.** A DNS query. If the domain publishes no mail exchanger, nothing can be delivered there, ever. Still definitive.
+
+**3. SMTP handshake.** Connect to the mail server and ask about the mailbox without sending anything. The strongest signal available — and the first one that can lie to you. Plenty of servers answer identically for every address specifically to defeat this probe.
+
+**4. Disposable-domain detection.** A list lookup. Definitive for burner domains someone has already catalogued. Silent about the one registered this morning.
+
+**5. Catch-all detection.** Determines whether a domain accepts *everything*.
+
+Read that last one again. Check 5 exists to tell you check 3 was meaningless.
+
+On a catch-all domain the SMTP handshake returns "yes" for every address you could possibly ask about — real mailboxes, typos, strings you invented. No external check can distinguish them. That is not a limitation of my implementation; it is not knowable from outside.
+
+Once I understood the chain, returning a boolean felt like lying. The service reports which link produced the verdict, so a caller can treat "no MX record" and "catch-all domain, probably fine" as the different facts they are.
+
+## The concurrency limit is not a performance knob
+
+`WORKERS_COUNT` and `RATE_LIMIT` look like tuning parameters. They are reputation controls, and they are the most important configuration in the service.
+
+The SMTP handshake opens a real connection to someone else's mail server. Run those unbounded across a list import and the traffic is indistinguishable from a dictionary attack — because structurally, it is one. The result is that the verifier's own IP gets throttled, then blocklisted, and the service quietly stops being able to verify anything.
+
+So concurrency is bounded by a fixed worker pool and arrival is bounded by requests per second. The service is deliberately slower than it could be, because a verifier that looks abusive has a short career.
+
+I did not design it that way from the start. I learned it the way you would expect.
+
+## Why Go, why free tiers
+
+Go, because this workload is almost entirely concurrent network I/O with strict bounds on it, and a worker pool over a channel is the whole design rather than a framework you adopt.
+
+Fly.io and Neon's free tiers, because the point of the project is not paying per check. A verification service with a hosting bill has quietly reintroduced the problem it was built to remove.
+
+## What it is for
+
+Self-hosted verification that answers what a signup form needs to know, and admits the cases where nobody can answer it.
+
+That second half is the part I would keep if I had to throw away the rest.
+
+**Repository:** [github.com/igmrrf/aikomail](https://github.com/igmrrf/aikomail)

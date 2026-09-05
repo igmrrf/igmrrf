@@ -1,0 +1,50 @@
+---
+title: "YurForms: Autofill That Learns Instead of Matching Strings"
+summary: "A Next.js and Supabase service plus Chrome extension that detects forms, matches fields by context rather than by name, and fills them across devices."
+techStack: ["Next.js 14", "TypeScript", "Supabase", "Chrome Extensions", "Tailwind CSS", "SendGrid"]
+businessValue: "Reclaims the time lost to re-entering the same twenty facts into every job application, visa form and onboarding flow. Field matching adapts to how each site names things, so it keeps working on forms that browser autofill silently skips."
+technicalTradeOffs: "Adaptive, context-aware matching handles the messy real-world forms that name-based autofill misses, and it can be confidently wrong in ways a string match cannot — hence a conflict-resolution layer and a user-feedback loop that corrects the model rather than trusting it. Cross-device sync is the feature users ask for and the one that turns a local convenience into a store of personal data, which is why storage security is treated as a headline concern rather than an implementation detail."
+githubUrl: "https://github.com/igmrrf/yurforms"
+date: "2025-01-24"
+featured: false
+---
+
+# YurForms: Autofill That Learns Instead of Matching Strings
+
+## The Problem
+
+Browser autofill works on the forms it was designed for — checkout pages with `autocomplete="postal-code"` — and quietly fails on everything else. Job applications, visa applications, university portals, vendor onboarding: forms built by people who named the field `txtApplicantSurname_2` and never thought about a machine reading it.
+
+So the same twenty facts get typed again. And because they are typed rather than filled, they drift: the address on one application is a move out of date, the phone number on another has the old country code.
+
+## Architectural Deep-Dive
+
+### Why matching by name is not enough
+
+Name-based matching is a lookup table, and a lookup table fails silently on inputs it has never seen. Every unrecognised field name is a field left blank, with no signal that anything went wrong.
+
+YurForms matches on context instead — the surrounding label text, field type, position in the form, and the shape of the data expected. A field labelled "Surname", "Family name" or "Last Name" resolves to the same stored value regardless of what its `name` attribute says.
+
+This is a real trade, not a free upgrade. Context matching generalises to forms it has never seen, and generalisation means it can be *confidently wrong* — filling a plausible value into a field that meant something else, which a lookup table would simply have skipped.
+
+### Designing for being wrong
+
+Because the matcher can err, the architecture assumes it will:
+
+- **Conflict resolution** for when several stored values plausibly fit one field.
+- **A user feedback loop** — corrections are captured and used to improve subsequent matching, so a mistake on a given site is fixed once rather than every time.
+- **Real-time detection** with visible fill state, so the user can see what was filled before submitting rather than discovering it after.
+
+### The two-surface architecture
+
+A Next.js web app is the vault and the management surface; a Chrome extension is where filling actually happens, because that is the only place with access to the page. Supabase provides storage, auth and the sync substrate; SendGrid handles transactional mail. Offline support means the extension keeps working on a flaky connection, with sync reconciling afterwards.
+
+### The privacy surface
+
+Cross-device sync is the feature that makes the product useful and the one that changes its risk profile entirely. A local-only autofill tool holds data the user already has on that machine. A syncing one holds a copy of someone's identity documents on a server.
+
+That is why secure storage and a privacy-first posture are stated as headline features rather than buried as implementation details — for this category of product, the data-handling story *is* the product, and a user who cannot answer "where does this live" will not, and should not, use it.
+
+## Impact
+
+A dark/light, responsive, minimalist interface across both surfaces — because a tool that saves two minutes has to be pleasant enough that people reach for it instead of typing.

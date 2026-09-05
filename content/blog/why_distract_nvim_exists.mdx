@@ -1,0 +1,69 @@
+---
+title: "Why distract.nvim Exists"
+summary: "Terminal graphics fragment across a dozen incompatible capabilities. Supporting all of them usually means writing the project several times — unless the fallbacks agree on geometry."
+date: "2026-08-19"
+tags: ["neovim", "lua", "terminal", "graphics", "rust"]
+featured: false
+---
+
+I wanted to draw something animated inside Neovim. That is the whole origin. Not a productivity thesis — I thought it would be fun.
+
+The interesting part is what happened once I tried to make it work on more than one terminal.
+
+## The fragmentation problem
+
+Terminal graphics capabilities do not form a ladder. They form a scatter plot.
+
+Kitty and Ghostty speak a graphics protocol. Alacritty does not. tmux mangles a good fraction of what passes through it. Truecolor is nearly universal but not quite. X11 cannot do click-through windows, and Wayland can. SSH strips away a layer of assumptions you did not know you were making.
+
+The standard responses are both bad. Target one terminal and the project is a demo for people who already run what you run. Or write fallbacks — and discover that "fallback" usually means a second implementation with its own bugs, its own asset requirements, and its own subtly different behaviour, which is three projects pretending to be one.
+
+## The constraint that made it tractable
+
+The thing that unlocked this was not a rendering technique. It was a rule:
+
+**Every backend must occupy exactly the same cells.**
+
+A 24×16 sprite is 24 columns by 8 rows under half-blocks, and it is 24 columns by 8 rows under the Kitty graphics protocol. The fidelity difference is pixel density *inside* that rectangle — never a bigger rectangle.
+
+That sounds like a detail. It is the reason the project is one project.
+
+Because geometry is fixed across backends, everything built on geometry is written once: placement, collision, floors, obstacles, wrapping, the entity state machines. The backend only decides how a rectangle gets coloured in. Switching from `halfblock` to `kitty` cannot move anything, because there is nothing backend-specific to move.
+
+Without that rule, every feature would need testing three times, and every bug report would start with "which backend".
+
+## Three backends, one ladder
+
+- **`halfblock`** — 24-bit RGB sprites from Unicode half-blocks (`▀`/`▄`), drawn as overlay virtual text so only cells containing an actual pixel are touched. The characters around each pixel survive. Works in any truecolor terminal: Ghostty, WezTerm, Kitty, Alacritty, iTerm2, over tmux, over SSH.
+- **`kitty`** — real RGBA with per-pixel alpha, drawn by the terminal itself. Offered only when the terminal answers the protocol's `a=q` query.
+- **`overlay`** — a transparent, borderless, click-through wgpu window. One instanced quad per entity from a sprite atlas uploaded once, and it skips the frame entirely when nothing has moved.
+
+Name none and you get `kitty` if the terminal answers, `halfblock` otherwise. Name one and it wins.
+
+## The feature I deleted
+
+`overlay` does not run on X11.
+
+Click-through is unsupported there. A fullscreen, always-on-top window without click-through would capture every mouse click on your desktop — the entire desktop, not just the editor. You would have to find a way to kill it blind.
+
+I could have shipped it with a warning. Warnings are read after the damage.
+
+So the overlay refuses to start on X11 and tells you why. It is the smallest amount of code in the project and the decision I am most confident about: sometimes the correct engineering answer is to ship less.
+
+## Then I wanted 3D, and nearly ruined it
+
+The obvious way to add a 3D mode is a second asset pipeline: a mesh format, models authored alongside every sprite, importers. That is a lot of work, and worse, it splits the project in half — built-in assets would support 3D and user-imported GIFs would not, forever.
+
+What I did instead: every asset already resolves to RGBA frames, so a frame's opaque pixels get **extruded into a slab of cubes**. A real model of that frame, built from art the asset already has. Built-ins, imported spritesheets, GIFs, anything registered at runtime — all work in 3D with nothing authored twice. A face is only emitted where the neighbour that would hide it is transparent, so a solid frame costs two quads per pixel plus its silhouette.
+
+And the same-geometry rule held. A model is fitted into the sprite's own canvas, because the footprint is what the physics measures against. A model drawn face-on covers *exactly* the pixels its sprite does — the test suite asserts this — so turning 3D on never moves or reshapes anything.
+
+The only thing that changes meaning is `z`: draw order plus parallax damping in 2D, perspective shrink in 3D.
+
+## What I actually learned
+
+The constraint that felt limiting — every backend occupies identical cells — is the only reason three backends and two render modes stayed maintainable. It converted "support many environments" from a multiplication into an addition.
+
+I did not start with that rule. I arrived at it after the second backend started disagreeing with the first about where things were, and I could feel the project about to become three projects.
+
+**Repository:** [github.com/igmrrf/distract.nvim](https://github.com/igmrrf/distract.nvim)

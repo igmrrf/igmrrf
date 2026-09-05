@@ -1,0 +1,70 @@
+---
+title: "Why fedsdk Exists"
+summary: "A routing number can pass its checksum and still belong to no bank on earth. Answering that properly usually means adding a network call to a keystroke."
+date: "2026-06-05"
+tags: ["typescript", "fintech", "npm", "edge", "validation"]
+featured: false
+---
+
+An ABA routing number has a mod-10 checksum. A large share of typos fail it, and catching those needs nothing but arithmetic.
+
+But a checksum-valid number is not necessarily a *real* number. Nine digits can pass the check and belong to no institution at all. Or belong to one that participates in ACH but not Fedwire — which is exactly the distinction a payment form needs before it lets someone continue, because "this bank cannot receive a wire" is a different problem from "you made a typo".
+
+Answering that requires the Federal Reserve's FedACH and Fedwire directories. And the default instinct — put the directory behind an API — attaches a network round trip to a keystroke.
+
+## Three functions, three honest cost profiles
+
+The API is small on purpose, and each function tells you what it costs:
+
+```ts
+validateABA('021000021')  // checksum only. No I/O. Synchronous.
+lookup('021000021')       // directory only. Institution + networks, or null.
+validate('021000021')     // both.
+```
+
+The distinction I actually care about lives in `validate`'s return shape:
+
+- Checksum fails → `{ valid: false, result: null }`
+- Checksum passes, number not in the directories → `{ valid: true, result: null }`
+
+Those are different facts and they deserve different messages. "That looks like a typo" versus "that number is well-formed but we cannot find the institution". An API that collapses them into one boolean forces every caller to guess which one happened, and callers guess wrong.
+
+## Shipping 750KB of the Federal Reserve
+
+The ~19,000-entry dataset — from the Fed's directories, mirrored by `moov-io/fed` — ships inside the package.
+
+That is an unfashionable choice. It buys three things I wanted more than package size:
+
+**No latency.** The lookup is a function call. It can run on every keystroke without debouncing against someone else's rate limit.
+
+**No availability risk.** Nobody else's downtime becomes my validation failure.
+
+**Identical results everywhere.** Production, CI, and a plane with no wifi all agree. Tests do not need a network or a mock.
+
+And it costs freshness. The data is a snapshot as of the last release. Institutions merge, routing numbers get retired, and the package does not notice.
+
+I thought about a background fetch that would refresh the dataset at runtime. Then I noticed it would reintroduce every single thing bundling had solved — latency, availability coupling, nondeterministic tests — to fix a problem that moves on a scale of months.
+
+So the package exposes `npm run sync` and states plainly that refreshing is a deliberate act, taken at release time by a human. A stale answer you can reason about beats a fresh answer that sometimes does not arrive.
+
+## Where that trade is wrong, and the subpath that admits it
+
+Bundling 750KB into a browser bundle or a Cloudflare Worker is indefensible. Whatever the argument for shipping the directory server-side, it does not survive contact with an edge runtime's cold start.
+
+So the checksum path is importable on its own:
+
+```ts
+import { validateABA } from 'fedsdk/validate'
+```
+
+No Node built-ins. No database. Just the arithmetic.
+
+That single subpath is the design decision I am happiest with, because it stops the package from having an opinion about where you are running. The edge function validates shape; the server confirms existence. One package, two cost profiles, and the caller picks which one they are paying for — instead of me picking on their behalf and being wrong for half of them.
+
+## The smaller point
+
+Packages that do one thing completely are undervalued next to packages that do many things partially.
+
+This one does a single fintech primitive, tells you which of three things it learned, and admits when it cannot answer.
+
+**Repository:** [github.com/igmrrf/fedsdk](https://github.com/igmrrf/fedsdk)

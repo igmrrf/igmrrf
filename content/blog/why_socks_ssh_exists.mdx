@@ -1,0 +1,69 @@
+---
+title: "Why socks-ssh Exists"
+summary: "Financial APIs allowlist IPs, which is correct security practice and makes local development structurally impossible. The fix should be narrow, not a full-tunnel VPN."
+date: "2026-07-15"
+tags: ["node", "typescript", "ssh", "networking", "developer-tools"]
+featured: false
+---
+
+Payment providers allowlist IPs. That is correct security practice, and it makes local development structurally impossible.
+
+A laptop on a residential connection has an address that changes. No provider is going to allowlist it, and they should not.
+
+## The workarounds and what is wrong with them
+
+**Deploy to the whitelisted staging box for every change.** The oldest loop in the business, and every iteration is minutes long.
+
+**Full-tunnel VPN.** Now every request the process makes routes through that hop — your package registry, your local database, your telemetry, your unrelated third-party calls. A hop that has no business seeing any of it, and one you now debug whenever anything unrelated is slow.
+
+What I actually wanted was narrow: calls to `*.terrapay.com` should leave from the allowlisted server. Everything else should behave exactly as though this library is not installed.
+
+## The invasive decision
+
+`socks-ssh` spawns and maintains `ssh -D <port> -N -C`, which gives a local SOCKS5 proxy backed by an allowlisted host. Straightforward.
+
+Then it replaces `globalThis.fetch`.
+
+That is invasive and I want to name it as a real cost rather than a footnote. Anything else in the process that already captured a reference to `fetch`, or that patches it too, is now sharing a mutable global with this library. That is a genuine hazard and it will surprise somebody eventually.
+
+What it buys is that an existing codebase needs **zero changes at any call site**. No injected client to thread through five layers. No per-call configuration. No refactor of the module that talks to the provider — a module that, in a payments integration, is the one you least want to touch for reasons unrelated to payments.
+
+The alternative designs all require the codebase to know about the tunnel. A custom dispatcher passed to each call, or a wrapped client every call site must adopt. Both are cleaner in isolation and both make adoption a refactor, which in practice means the tool does not get adopted.
+
+I bounded the hazard instead of avoiding it. Routing is opt-in per host suffix via `SOCKS_PROXY_HOSTS`. Anything you did not explicitly name takes the normal path, untouched. The default behaviour for the other 99% of requests is "this library is not here".
+
+## The lifecycle detail that matters more than it sounds
+
+The package kills the SSH child process when the parent Node process terminates.
+
+That is four lines of code and it is the difference between a tool you use daily and one you use twice. Without it, every crashed dev server leaves an orphaned SSH process holding port 1080, and the next start fails with an error that does not mention SSH at all. Two rounds of that and people uninstall.
+
+Most of what makes a developer tool bearable is this kind of thing. Not the clever part — the cleanup.
+
+## Logging that cannot become the leak
+
+A tunnel is diagnostic infrastructure, so it logs routed requests and their responses. Otherwise, when a call fails, you cannot tell whether it left through the tunnel at all.
+
+But a debug log of requests to a payment provider is a log full of credentials, and the tool would then be the vulnerability.
+
+So: sensitive headers — authorization, API keys, passwords — are redacted automatically, not opt-in. Response bodies truncate at `SOCKS_PROXY_BODY_MAX`, 2000 characters by default. Both defaults are the safe ones, and loosening them is a deliberate act.
+
+For production hardening the docs cover pinning the remote host key through `SSH_KNOWN_HOSTS_FILE` and `SSH_STRICT_HOST_KEY_CHECKING=yes`, rather than leaving trust-on-first-connect as a silent default nobody revisits.
+
+## Preload over programmatic
+
+The recommended path touches no application code at all:
+
+```json
+{ "scripts": { "dev:proxy": "NODE_OPTIONS='--import socks-ssh/register' next dev" } }
+```
+
+The tunnel is a property of *how you ran the app*, not of the app. That feels right: production already has the correct IP and should never load this, and expressing that as a separate npm script is clearer than a conditional inside the codebase that someone will eventually get wrong.
+
+`init()` exists for cases that genuinely need conditional setup.
+
+## The general shape
+
+Sometimes the clean design is the one nobody adopts. A global patch with an explicit opt-in list was, here, more honest than an elegant abstraction that requires rewriting the integration you are trying to debug.
+
+**Repository:** [github.com/igmrrf/socks-ssh](https://github.com/igmrrf/socks-ssh)

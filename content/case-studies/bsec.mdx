@@ -1,0 +1,50 @@
+---
+title: "bsec: Decentralized Secret Sharing With an Honest Threat Model"
+summary: "A Rust CLI for environment-variable management, file encryption and ephemeral secret sharing over IPFS and an on-chain registry — documented with the limits its cryptography actually guarantees."
+techStack: ["Rust", "AES-256-GCM", "ECDH secp256k1", "HKDF-SHA256", "Argon2id", "IPFS", "Solidity", "Ethereum"]
+businessValue: "Replaces the Slack-DM-a-dotenv habit with something auditable: secrets are encrypted for a specific recipient's key, injected straight into process memory rather than written to disk, and validated against a committed schema so a missing key fails at startup instead of in production."
+technicalTradeOffs: "On-chain TTL, max-reads and revocation gate listing and read accounting — they cannot stop a recipient who already fetched the IPFS payload from decrypting it again offline. Rather than market these as hard guarantees, the README states the gap plainly. The same honesty governs `--no-export`, a guard rail against accidental file writes that is explicitly not DRM."
+githubUrl: "https://github.com/igmrrf/clienv"
+date: "2026-08-15"
+featured: false
+---
+
+# bsec: Decentralized Secret Sharing With an Honest Threat Model
+
+## The Problem
+
+Secret distribution inside small teams is almost universally worse than the systems it protects. A `.env` gets pasted into a DM. A new engineer is onboarded by someone screen-sharing a config file. The plaintext then lives forever in a chat history that nobody can audit and nobody can revoke.
+
+The tooling that exists to fix this mostly assumes a company: a vault, an identity provider, a platform team to run it. `bsec` targets the gap below that — a CLI that a single developer can install, that does not require a server to be operated, and that still gets the cryptography right.
+
+## Architectural Deep-Dive
+
+### The encryption path
+
+A secret payload is encrypted with AES-256-GCM under a per-secret random key. That key is wrapped for the recipient using ECDH over secp256k1 plus HKDF-SHA256. Only the holder of the recipient's private key can unwrap it. The ciphertext goes to IPFS; a registry contract records the pointer and the lifecycle metadata.
+
+Wallets are created with `--password`, which derives the key with Argon2id and seals the private key and mnemonic under AES-256-GCM. Without a password the key is stored unencrypted at mode `0600` and `init` prints a warning rather than silently accepting the weaker posture.
+
+### Injection instead of materialisation
+
+The most useful command is the least cryptographic one. `bsec run -- <command>` injects secrets directly into the child process's environment — no plaintext file is created on disk at any point. `run --secret` stages into a temp directory wiped on exit, including on SIGINT and SIGTERM.
+
+`materialize` does write real files, at mode `0600` under `0700` directories, and the documentation says so and tells you to delete them when done. `materialize --as schema` discloses key *names* while withholding values, which is the form you actually want to commit.
+
+### Schema validation as a startup gate
+
+`.env` files validate against a committed `.env.schema`, with auto-fix for missing keys and `.env.template` generation. This is the unglamorous feature that pays for itself: a missing environment variable becomes a failure at process start with a named key, rather than a `NoneType` deep inside a request handler an hour later.
+
+## The Trade-Off Worth Reading
+
+The security model section of the README is longer than the installation section, on purpose.
+
+Confidentiality here is cryptographic. Access control is not. The on-chain `expiresAt`, `maxReads` and `revoked` fields gate listing and the recorded read count — they do **not** cryptographically prevent a recipient who has already fetched the IPFS payload from decrypting it again offline, forever. TTL, max-reads and revocation are best-effort lifecycle signals, not guarantees against a past recipient.
+
+`--to public` wraps with a fixed, well-known key and therefore provides no confidentiality at all; it exists for non-sensitive content and says so.
+
+And `share`/`view` require real backends — a funded wallet with a deployed `BsecSecretRegistry`, and real IPFS storage via a Pinata JWT or a reachable daemon. With no backend reachable, commands fail with a clear error. **They never fake success**, which is the single most important property a secrets tool can have.
+
+## Impact
+
+Distribution is deliberately broad — Cargo, Homebrew, GitHub binaries, Docker/GHCR, `.deb`/`.rpm`/AUR/snap, winget/choco/scoop, and an NPM engine wrapper — because a secrets tool that one person on the team cannot install is a secrets tool the team will route around.

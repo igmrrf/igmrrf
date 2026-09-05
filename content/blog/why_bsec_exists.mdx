@@ -1,0 +1,76 @@
+---
+title: "Why bsec Exists"
+summary: "Secret sharing in small teams happens over DMs. The tools that fix it assume you have a platform team — and the ones that don't tend to oversell what their cryptography guarantees."
+date: "2026-08-15"
+tags: ["rust", "security", "cryptography", "cli", "secrets"]
+featured: false
+---
+
+Someone needs the staging `.env`. You paste it into a DM.
+
+That is the entire problem, and everybody reading this has done it. The plaintext now lives permanently in a chat history that nobody audits, that a departing employee keeps a copy of, and that no revocation mechanism reaches.
+
+## Why the existing answers did not fit
+
+The enterprise tooling solves this properly: Vault, cloud secret managers, an identity provider, rotation policies. All of it assumes a company — someone to run the vault, a platform team, an IdP already in place.
+
+Below that line, tooling thins out fast. And a two-person team sharing an API key has the same problem as a two-hundred-person one; they just do not have anyone to operate a vault.
+
+I wanted something a single developer could install and use, with no server to run — and that still got the cryptography right rather than approximately right.
+
+## The part I care most about
+
+`bsec run -- <command>` injects secrets straight into the child process's environment. No plaintext file is written to disk at any point.
+
+Everything else in the tool is scaffolding around that idea. The most common way secrets leak is not a broken cipher — it is a `.env` that got written somewhere and then stayed there: in a container image layer, in a backup, in a directory someone later ran `git add .` inside.
+
+If the secret never becomes a file, that entire failure class disappears.
+
+`materialize` does write real files, because sometimes you genuinely need one. Mode `0600`, under `0700` directories, and the documentation says to delete them when you are done. `run --secret` stages into a temp directory wiped on exit, including on SIGINT and SIGTERM.
+
+## The cryptography
+
+A secret is encrypted with AES-256-GCM under a per-secret random key. That key is wrapped for the recipient with ECDH over secp256k1 plus HKDF-SHA256. The ciphertext goes to IPFS; a registry contract records the pointer and the lifecycle metadata.
+
+Wallets created with `--password` derive through Argon2id and seal the private key and mnemonic with AES-256-GCM. Without a password, the key sits unencrypted at mode `0600` and `init` prints a warning — because silently accepting the weaker posture is how people end up with an unprotected key they believe is protected.
+
+## The section that took longest to write
+
+The security model section of the README is longer than the installation section. That was deliberate, and it was the hardest part of the project.
+
+`bsec` has TTL, max-reads and revocation. They sound like access control. They are not, and saying so plainly cost me the most attractive sentence I could have put on the project.
+
+Here is the actual guarantee. The on-chain `expiresAt`, `maxReads` and `revoked` fields gate **listing and the recorded read count**. They do not cryptographically prevent a recipient who has already fetched the IPFS payload from decrypting it again offline, tomorrow, or in five years. Once someone has the ciphertext and the key, revocation is a request, not a mechanism.
+
+So the docs call them best-effort lifecycle signals. Not guarantees against a past recipient.
+
+The same honesty applies twice more:
+
+- **`--to public`** wraps with a fixed, well-known key. It provides *no* confidentiality. It is for non-sensitive content and the docs say exactly that.
+- **`--no-export`** makes `bsec` refuse to write a secret to a file. It is a guard rail against accidental writes. It is explicitly **not DRM** — a recipient holds the plaintext after decrypt and can persist it by any other means.
+
+A security tool that overstates itself is worse than no tool, because people make decisions based on the claim. If someone chooses `bsec` believing revocation retracts a leaked secret, I have made them less safe than the DM did.
+
+## Never faking success
+
+`share` and `view` need real backends: a funded wallet with a deployed `BsecSecretRegistry`, and real IPFS via a Pinata JWT or a reachable daemon.
+
+If no backend is reachable, the commands fail with a clear error. They never fall back to a local stub, never write an unencrypted copy, never print success.
+
+This sounds obvious. It is not — "degrade gracefully" is the instinct everywhere else in software, and in a secrets tool graceful degradation means silently doing the unsafe thing.
+
+## The boring feature that earns its place
+
+Schema validation. `.env` files validate against a committed `.env.schema`, with auto-fix for missing keys and `.env.template` generation.
+
+No cryptography involved. It just means a missing environment variable fails at process start, naming the key, instead of surfacing as a null dereference inside a request handler an hour into the deploy.
+
+`materialize --as schema` discloses key *names* while withholding values — which is the form you actually want to commit.
+
+## Distribution as a security property
+
+Cargo, Homebrew, GitHub binaries, Docker and GHCR, `.deb`/`.rpm`/AUR/snap, winget/choco/scoop, and an NPM engine wrapper.
+
+That is a lot of packaging for a side project, and it is not completionism. A secrets tool that one person on the team cannot install is a secrets tool the team routes around — and the route around it is the DM.
+
+**Repository:** [github.com/igmrrf/clienv](https://github.com/igmrrf/clienv)

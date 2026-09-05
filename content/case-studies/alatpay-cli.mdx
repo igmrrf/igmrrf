@@ -1,0 +1,46 @@
+---
+title: "AlatPay CLI: Making Webhooks Debuggable Locally"
+summary: "A Go toolkit pairing a payments CLI with a mock WebSocket relay server, so webhook signature verification and event handling can be developed without a public tunnel."
+techStack: ["Go", "WebSockets", "HMAC Signature Verification", "REST", "CLI Tooling"]
+businessValue: "Collapses the slowest loop in payments integration. Instead of deploying to a staging URL and triggering a real transaction to see one webhook, a developer triggers events locally, watches them stream into the terminal, and sees signature verification pass or fail immediately."
+technicalTradeOffs: "A mock server means you are testing against your model of the provider, not the provider — a divergence in payload shape or signing scheme will pass locally and fail in staging. The mitigation is scope discipline: the mock relays and signs, it does not simulate payment outcomes, and the CLI can point at the real platform with a config change."
+githubUrl: "https://github.com/igmrrf/alatpaycli"
+date: "2026-03-01"
+featured: false
+---
+
+# AlatPay CLI: Making Webhooks Debuggable Locally
+
+## The Problem
+
+Webhook development has a structural problem: the event you need to debug is sent by someone else's server to a URL that must be publicly reachable. On a laptop, behind NAT, that is not a URL you have.
+
+The usual workarounds are all bad in the same way. Deploy to staging and trigger a real transaction — minutes per iteration. Run a tunnel and hope the provider tolerates the changing hostname. Write the handler blind and find out in staging whether the HMAC verification was right.
+
+Every one of those loops is measured in minutes, and webhook handlers are exactly the code where you want a loop measured in seconds, because signature verification either works or silently rejects everything.
+
+## Architectural Deep-Dive
+
+### Three components, one loop
+
+**`alatpay-mock-server`** acts as the local AlatPay platform. It receives webhooks over `POST /webhook` and broadcasts them to connected WebSocket clients at `ws://localhost:8081/ws`. It is a relay, deliberately — it does not simulate settlement, decline logic or state machines it has no authority over.
+
+**`alatpay`** is the CLI: authenticate and store credentials, create transactions, trigger mock events, and — the important one — `alatpay listen`, which connects over WebSocket, intercepts events, **verifies HMAC signatures**, and prints the payload in real time. It can also start a web dashboard for the same stream.
+
+**`backend`** is a reference receiver, so the loop can be exercised end to end.
+
+### Why signature verification is the centre of it
+
+Most of a webhook handler is uninteresting. The part that goes wrong is the signature check: the wrong secret, the wrong canonicalisation, the raw body consumed by a JSON middleware before the signature was computed. These fail closed and identically — every event rejected, no error to read.
+
+Putting verification in the `listen` path means the developer sees pass-or-fail per event, live, against a payload they can read. That is the difference between debugging a hypothesis and debugging a symptom.
+
+## The Honest Limitation
+
+A mock server tests you against your own understanding of the provider. If the real platform signs a slightly different canonical string, or nests the payload one level deeper, the mock will happily agree with the handler and staging will not.
+
+The design contains this rather than solving it. The mock's job is narrow — relay and sign — so there is less of it to be wrong about, and the CLI points at the real platform with a configuration change rather than a code change, so the local loop is a fast first pass rather than a substitute for integration testing.
+
+## Impact
+
+A developer-experience layer over a payment provider, built for the loop that actually costs time: not making the API call, but proving the callback was genuine.

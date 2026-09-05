@@ -1,0 +1,46 @@
+---
+title: "pack.nvim: A Plugin Manager That Delegates Instead of Reimplementing"
+summary: "A Neovim plugin manager built on top of the editor's native vim.pack API, adding an interactive dashboard and lazy loading without reimplementing git."
+techStack: ["Lua", "Neovim 0.12 vim.pack", "vim.system", "Git", "Asynchronous Programming"]
+businessValue: "Removes an entire class of plugin-manager risk from a developer's editor: cloning, checkout, pinning and the lockfile are handled by Neovim itself, so the manager cannot corrupt state it does not own. Startup stays fast through ftdetect pre-compilation and trigger-based lazy loading."
+technicalTradeOffs: "Betting the whole backend on vim.pack means the plugin simply refuses to run below Neovim 0.12 — a deliberate loss of reach in exchange for never shipping a bespoke git implementation. Optional backgrounded git jobs keep the UI responsive during large clones, at the cost of a second code path that must leave native vim.pack's lockfile consistent afterwards."
+githubUrl: "https://github.com/igmrrf/pack.nvim"
+date: "2026-09-02"
+featured: true
+---
+
+# pack.nvim: A Plugin Manager That Delegates Instead of Reimplementing
+
+## The Problem
+
+Every popular Neovim plugin manager ships its own git client. That is how they came to exist — for years Neovim had no package management worth using, so each manager grew a cloning layer, a checkout layer, a lockfile format and a resolution algorithm of its own. The cost is invisible until it bites: four managers, four subtly different ideas of what "pinned to v2.1.0" means, and four independent surfaces where a half-finished clone can leave your editor unbootable.
+
+Neovim 0.12 shipped `vim.pack`. The cloning problem is now the editor's problem. What was still missing was everything *around* it — a dashboard, lazy loading, a way to see that eleven plugins are behind without leaving the buffer you were in.
+
+## Architectural Deep-Dive
+
+### Native backend, layered ergonomics
+
+Every plugin installs under `vim.pack`'s directory and every plugin — lazy or eager — is `packadd`-ed explicitly rather than relying on Neovim's `start/` auto-load. That single decision is what makes ordered eager loading and lazy loading tractable: load order is something pack decides, not something that emerges from directory naming.
+
+Version pinning (`branch`, `tag`, `commit`, or a semver `version` range) resolves down to a native `vim.pack` spec. Native owns the lockfile; `:Pack restore` rolls every plugin back to it. There is exactly one source of truth for what is installed.
+
+### Async probes for a synchronous-feeling UI
+
+The dashboard needs to know which plugins are outdated and what commits are pending. That is read-only git work, and it runs as concurrency-limited non-blocking probes through `vim.system` — never on the main loop. The "outdated" indicator and the commit preview are therefore free: they cost you nothing at startup and never block a keystroke.
+
+### The `use_git` escape hatch
+
+Large transfers are the one case where native `vim.pack` blocks noticeably. With `use_git = true`, installs and updates run as backgrounded `git` jobs, and native `vim.pack` then runs afterwards — with the objects already local, so it is cheap — purely to register the plugin and sync the lockfile. Bulk updates batch at five plugins per call.
+
+This is the plugin's most interesting trade-off. It is a second code path, and a second code path around package installation is exactly the kind of thing that causes the corruption this project set out to avoid. It is contained by a strict rule: the git path never writes the lockfile. It only makes native's later run fast.
+
+### Lazy loading without the startup tax
+
+Triggers are the usual set — `cmd`, `event` with patterns, `ft`, `keys` — with one refinement worth naming. When a spec sets both `ft` and `keys`, the keymaps are never bound globally; they exist only in buffers whose filetype matches, both before and after the plugin loads. A Rust plugin's keymaps do not silently shadow anything in a Markdown buffer.
+
+Lazy plugins' `ftdetect` files are pre-compiled into a single cache block sourced at startup, so their filetypes are detected *before* the plugin loads — otherwise lazy-by-filetype would be a chicken-and-egg problem.
+
+## Impact
+
+`:checkhealth pack` verifies the Neovim version, git, the install directory, per-plugin status and orphaned directories, which turns "my editor is broken" into a diagnosable report. Disabling a plugin persists to `nvim-pack-extra.json` rather than requiring an edit to your Lua config — so bisecting a bad plugin is a keystroke in the dashboard, not a commit.
