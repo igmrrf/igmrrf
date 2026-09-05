@@ -1,0 +1,52 @@
+---
+title: "Subbox: Deterministic Social Graphics Without a Headless Browser"
+summary: "A Next.js tool that turns text into platform-sized social images, rendering PNGs server-side with Satori and Resvg instead of screenshotting a DOM."
+techStack: ["Next.js 16", "TypeScript", "Satori", "Resvg", "Zustand", "Tailwind CSS 4", "Vitest", "Biome"]
+businessValue: "Removes the design bottleneck from posting. A quote, a changelog line or a code snippet becomes a correctly-sized, on-brand graphic for X, LinkedIn, Instagram or TikTok in seconds, without opening a design tool or maintaining a template file per platform."
+technicalTradeOffs: "Rendering through Satori means committing to its CSS subset — no arbitrary layout, no browser-only features — in exchange for output that is deterministic, fast, and free of a headless Chromium in the deployment. The alternative, screenshotting a real DOM, supports everything and drags a browser binary and its cold-start cost into every render."
+githubUrl: "https://github.com/igmrrf/subbox"
+date: "2026-03-18"
+featured: false
+---
+
+# Subbox: Deterministic Social Graphics Without a Headless Browser
+
+## The Problem
+
+Text posts perform worse than images on every major platform, so the practical advice is "make it a graphic". The practical reality is that making it a graphic means opening a design tool, finding last time's file, checking whether X wants 16:9 and Instagram wants 4:5 this month, and retyping the text — a fifteen-minute detour attached to a thirty-second thought.
+
+## Architectural Deep-Dive
+
+### The rendering decision
+
+The obvious way to turn HTML into an image is to run a headless browser and screenshot it. Everything works, because it *is* a browser.
+
+Subbox uses [Satori](https://github.com/vercel/satori) to convert a JSX subset into SVG, then [Resvg](https://github.com/yisibl/resvg-js) to rasterise that SVG into PNG. No browser is involved at any point.
+
+The cost is a constrained CSS subset — flexbox-oriented layout, a defined set of supported properties, no browser-only behaviour. Anything outside it has to be expressed differently or not at all.
+
+What it buys is worth more for this workload:
+
+- **Determinism.** The same input renders identically every time. No font-loading race, no timing-dependent screenshot, no "it looked right locally".
+- **Speed.** No browser to launch, no page to load — the render is a function call.
+- **Deployability.** No Chromium binary in the image, no cold-start penalty, no memory ceiling to tune around.
+
+For a tool whose entire job is producing a predictable image from structured input, the browser's generality was never the thing being paid for.
+
+### Platform presets as data
+
+Twitter/X, LinkedIn, Instagram and TikTok each get a preset carrying dimensions, safe margins and a background gradient. Presets are data, so supporting a new platform — or a platform's next aspect-ratio change — is a data edit rather than a layout rewrite.
+
+### Composition options
+
+Light and dark themes; solid, glass (backdrop blur) and flat card styles; optional browser-style window chrome with macOS traffic lights; platform gradients or solid backgrounds. Typography adapts to content length, so a six-word quote and a paragraph both fill their canvas without manual sizing.
+
+State lives in Zustand — the right weight for a tool that is one editing surface with many toggles and no server state to synchronise.
+
+### Engineering hygiene
+
+Vitest for unit and integration tests, Biome for lint and format, PWA support so it installs like an app. The test suite matters more than it looks: image output is exactly the kind of thing that regresses invisibly, because nobody diffs a PNG by eye.
+
+## Impact
+
+MIT-licensed and self-hostable. The design constraint — pick a renderer that cannot do everything, so that what it does do is predictable — is the whole reason the tool is fast enough to use mid-thought.

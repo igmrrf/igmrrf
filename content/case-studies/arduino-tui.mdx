@@ -1,0 +1,40 @@
+---
+title: "arduino-tui: Wrapping a CLI Instead of Reimplementing It"
+summary: "A keyboard-driven Rust terminal UI for browsing, searching and managing Arduino libraries, built as a non-blocking wrapper around the official arduino-cli."
+techStack: ["Rust", "Ratatui", "Tokio", "arduino-cli", "Homebrew", "crates.io"]
+businessValue: "Turns Arduino library management from a documentation-lookup exercise into a searchable, one-keystroke workflow, without asking embedded developers to leave the terminal their toolchain already lives in."
+technicalTradeOffs: "Shelling out to arduino-cli rather than speaking to the library registry directly means inheriting its correctness, its authentication and its compatibility guarantees for free — and paying for that with process-spawn latency and the fragility of parsing another program's output. Tokio absorbs the latency; the parsing surface is the standing maintenance cost."
+githubUrl: "https://github.com/igmrrf/arduino-tui"
+date: "2026-04-17"
+featured: false
+---
+
+# arduino-tui: Wrapping a CLI Instead of Reimplementing It
+
+## The Problem
+
+Arduino library management is a search problem disguised as a package-manager problem. You know roughly what you need — a driver for a display, a protocol implementation — but not what it is called, who maintains it, whether it is still updated, or which of the six similarly-named results is the one everyone actually uses.
+
+`arduino-cli` can answer all of that. It answers it as a series of separate commands whose output you read, scroll back through, and then retype a name from. The information is available; the workflow is not.
+
+## Architectural Deep-Dive
+
+### The wrapper decision
+
+The tempting design is to talk to the Arduino library registry directly — fewer moving parts, no subprocess, structured data. The tempting design is wrong here.
+
+`arduino-cli` is the official client. It knows the index format, tracks its changes, handles installation paths across platforms, and is maintained by the people who define the ecosystem. Reimplementing it means signing up to track all of that forever, in a side project, to save a process spawn.
+
+So `arduino-tui` shells out, and treats `arduino-cli` as the source of truth for everything it reports. The cost is real: process-spawn latency on every operation, and a parsing layer coupled to another program's output format. The first is solved. The second is the honest ongoing liability of this design, and it is still cheaper than owning a registry client.
+
+### Non-blocking by construction
+
+Every `arduino-cli` invocation runs in the background through Tokio. The UI never freezes while a search runs or a library downloads — which matters more here than in most TUIs, because library installs pull real archives over the network and a synchronous implementation would spend most of its life unresponsive.
+
+### Keyboard-first
+
+Vim-like keybindings throughout; nothing requires the mouse. Search hits the entire library registry instantly, install and uninstall are single keystrokes, and detail views show versions, authors, descriptions and installation status without a second command. The design target is that you never leave the interface to complete a task you started in it.
+
+## Impact
+
+Distributed through crates.io (`cargo install arduino-tui`), through a Homebrew tap that pulls in `arduino-cli` as a dependency, and buildable from source. The Homebrew path matters most: it means the prerequisite the tool depends on is installed *with* it, rather than being a README step the user discovers after the first crash.

@@ -1,0 +1,64 @@
+---
+title: "Why the AlatPay CLI Exists"
+summary: "The event you need to debug is sent by someone else's server to a publicly reachable URL. On a laptop behind NAT, that is not a URL you have."
+date: "2026-03-01"
+tags: ["go", "webhooks", "payments", "developer-tools", "cli"]
+featured: false
+---
+
+Webhook development has a structural problem that no amount of good code on your side fixes.
+
+The event you need to inspect is sent by someone else's server, to a URL that has to be publicly reachable, at a moment you do not fully control. On a laptop, behind NAT, that URL does not exist.
+
+## The three bad options
+
+**Deploy to staging and trigger a real transaction.** Correct, and every iteration costs minutes. Change one line of the signature check, push, wait for the deploy, trigger a payment, read the logs, discover it is still wrong.
+
+**Run a tunnel.** Better, and now you are debugging the tunnel some of the time — changing hostnames, provider allowlists, the connection dropping mid-test.
+
+**Write the handler blind and find out in staging.** This is what most people actually do, and it is why webhook handlers so often ship subtly broken.
+
+Every one of those loops is minutes long, for code where the loop needs to be seconds long, because of what usually breaks.
+
+## What usually breaks
+
+Most of a webhook handler is boring. Parse JSON, look up a record, update a status.
+
+The part that goes wrong is signature verification. The wrong secret. The wrong canonical string. The raw body already consumed by a JSON middleware before the HMAC was computed over it.
+
+All of those fail the same way: **every event rejected, identically, with no error to read**. Fail-closed is correct behaviour and it is diagnostically useless — a perfectly working handler and a completely broken one look the same from outside. Silence.
+
+So the tool is built around making that one thing visible.
+
+## The three pieces
+
+**`alatpay-mock-server`** stands in for the platform. It takes webhooks at `POST /webhook` and broadcasts them to WebSocket clients at `ws://localhost:8081/ws`. A relay — nothing more.
+
+**`alatpay`** is the CLI: authenticate, create transactions, trigger mock events, and `alatpay listen`, which connects over WebSocket, intercepts events, **verifies HMAC signatures**, and prints the payload live. There is a web dashboard over the same stream when a terminal is not the right shape for what you are reading.
+
+**`backend`** is a reference receiver so the loop closes end to end.
+
+Putting verification in the `listen` path is the point of the whole toolkit. You see pass or fail, per event, next to a payload you can actually read. That is debugging a hypothesis instead of debugging a symptom.
+
+## The limitation I cannot engineer away
+
+A mock server tests you against **your own understanding of the provider**.
+
+If the real platform signs a slightly different canonical string, or nests the payload one level deeper than I assumed, the mock and the handler will agree with each other beautifully and staging will reject everything. My mock encodes my belief, and my handler encodes the same belief, so they cannot disagree.
+
+There is no clever fix. There is only containment:
+
+- **Keep the mock small.** It relays and it signs. It does not simulate settlement, decline logic, retry schedules or any state machine it has no authority over. Less surface, less to be wrong about.
+- **Make the real platform one config change away.** Not a code change. The local loop is a fast first pass, explicitly not a replacement for integration testing.
+
+I would rather ship a tool with a documented boundary than one that quietly encourages you to trust it further than it can carry you.
+
+## Why a mock and not a recording
+
+Recorded fixtures — capture real webhooks once, replay them locally — avoid the "my model of the provider" problem entirely, and I considered them.
+
+They also cannot help you until you have already received a real webhook, which is precisely the thing that is hard to do. Fixtures are excellent for regression tests and useless for the first integration, and the first integration is where the days go.
+
+The right answer is probably both. The mock is what I needed first.
+
+**Repository:** [github.com/igmrrf/alatpaycli](https://github.com/igmrrf/alatpaycli)

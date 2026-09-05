@@ -1,0 +1,52 @@
+---
+title: "DevIcons: A CDN That Is Just a Git Repository"
+summary: "620+ cryptocurrency and brand icons served as raw files and over jsDelivr, with a GitHub Pages showcase for browsing them."
+techStack: ["TypeScript", "SVG", "GitHub Pages", "jsDelivr CDN", "JSON Manifests"]
+businessValue: "Removes a recurring, unbudgeted task from every crypto or fintech build: sourcing, normalising and hosting hundreds of asset icons. A ticker symbol maps to a predictable URL in four colour variants, with no account, no API key and no rate limit."
+technicalTradeOffs: "Serving assets from a git repository through jsDelivr costs nothing, scales globally and rate-limits nobody — and gives up the things a real asset API provides: versioned releases, cache invalidation on demand, and any control over consumers pinned to `@main`. The mitigation is a JSON manifest, so consumers can discover what exists instead of guessing at URLs."
+githubUrl: "https://github.com/igmrrf/igmrrf.github.io"
+date: "2026-08-20"
+featured: false
+---
+
+# DevIcons: A CDN That Is Just a Git Repository
+
+## The Problem
+
+Every crypto or fintech interface needs the same few hundred icons, and every team sources them the same way: a mix of scraped logos, inconsistent viewBoxes, one PNG somebody exported at 3am, and a folder in `public/` that nobody dares clean up. The variants are never complete — there is a colour version but no monochrome, so the dark-mode header gets a hardcoded exception.
+
+It is not hard work. It is unbudgeted work, repeated per project, that produces no reusable artifact.
+
+## Architectural Deep-Dive
+
+### Predictable URLs over an API
+
+There is no service to call. Every asset lives at a URL derived from its symbol:
+
+```text
+https://cdn.jsdelivr.net/gh/igmrrf/igmrrf.github.io@main/cryptoicons/svg/color/btc.svg
+```
+
+Swap `color` for `black`, `white` or `icon` and the variant changes. Swap the symbol and the asset changes. A consumer needs no client library, because the URL scheme *is* the API — and a template string is a smaller dependency than any SDK.
+
+487 cryptocurrency icons in four variants each, plus social and tech brand marks and financial data registries, for 620+ assets total. Reachable as raw GitHub files or through jsDelivr's CDN.
+
+### The manifest
+
+Predictable URLs have one failure mode: a consumer cannot tell whether an asset exists without requesting it and handling a 404. A `manifest.json` per collection lists what is actually there, so a build step can resolve availability up front and fall back deliberately rather than shipping broken images.
+
+### What this design gives up
+
+This is a CDN in the sense that jsDelivr is a CDN and the origin is a git repository. That buys global edge caching, no bandwidth bill, no rate limits and no account — genuinely everything most consumers need.
+
+It gives up real things. There are no versioned releases, so a consumer pinned to `@main` inherits every change including one that redraws an icon they relied on. There is no cache invalidation on demand — a fix propagates on jsDelivr's schedule, not yours. And there is no analytics, so the maintainer cannot see which assets matter.
+
+For a free, zero-operations asset library these are the right trade-offs, and the manifest is what keeps the arrangement honest: consumers can at least discover the contents rather than reverse-engineering them.
+
+### The showcase
+
+The GitHub Pages application is the browsing surface — a Neo-Glass retro-futuristic interface for searching and previewing the collection, and copying the URL you need. The repository serves double duty: the site for humans, the raw tree for machines.
+
+## Impact
+
+One canonical, MIT-licensed source for an asset problem that otherwise gets re-solved badly in every project that hits it.
