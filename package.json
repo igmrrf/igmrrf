@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run build:decks && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:decks": "node scripts/build-decks.mjs"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

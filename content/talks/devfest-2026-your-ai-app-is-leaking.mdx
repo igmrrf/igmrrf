@@ -1,0 +1,45 @@
+---
+title: "Your AI App is Leaking"
+summary: "A practical guide to securing AI-powered applications in production — from API keys in the client bundle to prompt injection that walks straight past your authorization layer."
+event: "DevFest 2026"
+location: "Lagos, Nigeria"
+date: "2026-11-14"
+durationMinutes: 45
+tags: ["AI Security", "Prompt Injection", "Web Crypto", "Docker", "Data Sovereignty", "OWASP LLM"]
+deckSlug: "devfest-2026-your-ai-app-is-leaking"
+pdf: "/decks/devfest-2026-your-ai-app-is-leaking.pdf"
+repoUrl: "https://github.com/igmrrf/securing-ai-in-production"
+featured: true
+---
+
+Every team is shipping AI features. Most are bolting intelligence onto architectures that were never designed to protect the data those models consume. The result is predictable and it is everywhere: API keys in client bundles, unvalidated model inputs, sensitive documents streamed to third-party inference APIs with no access controls, and prompt injection attacks that bypass the entire authorization layer.
+
+This session is a walkthrough of what it actually takes to secure an AI application from code to deployment, built on patterns from production systems rather than theory slides.
+
+## What the talk covers
+
+**Authentication and access control for AI endpoints.** Your `/api/chat` is not a CRUD route — it is a metered, privileged, impersonatable resource. RBAC, step-up MFA for high-risk tool calls, and session lifecycle management, so your inference APIs are not open doors.
+
+**Protecting sensitive data in the pipeline.** Client-side envelope encryption with the Web Crypto API (RSA-OAEP wrapping an AES-GCM key), secrets management, and an honest accounting of where your PII actually ends up — observability traces, vector stores, provider retention windows, and your own error handlers.
+
+**Input validation and prompt injection defence.** Treating model inputs with the discipline you would apply to SQL, and being clear that structural delimiters are a mitigation rather than a fix. Direct injection is the noisy case; indirect injection through a document your user received is the one that gets you.
+
+**Infrastructure hardening.** Rootless containers, read-only root filesystems, dropped capabilities, and CI/CD security gates that fail the build rather than filing a ticket.
+
+**The sovereignty question.** When on-premise inference makes more sense than renting cloud capacity — regulation (NDPA, POPIA, Kenya's DPA), resilience after the 2024 subsea cable cuts, and FX exposure for teams earning in local currency and paying per token in USD.
+
+## Three bugs I shipped
+
+The reference implementation for this talk had three real defects in it, and each one is on a slide:
+
+1. A step-up MFA gate whose entire authorization check was `ticket.startsWith('MFA_PROOF_')` — a string prefix the attacker controls.
+2. A canary-token killswitch that tested each stream chunk in isolation, so a canary split across chunks (which is every canary, in production) never matched.
+3. A secret scanner that reported a clean tree while a fake credential sat in the bundle, because the regex character class stopped at the first hyphen.
+
+They are in the deck because the fix is more useful than the pretence, and because each generalises: bind approvals to arguments, test detections against streams rather than strings, and prove your scanner catches a secret you planted on purpose.
+
+## What you leave with
+
+A mental model for threat assessment in AI applications, a checklist of vulnerabilities to audit in your own stack, and working patterns you can apply on Monday. The first three items on that checklist are free and take about an hour.
+
+The full reference implementation — hardened gateway, Web Crypto demo, Docker and Compose configs, CI security pipeline, and the threat-model documentation — is open source and linked above.

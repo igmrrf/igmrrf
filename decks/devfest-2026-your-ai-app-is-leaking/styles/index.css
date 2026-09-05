@@ -1,0 +1,356 @@
+/* ==========================================================================
+   DevFest 2026 — "Your AI App is Leaking"
+   Design system for the deck.
+
+   Principles:
+   1. Near-black ground. Google's four brand colours are the only chroma, and
+      they carry MEANING: red = compromised, green = hardened, yellow = caution,
+      blue = structure. Never decoration.
+   2. One accent per slide. If everything is highlighted, nothing is.
+   3. Type does the work. Projectors crush contrast and detail; size and weight
+      survive, hairlines and 11px body text do not.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --df-blue: #4285f4;
+  --df-red: #ea4335;
+  --df-yellow: #fbbc04;
+  --df-green: #34a853;
+
+  --df-blue-soft: #8ab4f8;
+  --df-red-soft: #f28b82;
+  --df-yellow-soft: #fdd663;
+  --df-green-soft: #81c995;
+
+  --df-bg: #0b0c0f;
+  --df-bg-raised: #14161b;
+  --df-surface: #1a1d24;
+  --df-border: #2a2e38;
+  --df-border-strong: #3a3f4c;
+
+  --df-text: #f1f3f4;
+  --df-muted: #9aa0a6;
+  --df-dim: #6b7280;
+
+  --df-accent: var(--df-blue);
+
+  --df-radius: 14px;
+  --df-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --df-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+.slidev-layout {
+  background-color: var(--df-bg);
+  color: var(--df-text);
+  font-family: var(--df-sans);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+  padding: 2.75rem 3.25rem;
+}
+
+.slidev-layout h1,
+.slidev-layout h2,
+.slidev-layout h3,
+.slidev-layout h4 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--df-text);
+}
+
+.slidev-layout h1 {
+  font-size: 3.1rem;
+  /* line-height 1.05 on an 800-weight face clips descenders into whatever
+     follows. Padding, not margin, so it survives margin collapsing. */
+  padding-bottom: 0.12em;
+  margin-bottom: 0.9rem;
+}
+
+.slidev-layout h2 {
+  font-size: 2rem;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  color: var(--df-muted);
+  line-height: 1.6;
+}
+
+.slidev-layout strong {
+  color: var(--df-text);
+  font-weight: 700;
+}
+
+.slidev-layout code:not(pre code) {
+  font-family: var(--df-mono);
+  font-size: 0.86em;
+  background: rgba(138, 180, 248, 0.12);
+  color: var(--df-blue-soft);
+  padding: 0.12em 0.4em;
+  border-radius: 5px;
+  border: 1px solid rgba(138, 180, 248, 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   Slide furniture: the thin accent rule + eyebrow above every title
+   -------------------------------------------------------------------------- */
+
+.df-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--df-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--df-accent);
+  margin-bottom: 0.85rem;
+}
+
+.df-eyebrow::before {
+  content: '';
+  width: 26px;
+  height: 2px;
+  background: var(--df-accent);
+  flex: none;
+}
+
+.df-lede {
+  font-size: 1.05rem;
+  color: var(--df-muted);
+  max-width: 58ch;
+  margin-top: 0;
+}
+
+/* Accent scoping: put .accent-red on a slide and every accent follows. */
+.accent-red   { --df-accent: var(--df-red); }
+.accent-green { --df-accent: var(--df-green); }
+.accent-yellow{ --df-accent: var(--df-yellow); }
+.accent-blue  { --df-accent: var(--df-blue); }
+
+/* --------------------------------------------------------------------------
+   Cards
+   -------------------------------------------------------------------------- */
+
+.df-card {
+  background: var(--df-bg-raised);
+  border: 1px solid var(--df-border);
+  border-radius: var(--df-radius);
+  padding: 1.15rem 1.25rem;
+  position: relative;
+}
+
+.df-card--red    { border-color: rgba(234, 67, 53, 0.34); background: rgba(234, 67, 53, 0.05); }
+.df-card--green  { border-color: rgba(52, 168, 83, 0.34); background: rgba(52, 168, 83, 0.05); }
+.df-card--yellow { border-color: rgba(251, 188, 4, 0.32); background: rgba(251, 188, 4, 0.05); }
+.df-card--blue   { border-color: rgba(66, 133, 244, 0.34); background: rgba(66, 133, 244, 0.05); }
+
+.df-card__title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* --------------------------------------------------------------------------
+   Badges
+   -------------------------------------------------------------------------- */
+
+.df-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.24rem 0.7rem;
+  border-radius: 9999px;
+  font-family: var(--df-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  white-space: nowrap;
+}
+
+.df-badge--blue   { background: rgba(66, 133, 244, 0.14); color: var(--df-blue-soft);   border: 1px solid rgba(66, 133, 244, 0.32); }
+.df-badge--red    { background: rgba(234, 67, 53, 0.14);  color: var(--df-red-soft);    border: 1px solid rgba(234, 67, 53, 0.32); }
+.df-badge--green  { background: rgba(52, 168, 83, 0.14);  color: var(--df-green-soft);  border: 1px solid rgba(52, 168, 83, 0.32); }
+.df-badge--yellow { background: rgba(251, 188, 4, 0.14);  color: var(--df-yellow-soft); border: 1px solid rgba(251, 188, 4, 0.32); }
+.df-badge--ghost  { background: rgba(255, 255, 255, 0.04); color: var(--df-muted);      border: 1px solid var(--df-border); }
+
+/* --------------------------------------------------------------------------
+   Gradient text (used once, on the cover)
+   -------------------------------------------------------------------------- */
+
+.df-gradient {
+  /* Warm ramp only. A red->yellow->blue sweep passes through a desaturated
+     dead zone mid-word that reads grey on a projector. */
+  background: linear-gradient(98deg, #ea4335 0%, #f4713c 38%, #fbbc04 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Code blocks — the workhorse of this talk
+   -------------------------------------------------------------------------- */
+
+.slidev-layout pre,
+.slidev-layout .slidev-code {
+  font-family: var(--df-mono) !important;
+  background: #0e1015 !important;
+  border: 1px solid var(--df-border);
+  border-radius: 10px;
+  font-size: 0.78rem !important;
+  line-height: 1.62 !important;
+  padding: 0.95rem 1.05rem !important;
+}
+
+.slidev-layout .slidev-code .line.highlighted {
+  background: rgba(66, 133, 244, 0.10);
+  box-shadow: inset 2px 0 0 var(--df-blue);
+}
+
+.accent-red .slidev-code .line.highlighted {
+  background: rgba(234, 67, 53, 0.10);
+  box-shadow: inset 2px 0 0 var(--df-red);
+}
+
+.accent-green .slidev-code .line.highlighted {
+  background: rgba(52, 168, 83, 0.10);
+  box-shadow: inset 2px 0 0 var(--df-green);
+}
+
+.accent-yellow .slidev-code .line.highlighted {
+  background: rgba(251, 188, 4, 0.10);
+  box-shadow: inset 2px 0 0 var(--df-yellow);
+}
+
+/* Slidev dims un-highlighted lines. Its default is too aggressive for a
+   projector — dimmed code must still be readable from the back row. */
+.slidev-layout .slidev-code .line:not(.highlighted) {
+  opacity: 0.42;
+  transition: opacity 220ms ease;
+}
+
+/* Two-column code needs a smaller grade to avoid horizontal clipping. */
+.df-compare-scope pre,
+.df-compare-scope .slidev-code,
+.df-compare-scope code {
+  font-size: 0.645rem !important;
+  line-height: 1.55 !important;
+  padding: 0.8rem 0.85rem !important;
+}
+
+/* Filename chip above a code block: ```ts {*}{filename:'proxy.ts'} */
+.df-file {
+  display: inline-block;
+  font-family: var(--df-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--df-dim);
+  background: var(--df-surface);
+  border: 1px solid var(--df-border);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0.24rem 0.7rem;
+  margin-bottom: -1px;
+}
+
+/* --------------------------------------------------------------------------
+   Mermaid — force it onto the deck palette instead of its pastel default
+   -------------------------------------------------------------------------- */
+
+.slidev-layout .mermaid {
+  background: transparent !important;
+}
+
+.slidev-layout .mermaid .messageText,
+.slidev-layout .mermaid .labelText,
+.slidev-layout .mermaid .loopText,
+.slidev-layout .mermaid text.actor > tspan {
+  fill: var(--df-text) !important;
+  font-family: var(--df-sans) !important;
+  font-size: 13px !important;
+}
+
+.slidev-layout .mermaid .actor {
+  fill: var(--df-surface) !important;
+  stroke: var(--df-border-strong) !important;
+}
+
+.slidev-layout .mermaid line,
+.slidev-layout .mermaid .messageLine0,
+.slidev-layout .mermaid .messageLine1 {
+  stroke: var(--df-border-strong) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Presenter-friendly progress rail
+   -------------------------------------------------------------------------- */
+
+.df-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  display: flex;
+}
+
+.df-rail span { flex: 1; }
+.df-rail span:nth-child(1) { background: var(--df-blue); }
+.df-rail span:nth-child(2) { background: var(--df-red); }
+.df-rail span:nth-child(3) { background: var(--df-yellow); }
+.df-rail span:nth-child(4) { background: var(--df-green); }
+
+/* --------------------------------------------------------------------------
+   Utilities
+   -------------------------------------------------------------------------- */
+
+.df-mono { font-family: var(--df-mono); }
+.df-dim  { color: var(--df-dim); }
+.df-muted{ color: var(--df-muted); }
+
+.df-kbd {
+  font-family: var(--df-mono);
+  font-size: 0.72rem;
+  border: 1px solid var(--df-border-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 0.1rem 0.4rem;
+  color: var(--df-text);
+  background: var(--df-surface);
+}
+
+/* Slidev's goto dialog overflows the viewport when closed on some versions. */
+#slidev-goto-dialog.-top-20,
+#slidev-goto-dialog.-top-20 * {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Code inside a centred statement slide: constrain and left-align, otherwise
+   a two-line snippet stretches the full 1280px and reads as a banner.
+   -------------------------------------------------------------------------- */
+
+.df-statement pre,
+.df-statement .slidev-code {
+  max-width: 44rem;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+.df-statement__body :deep(pre) { text-align: left; }

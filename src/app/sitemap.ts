@@ -1,11 +1,11 @@
 import { MetadataRoute } from 'next';
-import { getCaseStudySlugs, getBlogPostSlugs } from '@/lib/mdx';
+import { getCaseStudySlugs, getBlogPostSlugs, getTalkSlugs } from '@/lib/mdx';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://theldo.com';
 
   // Core routes
-  const routes = ['', '/case-studies', '/experience', '/blog', '/about', '/chat', '/stack'].map(
+  const routes = ['', '/case-studies', '/talks', '/experience', '/blog', '/about', '/chat', '/stack'].map(
     (route) => ({
       url: `${baseUrl}${route}`,
       lastModified: new Date(),
@@ -30,5 +30,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }));
 
-  return [...routes, ...caseStudyRoutes, ...blogPosts];
+  // Talks
+  const talkRoutes = getTalkSlugs().map((slug) => ({
+    url: `${baseUrl}/talks/${slug.replace(/\.mdx?$/, '')}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  }));
+
+  return [...routes, ...caseStudyRoutes, ...talkRoutes, ...blogPosts];
 }

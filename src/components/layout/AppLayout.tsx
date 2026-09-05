@@ -11,6 +11,7 @@ import {
   User,
   History,
   Bot,
+  Presentation,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -23,6 +24,7 @@ interface AppLayoutProps {
 
 const navLinks = [
   { href: "/case-studies", label: "Work", icon: BookText },
+  { href: "/talks", label: "Talks", icon: Presentation },
   { href: "/experience", label: "Experience", icon: History },
   { href: "/blog", label: "Blog", icon: PenTool },
   { href: "/about", label: "About", icon: User },
