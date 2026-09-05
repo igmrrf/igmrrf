@@ -1,0 +1,69 @@
+---
+title: "Why DevIcons Exists"
+summary: "Every crypto project re-solves the same icon problem badly. The fix was not an API — it was a URL scheme and a git repository."
+date: "2026-08-20"
+tags: ["svg", "icons", "cdn", "jsdelivr", "open-source"]
+featured: false
+---
+
+Every crypto or fintech interface needs the same few hundred icons, and every team assembles them the same way.
+
+A handful scraped from a logo page. Inconsistent viewBoxes, so some render at the wrong optical size and get a one-off CSS fix. One PNG somebody exported at 3am because the SVG was nowhere to be found. A folder in `public/` that nobody dares clean up because it is unclear what still references what.
+
+And the variants are never complete. There is a colour version but no monochrome, so the dark-mode header gets a hardcoded exception that lives forever.
+
+None of this is hard. It is *unbudgeted*, repeated per project, and produces nothing reusable.
+
+## The design: no service at all
+
+The reflex is to build an icon API. Endpoints, a client library, maybe keys and a dashboard.
+
+DevIcons has none of that. Every asset lives at a URL derived from its symbol:
+
+```text
+https://cdn.jsdelivr.net/gh/igmrrf/igmrrf.github.io@main/cryptoicons/svg/color/btc.svg
+```
+
+Swap `color` for `black`, `white` or `icon` and the variant changes. Swap the symbol and the asset changes. That is the entire interface.
+
+A consumer needs no client library, because **the URL scheme is the API**. A template string is a smaller dependency than any SDK, and it never needs a version bump.
+
+487 cryptocurrency icons across four variants each, plus social and tech brand marks and financial data registries — 620+ assets. Reachable as raw GitHub files or through jsDelivr's CDN.
+
+## The manifest, and the failure mode it fixes
+
+Predictable URLs have exactly one weakness: a consumer cannot tell whether an asset exists without requesting it and handling a 404.
+
+In practice that means broken images shipping to production, because nobody checks 404s on an `<img>` tag.
+
+So each collection has a `manifest.json` listing what is actually there. A build step resolves availability up front and falls back deliberately — a generic token glyph instead of a broken image icon.
+
+## What this gives up
+
+This is a CDN in the sense that jsDelivr is a CDN and the origin happens to be a git repository. Free, globally edge-cached, no rate limits, no account, no bandwidth bill.
+
+It also gives up things I do not want to pretend it has:
+
+**No versioned releases.** A consumer pinned to `@main` inherits every change, including one that redraws an icon they had aligned their layout around. jsDelivr can pin to a commit, but that is the consumer's discipline, not something the project enforces.
+
+**No cache invalidation on demand.** A fix propagates on jsDelivr's schedule, not mine. If an icon is wrong, "wait" is most of the remedy.
+
+**No analytics.** I cannot see which assets matter, so I cannot prioritise by usage.
+
+For a free, zero-operations asset library these are the right trades — each of those capabilities costs infrastructure that would have to be paid for and run, which would make it a service, which is the thing I was avoiding. But they are real, and someone deciding whether to depend on this should know them before they do.
+
+The manifest is what keeps the arrangement honest. Consumers can discover the contents rather than reverse-engineering them from a README.
+
+## The showcase
+
+The GitHub Pages application is the browsing surface — search, preview, copy the URL you need, in a Neo-Glass retro-futuristic interface, because if I am going to look at 620 icons I would like the page to be worth looking at.
+
+The repository does double duty: the site for humans, the raw tree for machines. One thing to maintain.
+
+## The pattern worth stealing
+
+Before building a service, check whether a naming convention would do.
+
+A convention has no uptime, no bill, no keys, no client library and no deprecation cycle. It is not the right answer often — but this problem was "make hundreds of files reachable by name", and that is precisely what a filesystem behind a CDN already does.
+
+**Repository:** [github.com/igmrrf/igmrrf.github.io](https://github.com/igmrrf/igmrrf.github.io)

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "previews": "node scripts/capture-previews.mjs"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",

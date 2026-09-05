@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { CompanyLink } from "@/components/experience/CompanyLink";
 
 const container = {
   hidden: { opacity: 0 },
@@ -102,7 +103,8 @@ export default function ExperiencePage() {
               <div className="md:col-span-9 p-10 flex flex-col gap-8">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-3 text-[10px] font-mono tracking-widest uppercase text-primary">
-                    <Briefcase className="h-3 w-3" /> {exp.company}
+                    <Briefcase className="h-3 w-3 shrink-0" />
+                    <CompanyLink slug={exp.company} />
                   </div>
                   <h3 className="text-3xl font-black uppercase tracking-tighter italic group-hover:text-primary transition-colors">
                     {exp.role}
@@ -272,7 +274,7 @@ export default function ExperiencePage() {
 const experiences = [
   {
     role: "Senior Software Architect",
-    company: "OneRemit",
+    company: "oneremit",
     location: "Remote",
     period: "Feb 2026 - Present",
     highlights: [
@@ -285,7 +287,7 @@ const experiences = [
   },
   {
     role: "Senior Software Engineer",
-    company: "Lingawa",
+    company: "lingawa",
     location: "Remote",
     period: "Mar 2025 - Feb 2026",
     highlights: [
@@ -298,7 +300,7 @@ const experiences = [
   },
   {
     role: "Co-Founder & Chief Product Officer",
-    company: "NPC Labs",
+    company: "npc-labs",
     location: "United States (Remote)",
     period: "Sep 2023 - Dec 2025",
     highlights: [
@@ -311,7 +313,7 @@ const experiences = [
   },
   {
     role: "Technical Lead Engineer",
-    company: "NPC Labs",
+    company: "npc-labs",
     location: "US",
     period: "Dec 2022 - Sep 2023",
     highlights: [
@@ -331,7 +333,7 @@ const experiences = [
   },
   {
     role: "Founder & Lead Engineer",
-    company: "Ajian Labs",
+    company: "ajian-labs",
     location: "NG",
     period: "Dec 2022 - Present",
     highlights: [
@@ -343,7 +345,7 @@ const experiences = [
   },
   {
     role: "Software Engineer",
-    company: "Kunda Box",
+    company: "kunda-box",
     location: "US",
     period: "Apr 2023 - Jun 2023",
     highlights: [
@@ -364,7 +366,7 @@ const experiences = [
   },
   {
     role: "Software Engineer (Fintech)",
-    company: "VeendHQ Inc.",
+    company: "veendhq",
     location: "Wilmington, DE",
     period: "Apr 2022 - Dec 2022",
     highlights: [
@@ -377,7 +379,7 @@ const experiences = [
   },
   {
     role: "Software Developer",
-    company: "Akaani",
+    company: "akaani",
     location: "US",
     period: "Jul 2021 - Apr 2022",
     highlights: [
@@ -389,7 +391,7 @@ const experiences = [
   },
   {
     role: "Frontend Lead",
-    company: "Vomoz Limited",
+    company: "vomoz",
     location: "US",
     period: "Jan 2021 - Jul 2021",
     highlights: [
@@ -401,7 +403,7 @@ const experiences = [
   },
   {
     role: "Frontend Developer Intern",
-    company: "Afridash Limited",
+    company: "afridash",
     location: "Nigeria",
     period: "July 2019 - Dec 2019",
     highlights: [
@@ -413,7 +415,7 @@ const experiences = [
   },
   {
     role: "Contract Developer",
-    company: "Freelance",
+    company: "freelance",
     location: "Nigeria",
     period: "Dec 2018 - Dec 2020",
     highlights: [

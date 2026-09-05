@@ -1,0 +1,57 @@
+---
+title: "Why arduino-tui Exists"
+summary: "Finding an Arduino library is a search problem wearing a package manager's clothes. arduino-cli has all the answers and none of the workflow."
+date: "2026-04-17"
+tags: ["rust", "tui", "arduino", "embedded", "developer-tools"]
+featured: false
+---
+
+You need a library for a display you just soldered. You know roughly what it does. You do not know what it is called, who maintains it, whether it has been touched since 2019, or which of the six near-identical results is the one everybody actually uses.
+
+`arduino-cli` can tell you all of that. It tells you as a sequence of separate commands whose output you read, scroll back through, and then retype a name from.
+
+The information is there. The workflow is not.
+
+## The design decision I want to defend
+
+The tempting architecture is to talk to the Arduino library registry directly. Fewer moving parts, structured JSON, no subprocess overhead, no output parsing. Clean.
+
+I did not do that, and it was the right call.
+
+`arduino-cli` is the official client. It knows the index format. It tracks changes to the index format. It handles installation paths across three operating systems. It is maintained by the people who *define* the ecosystem.
+
+Reimplementing it means signing up to track all of that — forever, in a side project, to save a process spawn. The first time the index format shifts, my version breaks and theirs does not. Then I am not maintaining a TUI, I am maintaining a package client with a TUI attached.
+
+So `arduino-tui` shells out and treats `arduino-cli` as the source of truth for everything it reports.
+
+## Being straight about what that costs
+
+Two things, and I would rather name them than pretend the decision was free.
+
+**Process-spawn latency on every operation.** Every search, every install, every detail lookup is a subprocess. That is solvable and it is solved — everything runs in the background through Tokio, so the UI never blocks. This matters more here than in most TUIs, because library installs pull real archives over a network. A synchronous implementation would spend most of its life frozen.
+
+**A parsing layer coupled to another program's output.** This one is not solvable, only managed. `arduino-cli` can change how it formats output and my parser breaks. That is the standing liability of this design and it will cost me maintenance at some point.
+
+I still think it is much cheaper than owning a registry client. A parser breaks visibly and is fixed in an afternoon. A stale index implementation breaks *silently*, tells people a library does not exist when it does, and I might not hear about it for months.
+
+## Keyboard-first, and what that actually means
+
+Vim-like bindings, nothing requiring the mouse, instant search across the whole registry, install and uninstall as single keystrokes, detail views with versions, authors, descriptions and install status.
+
+The real design target underneath all of that: **you should never leave the interface to finish a task you started in it.** Every time a tool makes you copy a name out and paste it into a shell, it has admitted it is a viewer rather than a manager.
+
+## The install path is part of the product
+
+`arduino-tui` needs `arduino-cli` on your `PATH`. That is a prerequisite, and prerequisites are where tools lose people — README step three, discovered after the first crash.
+
+The Homebrew tap installs `arduino-cli` as a dependency. `brew install arduino-tui` and both are there.
+
+Cargo and source builds exist for people who want them, but Homebrew is the path I care about, because it is the one where the dependency is never the user's problem.
+
+## The pattern
+
+Some tools should be rewritten. Some should be wrapped.
+
+The test I use: does the thing you would be replacing derive its correctness from being *official* — from being the reference implementation, from defining the format rather than parsing it? If so, wrap it. You cannot out-maintain the people who set the standard, and competing with them means inheriting a job you did not want.
+
+**Repository:** [github.com/igmrrf/arduino-tui](https://github.com/igmrrf/arduino-tui)

@@ -1,0 +1,46 @@
+---
+title: "aikomail: Email Verification as a Chain of Weakening Signals"
+summary: "A Go verification service that layers syntax, MX, SMTP handshake, disposable-domain and catch-all checks behind a worker pool and a rate limiter."
+techStack: ["Go", "PostgreSQL", "DNS/MX Lookup", "SMTP", "Docker Compose", "Fly.io", "Neon"]
+businessValue: "Cuts the bounce rate that destroys sender reputation. Bad addresses are rejected at signup — before they reach a mailing list, before a transactional email hard-bounces, and before a provider starts treating the whole domain as a spam source."
+technicalTradeOffs: "The SMTP handshake is the strongest available signal and also the most expensive and most likely to get the verifier's own IP throttled or blocklisted — which is precisely why it sits behind a worker pool and a request-per-second limiter rather than being run inline. Catch-all detection is honest about its own ceiling: on a catch-all domain, no external check can distinguish a real mailbox from a typo."
+githubUrl: "https://github.com/igmrrf/aikomail"
+date: "2026-02-20"
+featured: false
+---
+
+# aikomail: Email Verification as a Chain of Weakening Signals
+
+## The Problem
+
+Every product with a signup form eventually discovers that a meaningful share of the addresses it collected do not exist. Some are typos. Some are disposable addresses created to get past a gate. Some were valid two years ago. The damage is not the dead row in the database — it is that hard bounces are how mail providers decide you are a spammer, and reputation is far easier to lose than to rebuild.
+
+The commercial verification APIs solve this, at per-check pricing that stops making sense the moment you are verifying a list rather than a signup.
+
+## Architectural Deep-Dive
+
+### Five checks, decreasing confidence
+
+Verification is not one answer, it is a chain, and each link is weaker than the last:
+
+1. **Syntax validation** — cheap, local, and definitive when it fails.
+2. **MX record lookup** — a DNS query. If the domain publishes no mail exchanger, nothing can be delivered there. Still definitive.
+3. **SMTP handshake** — connect to the mail server and ask about the mailbox without sending anything. The strongest signal available, and the first one that can be wrong: plenty of servers answer identically for every address to defeat exactly this probe.
+4. **Disposable-domain detection** — a list lookup. Definitive for known burner domains, silent about new ones.
+5. **Catch-all detection** — determines whether a domain accepts *everything*. This check exists to tell you the SMTP result was meaningless.
+
+The design point is that the service reports which link produced the verdict rather than collapsing five different kinds of knowledge into one boolean.
+
+### Why the worker pool is a correctness feature
+
+The SMTP handshake opens a real connection to someone else's mail server. Run those inline and unbounded, and a list import turns into behaviour indistinguishable from a dictionary attack — with the verifier's IP as the thing that gets blocklisted.
+
+So concurrency is bounded by a fixed worker pool (`WORKERS_COUNT`) and arrival is bounded by a requests-per-second limiter (`RATE_LIMIT`). Both are environment-configured. These read as performance knobs and are really reputation controls: the service's ability to keep working depends on it never looking abusive.
+
+### Deployment shape
+
+Postgres for persistence, `.env.schema` copied to `.env` for configuration, Docker Compose for local orchestration, and a Make/Just target for each. It runs on free tiers — Fly.io for the service, Neon for the database — which is the correct hosting decision for a tool whose value is not having to pay per check.
+
+## Impact
+
+The result is a self-hostable service that answers the question a signup form actually needs answered, and is candid about the cases where nobody can answer it.

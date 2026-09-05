@@ -1,0 +1,61 @@
+---
+title: "Why Subbox Exists"
+summary: "Turning a thought into a shareable graphic takes fifteen minutes of design-tool detour. The fix was picking a renderer that deliberately cannot do everything."
+date: "2026-03-18"
+tags: ["nextjs", "typescript", "satori", "design-tools", "rendering"]
+featured: false
+---
+
+Text posts underperform images on every major platform. So the advice is "make it a graphic".
+
+Making it a graphic means opening a design tool, finding last time's file, checking whether X wants 16:9 and Instagram wants 4:5 this month, retyping the text, exporting, and remembering where the export went. Fifteen minutes attached to a thirty-second thought.
+
+The friction is not that design is hard. It is that the tool is general-purpose and the task is not.
+
+## The decision the whole project rests on
+
+To turn markup into an image, the obvious approach is a headless browser: render HTML, screenshot it. Everything works, because it *is* a browser.
+
+Subbox does not do that. [Satori](https://github.com/vercel/satori) converts a JSX subset to SVG, then [Resvg](https://github.com/yisibl/resvg-js) rasterises that SVG to PNG. No browser anywhere in the pipeline.
+
+The cost is real and immediate: a constrained CSS subset. Flexbox-oriented layout, a defined set of supported properties, none of the browser-only tricks. Anything outside it has to be expressed differently or not at all, and I hit that wall more than once.
+
+Three things bought it:
+
+**Determinism.** The same input renders identically every time. No font-loading race. No screenshot fired a beat before the layout settled. No "it looked right locally" — the class of bug where you cannot even reliably reproduce the failure.
+
+**Speed.** No browser to launch, no page to load. A render is a function call. That is what makes the tool usable *mid-thought*, which was the entire point — a fifteen-minute detour and a two-minute detour are the same category of thing if the two-minute one still breaks your train of thought.
+
+**Deployability.** No Chromium binary in the image. No cold-start penalty. No memory ceiling to tune around. A serverless function instead of a service.
+
+For a tool whose whole job is producing a predictable image from structured input, the browser's generality was never the thing I was paying for. I would have been paying for it anyway, on every render, forever.
+
+## Presets are data
+
+Twitter/X, LinkedIn, Instagram and TikTok each get a preset: dimensions, safe margins, background gradient.
+
+Presets are data, not layout code. Platforms change their preferred aspect ratios with no notice and no migration guide, and when that happens I want to edit a record, not a component tree. The same property means adding a platform is an addition rather than a change.
+
+## The rest of it
+
+Light and dark themes. Solid, glass and flat card styles. Optional browser-style window chrome with macOS traffic lights. Typography that adapts to content length, so a six-word quote and a full paragraph both fill their canvas without manual sizing.
+
+State in Zustand — the right weight for one editing surface with many toggles and no server state to synchronise. Reaching for a data-fetching library here would have been architecture cosplay.
+
+## The test suite is not decoration
+
+Vitest for unit and integration tests, Biome for lint and format.
+
+Image output regresses invisibly. Nobody diffs a PNG by eye, and a change that shifts padding by four pixels or silently drops a font fallback produces output that still looks like output. You find out weeks later, from a graphic you already posted.
+
+That is the argument for testing a project this small: not correctness in the abstract, but the fact that the failure mode is *quiet*.
+
+## What I would tell someone building the same thing
+
+The instinct is to pick the most capable renderer and constrain yourself by convention.
+
+The better move was picking a renderer that cannot do everything, and letting its limits be the constraint. It made the output predictable, made the tool fast enough to actually reach for, and removed a browser binary from the deployment.
+
+The constraint is the feature.
+
+**Repository:** [github.com/igmrrf/subbox](https://github.com/igmrrf/subbox)

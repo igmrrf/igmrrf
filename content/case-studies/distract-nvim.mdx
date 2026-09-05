@@ -1,0 +1,44 @@
+---
+title: "distract.nvim: One Asset Pipeline, Four Ways to Draw It"
+summary: "A data-driven rendering engine for Neovim that draws animated entities through half-block glyphs, the Kitty graphics protocol, or a GPU overlay window — in 2D or 3D, from a single set of assets."
+techStack: ["Lua", "Neovim API", "Kitty Graphics Protocol", "wgpu", "Rust", "State Machines"]
+businessValue: "Proves that rich graphics belong inside a terminal workflow, not beside it. The multi-backend fallback chain means the same configuration produces the best available fidelity on any terminal — from a bare SSH session to a GPU-composited desktop — with no per-environment configuration from the user."
+technicalTradeOffs: "Three rendering backends triple the surface area that every feature must cross, and the suite has to assert that a sprite covers identical cells on all of them. The larger bet was refusing to author a second set of 3D assets: opaque pixels are extruded into cube slabs at runtime instead, which keeps one asset pipeline forever but pays for it in per-frame CPU rasterisation inside the terminal backends."
+githubUrl: "https://github.com/igmrrf/distract.nvim"
+date: "2026-08-19"
+featured: true
+---
+
+# distract.nvim: One Asset Pipeline, Four Ways to Draw It
+
+## The Problem
+
+Terminal graphics are a mess of incompatible capabilities. Kitty and Ghostty speak a graphics protocol. Alacritty does not. tmux mangles half of what passes through it. X11 cannot do click-through windows. A project that wants to draw something animated in a developer's editor has to either target one terminal and abandon everyone else, or degrade — and degrading well is much harder than it sounds, because "degrade" usually means a second implementation with its own bugs and its own asset requirements.
+
+## Architectural Deep-Dive
+
+### The backend ladder
+
+Three backends, chosen automatically when you name none:
+
+- **`halfblock`** renders 24-bit RGB sprites using Unicode half-blocks (`▀`/`▄`) directly in the buffer. It is genuinely transparent: rows sitting over your code are drawn as overlay virtual text, so only cells that actually contain a pixel are touched and the characters around each pixel survive. Rows below the end of the buffer — where virtual text cannot be placed — fall back to a float with no background of its own.
+- **`kitty`** uses the terminal graphics protocol for real RGBA sprites with per-pixel alpha. Critically, it occupies *exactly* the same cells as `halfblock`: a 24×16 sprite is 24 columns by 8 rows either way. The fidelity gain is pixel density inside that rectangle, not a bigger rectangle, so nothing about placement changes when the backend does.
+- **`overlay`** is a transparent, borderless, click-through wgpu window that draws one instanced quad per entity from a sprite atlas uploaded once, and skips the frame entirely when nothing has moved.
+
+The fallback rule is a single line of policy: a terminal that answers the protocol's `a=q` query gets `kitty`, everything else gets `halfblock`. Naming one explicitly always wins.
+
+### The refusal that shaped the design
+
+`overlay` is not offered on X11 at all. Click-through is unsupported there, and a fullscreen always-on-top window without it would capture every mouse click on the user's desktop. The overlay refuses to start rather than trapping you — a case where the correct engineering answer is to ship less.
+
+### 3D without a second asset pipeline
+
+Every asset draws two ways on every backend, switchable live with `:DistractRender 3d`. There is no second set of 3D assets and no mesh format. Every asset already resolves to RGBA frames, so a frame's opaque pixels are extruded into a slab of cubes — a real model of that frame, built from art the asset already has. Built-ins, imported spritesheets, GIFs and anything user-registered all work in 3D with nothing authored twice.
+
+A face is only emitted where the neighbour that would hide it is transparent, so a solid frame costs two quads per pixel plus its silhouette.
+
+The invariant that makes this safe: **nothing about the simulation changes**. Placement, floors, obstacles, wrapping and an asset's cell footprint are identical in both modes, because the footprint is what the physics measures against. A model drawn face-on covers exactly the pixels its sprite does — which the test suite asserts — so turning 3D on never moves or reshapes an entity. The only thing that changes meaning is `z`: draw order plus parallax damping in 2D, perspective shrink in 3D.
+
+## Impact
+
+The engine is data-driven: entities are declared with capabilities and state machines rather than coded imperatively, so new behaviour is a data change. The result is a rendering system that works over SSH, inside tmux, on a GPU, and in three dimensions — from one description of what to draw.

@@ -1,0 +1,54 @@
+---
+title: "socks-ssh: Getting a Dynamic IP Past an Allowlist"
+summary: "A Node.js package that raises a SOCKS5 tunnel over SSH and selectively routes named hosts through it by intercepting global fetch — no changes at the call site."
+techStack: ["TypeScript", "Node.js", "SSH", "SOCKS5", "undici", "fetch-socks"]
+businessValue: "Restores local development against IP-allowlisted third-party APIs. Instead of deploying to a whitelisted staging box to test every change against a payment provider, an engineer runs the app locally and only the calls to that provider travel through the approved IP."
+technicalTradeOffs: "Patching `globalThis.fetch` is invasive by design — it is what lets an existing codebase gain tunnelled routing with zero call-site edits, and it is also a global mutation that any other library sharing the process must tolerate. Routing is therefore opt-in per host suffix rather than blanket, and the diagnostic logging that makes the tunnel debuggable is capped and redacted so it cannot become the leak."
+githubUrl: "https://github.com/igmrrf/socks-ssh"
+date: "2026-07-15"
+featured: false
+---
+
+# socks-ssh: Getting a Dynamic IP Past an Allowlist
+
+## The Problem
+
+Financial APIs allowlist IPs. That is correct security practice and it makes local development structurally impossible: a laptop on a residential connection has an address that changes, and no provider is going to allowlist it.
+
+The workarounds all degrade the loop. Deploy to the whitelisted staging box to test every change. Or run the whole application behind a full-tunnel VPN, which sends unrelated traffic — your package registry, your database, your telemetry — through a hop that has no business seeing it.
+
+What is actually wanted is narrow: calls to `*.terrapay.com` should leave from the allowlisted server, and everything else should behave exactly as before.
+
+## Architectural Deep-Dive
+
+### Tunnel lifecycle
+
+On initialisation the package spawns and maintains `ssh -D <port> -N -C`, giving a local SOCKS5 proxy backed by an allowlisted host. It registers cleanup so the SSH child process is killed when the parent Node process terminates — a detail that sounds trivial and is the difference between a tool you use daily and one that leaves orphaned SSH processes until you reboot.
+
+### Selective interception
+
+`globalThis.fetch` is replaced with a wrapper that inspects the target host. If it matches one of the configured suffixes in `SOCKS_PROXY_HOSTS`, the request goes through the SOCKS dispatcher; otherwise it takes the normal path, untouched.
+
+This is the load-bearing decision, and it is a genuine trade. Monkey-patching a global is invasive: anything else in the process that has already captured a reference to `fetch`, or that patches it too, is now sharing a resource with this library. What it buys is that an existing codebase needs **no changes at any call site** — no injected client, no per-call config, no refactor of the module that talks to the provider.
+
+The invasiveness is bounded by making routing explicitly opt-in per host suffix. The default for any host you did not name is "behave as if this library is not installed".
+
+### Two entry points
+
+Preloading is the recommended path, because it requires no application code at all:
+
+```json
+{ "scripts": { "dev:proxy": "NODE_OPTIONS='--import socks-ssh/register' next dev" } }
+```
+
+Programmatic `init()` exists for conditional setup — typically guarded on `NODE_ENV` so the tunnel never comes up in production, where the server already has the right IP.
+
+### Logging that cannot become the leak
+
+The tunnel is diagnostic infrastructure, so it logs routed requests and responses. Both are constrained: sensitive headers — authorization, API keys, passwords — are redacted automatically, and response bodies are truncated at `SOCKS_PROXY_BODY_MAX` (2000 characters by default).
+
+For production hardening the package documents pinning the remote host key via `SSH_KNOWN_HOSTS_FILE` and `SSH_STRICT_HOST_KEY_CHECKING=yes`, rather than leaving trust-on-first-connect as the silent default.
+
+## Impact
+
+Published on npm and reusable across projects: any service that gates on IP becomes locally developable by naming its hostname in an environment variable.

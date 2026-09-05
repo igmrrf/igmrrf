@@ -1,0 +1,64 @@
+---
+title: "Why pack.nvim Exists"
+summary: "Neovim 0.12 shipped native package management. Every plugin manager on the market was still carrying a git implementation it no longer needed."
+date: "2026-09-02"
+tags: ["neovim", "lua", "plugin-manager", "tooling"]
+featured: false
+---
+
+Neovim plugin managers all contain a git client. Not because anyone wanted to write one — because for years there was nothing else to use.
+
+`vim-plug`, `packer`, `lazy.nvim`: each grew its own cloning layer, its own checkout logic, its own lockfile format, its own idea of what a version constraint means. Four managers, four independent implementations of `git clone --depth 1 --branch v2.1.0`, four places a partial clone can leave you with an editor that will not start.
+
+Then Neovim 0.12 shipped `vim.pack`.
+
+## What actually changed
+
+`vim.pack` is native package management in the editor itself: cloning, checkout, updating, pinning, lockfile. Not a plugin. Not a library you vendor. Part of Neovim.
+
+Which means the reason every plugin manager carried a git implementation stopped being true.
+
+I looked at what was left once you subtract that, and it turned out to be everything I actually used a plugin manager *for*:
+
+- Seeing at a glance that eleven plugins are behind
+- Reading what changed before updating
+- Lazy loading, so 60 plugins do not cost 60 plugins of startup
+- Bisecting the plugin that broke things, without editing my config to do it
+
+None of that is git. All of it was bundled with git because that was the only way to ship it.
+
+## The bet
+
+`pack.nvim` requires Neovim 0.12. On anything older, `setup()` prints a warning and does nothing.
+
+That is a hard requirement and I chose it deliberately. Softening it — a compatibility shim for 0.11, a fallback git path for older versions — would mean writing the exact cloning layer this project exists to not write. The moment there are two backends, "which one installed this plugin, and does the other one understand its state" becomes a real question, and I would have reinvented the problem in the shape of a workaround.
+
+So the compatibility story is: upgrade Neovim, or use a different manager. Both are fine answers. Neither requires me to maintain a git client.
+
+## Where I broke my own rule
+
+There is one place `pack.nvim` runs git itself, and it is worth being honest about because it is the exception that tests the principle.
+
+Native `vim.pack` blocks during large transfers. Not fatally, but enough that installing twenty plugins on a fresh machine means staring at a frozen editor. So `use_git = true` runs installs and updates as backgrounded `git` jobs through `vim.system`, and native `vim.pack` runs afterwards — objects already local, so it is cheap — purely to register the plugin and sync the lockfile.
+
+I sat with this for a while, because it is a second code path around package installation, which is exactly the category of thing that causes the corruption I was trying to design out.
+
+What made it acceptable was a rule that constrains it: **the git path never writes the lockfile**. It only makes native's later run fast. Native remains the sole author of installation state. The background path is an optimisation on top of the real operation, not a replacement for it.
+
+If I ever find myself relaxing that rule, the feature should go.
+
+## The unglamorous part
+
+The feature I use most is not the dashboard. It is that disabling a plugin persists to `nvim-pack-extra.json` instead of requiring an edit to my Lua config.
+
+Bisecting a bad plugin used to mean commenting out specs, restarting, uncommenting, restarting, and eventually committing a config with three plugins mysteriously disabled because I forgot to undo the experiment. Now it is `x` in the dashboard, and the state lives somewhere that is not my config.
+
+`:checkhealth pack` came from the same instinct — verify the Neovim version, git, the install directory, per-plugin status and orphaned directories. It turns "my editor is broken" into a report you can read.
+
+## The general point
+
+When a platform absorbs a capability your tool was built to provide, the tool does not become obsolete. It becomes *smaller*, and the interesting question is what is left.
+
+For a plugin manager in 2026, what is left is the interface — and the interface was always the part worth building.
+
+**Repository:** [github.com/igmrrf/pack.nvim](https://github.com/igmrrf/pack.nvim)

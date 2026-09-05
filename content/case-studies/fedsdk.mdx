@@ -1,0 +1,50 @@
+---
+title: "fedsdk: Shipping the Fed's Routing Directory Inside an npm Package"
+summary: "US ABA routing number validation against bundled FedACH and Fedwire directories, with a dependency-free subpath export for browsers and edge runtimes."
+techStack: ["TypeScript", "Node.js", "npm", "Cloudflare Workers", "FedACH / Fedwire"]
+businessValue: "Turns a payment-form validation from a network round trip into a synchronous function call. A mistyped routing number is caught at the keystroke rather than at settlement, and the check works offline, in CI, and inside edge functions where an outbound API call is not an option."
+technicalTradeOffs: "Bundling ~19,000 routing numbers buys determinism, zero latency and no third-party dependency, and costs a 750KB dataset that goes stale between releases — mitigated by an explicit `npm run sync` rather than by pretending the data is live. The subpath export exists because that trade is wrong in a browser, so the checksum path is importable without the database."
+githubUrl: "https://github.com/igmrrf/fedsdk"
+date: "2026-06-05"
+featured: false
+---
+
+# fedsdk: Shipping the Fed's Routing Directory Inside an npm Package
+
+## The Problem
+
+An ABA routing number has a mod-10 checksum, so a large share of typos are detectable with arithmetic and no network. But a checksum-valid number is not necessarily a *real* number — the digits can pass and still belong to no institution, or belong to one that supports ACH but not Fedwire, which is precisely the distinction a payment form needs before it lets someone continue.
+
+Answering that properly requires the Federal Reserve's FedACH and Fedwire directories. The default instinct is to put those behind an API, and for a payment form the default instinct adds a network round trip to a keystroke.
+
+## Architectural Deep-Dive
+
+### Three functions, three cost profiles
+
+The API surface is deliberately small, and each function is honest about what it costs:
+
+- **`validateABA(rn)`** — mod-10 checksum only. No network, no file I/O, synchronous. Fast enough to run on every keystroke.
+- **`lookup(rn)`** — directory lookup only. Returns the institution name and which networks it participates in, or `null` if the number is not in the directories.
+- **`validate(rn)`** — both. Returns `{ valid: false, result: null }` when the checksum fails, and a `result` of `null` when the checksum passes but the number is not in the directories.
+
+That last distinction is the one that makes the package worth using. "Checksum-valid but unknown to the Fed" is a different user-facing message from "that is a typo", and an API that collapses them into one boolean forces the caller to guess.
+
+### The bundling trade-off, and its escape hatch
+
+The ~19,000-entry dataset — sourced from the Fed's directories and mirrored by `moov-io/fed` — ships inside the package. That is roughly 750KB, and it buys three things: no latency, no third-party availability risk, and identical results in production, in CI, and offline.
+
+It costs freshness. The data is a snapshot as of the last release. Rather than paper over that with a background fetch that would reintroduce every problem bundling solved, the package exposes `npm run sync` and states plainly that refreshing is a deliberate act.
+
+### The subpath export
+
+Bundling 750KB into a browser or a Cloudflare Worker is indefensible. So the checksum path is importable on its own:
+
+```ts
+import { validateABA } from 'fedsdk/validate'
+```
+
+No Node.js modules, no database. The edge function validates the shape; the server does the lookup. One package, two honest cost profiles, and the caller chooses which one they are paying for.
+
+## Impact
+
+A small, MIT-licensed, typed package that does one fintech primitive completely — including telling you when it cannot answer.
