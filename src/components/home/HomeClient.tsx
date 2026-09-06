@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Github, Terminal } from "lucide-react";
+import { ArrowRight, Github, Globe, Terminal } from "lucide-react";
 import { motion } from "framer-motion";
 import { CaseStudy } from "@/schemas/portfolio";
 import { ArchitecturalCard } from "@/components/ui/ArchitecturalCard";
@@ -182,14 +182,26 @@ export default function HomeClient({
                   <span className="text-[10px] font-mono text-primary font-bold">
                     0{i + 1} {"// CASE_STUDY"}
                   </span>
-                  <Link
-                    href={project.githubUrl}
-                    target="_blank"
-                    className="text-muted-foreground hover:text-primary transition-colors p-1"
-                    aria-label="GitHub Repository"
-                  >
-                    <Github className="h-4 w-4" />
-                  </Link>
+                  <span className="flex items-center">
+                    {project.liveUrl && (
+                      <Link
+                        href={project.liveUrl}
+                        target="_blank"
+                        className="text-muted-foreground hover:text-primary transition-colors p-1"
+                        aria-label="Live site"
+                      >
+                        <Globe className="h-4 w-4" />
+                      </Link>
+                    )}
+                    <Link
+                      href={project.githubUrl}
+                      target="_blank"
+                      className="text-muted-foreground hover:text-primary transition-colors p-1"
+                      aria-label="GitHub Repository"
+                    >
+                      <Github className="h-4 w-4" />
+                    </Link>
+                  </span>
                 </div>
                 <h3 className="text-xl font-black uppercase tracking-tight group-hover:text-primary transition-colors italic">
                   {project.title}

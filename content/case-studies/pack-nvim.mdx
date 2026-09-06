@@ -5,6 +5,7 @@ techStack: ["Lua", "Neovim 0.12 vim.pack", "vim.system", "Git", "Asynchronous Pr
 businessValue: "Removes an entire class of plugin-manager risk from a developer's editor: cloning, checkout, pinning and the lockfile are handled by Neovim itself, so the manager cannot corrupt state it does not own. Startup stays fast through ftdetect pre-compilation and trigger-based lazy loading."
 technicalTradeOffs: "Betting the whole backend on vim.pack means the plugin simply refuses to run below Neovim 0.12 — a deliberate loss of reach in exchange for never shipping a bespoke git implementation. Optional backgrounded git jobs keep the UI responsive during large clones, at the cost of a second code path that must leave native vim.pack's lockfile consistent afterwards."
 githubUrl: "https://github.com/igmrrf/pack.nvim"
+liveUrl: "https://pack.theldo.com"
 date: "2026-09-02"
 featured: true
 ---

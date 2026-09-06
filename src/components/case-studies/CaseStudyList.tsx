@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Calendar, Github } from "lucide-react";
+import { ArrowRight, Calendar, Github, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { CaseStudy } from "@/schemas/portfolio";
 
@@ -48,14 +48,26 @@ export function CaseStudyList({
                     month: "short",
                   })}
                 </span>
-                <Link
-                  href={study.githubUrl}
-                  target="_blank"
-                  className="flex items-center gap-1.5 hover:text-primary transition-colors"
-                  aria-label="GitHub Repository"
-                >
-                  <Github className="h-3.5 w-3.5" /> Source
-                </Link>
+                <span className="flex items-center gap-4">
+                  {study.liveUrl && (
+                    <Link
+                      href={study.liveUrl}
+                      target="_blank"
+                      className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                      aria-label="Live site"
+                    >
+                      <Globe className="h-3.5 w-3.5" /> Live
+                    </Link>
+                  )}
+                  <Link
+                    href={study.githubUrl}
+                    target="_blank"
+                    className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                    aria-label="GitHub Repository"
+                  >
+                    <Github className="h-3.5 w-3.5" /> Source
+                  </Link>
+                </span>
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-black group-hover:text-primary transition-colors leading-tight uppercase italic tracking-tight break-words">

@@ -7,6 +7,8 @@ export const CaseStudySchema = z.object({
   businessValue: z.string().min(1),
   technicalTradeOffs: z.string().min(1),
   githubUrl: z.url(),
+  /** Deployed instance, when the project has one to visit. */
+  liveUrl: z.url().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format must be YYYY-MM-DD"),
   featured: z.boolean().default(false),
 });

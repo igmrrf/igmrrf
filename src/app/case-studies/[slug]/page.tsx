@@ -1,6 +1,6 @@
 import { getCaseStudyBySlug, getCaseStudySlugs } from "@/lib/mdx";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Github, Calendar, Target, Zap } from "lucide-react";
+import { ArrowLeft, Github, Globe, Calendar, Target, Zap } from "lucide-react";
 import Link from "next/link";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { CodeBlock } from "@/components/blog/CodeBlock";
@@ -83,6 +83,15 @@ export default async function CaseStudyPage({
           >
             <Github className="h-3.5 w-3.5" /> View_Source_Repository
           </Link>
+          {meta.liveUrl && (
+            <Link
+              href={meta.liveUrl}
+              target="_blank"
+              className="flex items-center gap-1.5 px-2.5 py-1 border border-primary/40 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all font-bold"
+            >
+              <Globe className="h-3.5 w-3.5" /> Open_Live_Instance
+            </Link>
+          )}
         </div>
 
         <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase italic tracking-tight leading-tight break-words text-foreground">

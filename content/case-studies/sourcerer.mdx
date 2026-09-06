@@ -5,6 +5,7 @@ techStack: ["Go", "Kotlin", "Protocol Buffers", "PostgreSQL 18", "HTMX", "Docker
 businessValue: "Restores a tool a team lost to a shutdown, and keeps the expensive half of it — language classification and library recognition across hundreds of file types — rather than reimplementing it. Contributors get language breakdowns, commit punchcards, recognised-library rankings, public profiles and embeddable SVG badges from their own git history, self-hosted, with no dependency on a third party that can disappear again."
 technicalTradeOffs: "Forking rather than rewriting the Kotlin extractor preserves years of classification work at the cost of owning an abandoned codebase whose library database is frozen at 2020 — a backend-side catalogue of 22,000+ technology definitions layers over it for naming and ranking, but the classifier itself learns nothing new. Shelling out to a jar from a Go worker crosses a toolchain boundary at runtime, which is contained by refusing to start the service without a usable extractor rather than discovering the gap per-job. Server-rendered HTML with HTMX keeps the client trivial at the cost of a chattier server."
 githubUrl: "https://github.com/igmrrf/sourcerer-app"
+liveUrl: "https://sourcerer.theldo.com"
 date: "2026-08-20"
 featured: false
 ---
