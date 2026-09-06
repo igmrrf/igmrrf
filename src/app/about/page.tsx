@@ -161,10 +161,85 @@ export default function AboutPage() {
         <p>
           When I&apos;m not architecting systems, you can find me contributing to
           open-source, building specialized Neovim plugins like{" "}
-          <code>vi-mongo.nvim</code>, or sharing architectural solutions on{" "}
+          <code>pack.nvim</code> and <code>distract.nvim</code>, or sharing
+          architectural solutions on{" "}
           <strong>Stack Overflow</strong>, where I maintain authority on deep
           debugging for LSP configurations and modern framework friction points.
         </p>
+
+        <h2 className="mt-16">Upstream_Contributions</h2>
+        <p>
+          Patches merged into projects I do not own — from one-line corrections
+          to a full SDK overhaul. Listed because a merged pull request is worth
+          more than a fork: the fix reaches everyone, and nobody inherits a copy
+          to maintain.
+        </p>
+        <div className="not-prose mt-8 flex flex-col gap-px bg-border border border-border">
+          {[
+            {
+              repo: "fuadop/sendchamp-sdk",
+              pr: "#67, #74",
+              note: "Call & Email services, rebuilt type surface, rewritten test suites",
+              scale: "30 files",
+              href: "https://github.com/fuadop/sendchamp-sdk/pull/67",
+              caseStudy: "/case-studies/sendchamp-sdk",
+            },
+            {
+              repo: "kopecmaciej/vi-mongo.nvim",
+              pr: "#6",
+              note: "Opt-in persistent TUI buffer, window-targeting fix, termopen migration",
+              scale: "+50/-16",
+              href: "https://github.com/kopecmaciej/vi-mongo.nvim/pull/6",
+              caseStudy: "/case-studies/vi-mongo-nvim",
+            },
+            {
+              repo: "colinhacks/zod",
+              pr: "#4649",
+              note: "Replaced a reference to a non-existent error instance",
+              scale: "+1/-1",
+              href: "https://github.com/colinhacks/zod/pull/4649",
+              caseStudy: null,
+            },
+            {
+              repo: "apple/pkl",
+              pr: "#84",
+              note: "Corrected the Loading Modules example to match its config",
+              scale: "+4/-4",
+              href: "https://github.com/apple/pkl/pull/84",
+              caseStudy: null,
+            },
+          ].map((c) => (
+            <div
+              key={c.repo}
+              className="bg-background p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 hover:bg-accent/20 transition-colors"
+            >
+              <Link
+                href={c.href}
+                target="_blank"
+                className="text-xs font-mono font-bold tracking-tight text-primary hover:underline shrink-0 sm:w-64"
+              >
+                {c.repo}{" "}
+                <span className="text-muted-foreground font-medium">{c.pr}</span>
+              </Link>
+              <p className="text-xs text-muted-foreground leading-relaxed flex-1">
+                {c.note}
+              </p>
+              <div className="flex items-center gap-4 shrink-0">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60">
+                  {c.scale}
+                </span>
+                {c.caseStudy && (
+                  <Link
+                    href={c.caseStudy}
+                    className="text-[10px] font-mono uppercase tracking-widest text-primary hover:underline"
+                  >
+                    Case Study
+                  </Link>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </motion.div>
 
       <motion.div

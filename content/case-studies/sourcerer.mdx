@@ -1,0 +1,52 @@
+---
+title: "Sourcerer: Rebuilding a Dead Service From Its Open-Source Client"
+summary: "A discontinued developer-stats service brought back by writing the server its open-source extractor was still trying to reach — a Go web app and protobuf ingestion API around the original Kotlin analysis CLI."
+techStack: ["Go", "Kotlin", "Protocol Buffers", "PostgreSQL 18", "HTMX", "Docker Compose", "nginx", "Certbot", "GitHub OAuth"]
+businessValue: "Restores a tool a team lost to a shutdown, and keeps the expensive half of it — language classification and library recognition across hundreds of file types — rather than reimplementing it. Contributors get language breakdowns, commit punchcards, recognised-library rankings, public profiles and embeddable SVG badges from their own git history, self-hosted, with no dependency on a third party that can disappear again."
+technicalTradeOffs: "Forking rather than rewriting the Kotlin extractor preserves years of classification work at the cost of owning an abandoned codebase whose library database is frozen at 2020 — a backend-side catalogue of 22,000+ technology definitions layers over it for naming and ranking, but the classifier itself learns nothing new. Shelling out to a jar from a Go worker crosses a toolchain boundary at runtime, which is contained by refusing to start the service without a usable extractor rather than discovering the gap per-job. Server-rendered HTML with HTMX keeps the client trivial at the cost of a chattier server."
+githubUrl: "https://github.com/igmrrf/sourcerer-app"
+date: "2026-08-20"
+featured: false
+---
+
+# Sourcerer: Rebuilding a Dead Service From Its Open-Source Client
+
+## The Problem
+
+Sourcerer turned git history into an engineering profile — languages by volume, libraries recognised from imports, commit habits over the week. The company shut down and took the hosted service, and every profile, with it.
+
+What survived was the half that had been open-sourced: a Kotlin extractor that walks a cloned repository, classifies its files, recognises libraries and posts the results to an API. The API was proprietary and died with the company, leaving a well-tested analysis engine with nothing to talk to.
+
+The recovery path is narrower than a rewrite and it hinges on one file. `cli/src/main/proto/sourcerer.proto` defines the seventeen messages the extractor sends — `Commit`, `CommitStats`, `Fact`, `Author`, `Repo`, `RepoMeta` and the rest. A protobuf schema is an executable contract, so the dead service's ingestion API was fully specified in the surviving repository. The work was to implement the receiving end.
+
+## Architectural Deep-Dive
+
+### Three processes, one boundary that matters
+
+The system runs as a Go web application and ingestion API, the forked Kotlin extractor invoked as a jar, and nginx terminating TLS in front of both, over PostgreSQL 18. Three compose files cover production, a dev overlay on `:8080`, and a standalone local stack that bundles a log viewer.
+
+The interesting boundary is between Go and the jar. A background worker clones each repository and runs the extractor against the checkout, then ingests the protobuf it produces. That is a runtime dependency on an artefact from a different toolchain, and the containment is deliberate: the backend refuses to start without a usable extractor jar, and the image copies the jar in rather than mounting it. A missing or stale extractor is a boot failure in front of an operator, not a per-job failure in a worker log.
+
+### The schema follows the wire format
+
+Tables mirror what the proto sends rather than what a fresh design would produce: `users`, `repos`, `commits`, `commit_stats`, `facts`, `authors` and `public_profiles`, keyed on the upstream's rehashed commit and repository identifiers.
+
+Indexing targets the actual read patterns rather than the columns: commits are indexed by repo, by date, by author email, and — because every dashboard query filters on two at once — by the composite pairs `(repo_rehash, date)` and `(repo_rehash, author_email)`. Facts carry the same treatment on `(repo_rehash, email)` and `(email, code)`.
+
+### Server-rendered dashboards with HTMX
+
+Every dashboard surface is a Go template rendered server-side — languages, activity, punchcard, facts, libraries, repository cards — with HTMX swapping fragments in for filtering and live status. There is no client-side application and no build step for the frontend.
+
+The sync tracker is where that earns its keep: a status banner polls a partial while a clone runs, and worker deduplication keeps a repeatedly-refreshed page from queueing the same repository multiple times.
+
+### Badges and Hall of Fame as public artefacts
+
+Profiles, per-repository and per-library Hall of Fame slots, and SVG badges are all public GET endpoints — `/badge/{identifier}.svg`, `/fame/{owner}/{repo}/images/{num}` — designed to be embedded in a README and rendered by GitHub's image proxy. Fame slots are managed through a token-authenticated API so a repository owner can curate them without an account on the instance.
+
+A backend-side catalogue of over 22,000 technology and library definitions drives naming, language filtering and ranking on the library pages. It layers over the extractor's own recognition rather than replacing it — the classifier's understanding of the ecosystem is still frozen at the point the upstream was abandoned.
+
+## Impact
+
+The service a team lost is running again, self-hosted, with the classification work that made it valuable preserved rather than approximated — roughly 8,500 lines of Go carrying tests across the chart generation, fame ranking, SEO output, sync behaviour and security surface.
+
+Its transferable lesson is about shutdowns generally: an open-source client that speaks a documented protocol is a specification for the server that died. Recovering the service becomes a bounded implementation problem rather than an archaeological one, and the expensive domain logic never has to be rewritten at all.

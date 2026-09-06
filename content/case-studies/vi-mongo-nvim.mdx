@@ -1,25 +1,60 @@
 ---
-title: "vi-mongo.nvim: Asynchronous TUI Database Explorer"
-summary: "An integrated MongoDB management interface for Neovim built with Lua and high-performance TUI patterns."
-techStack: ["Lua", "Neovim API", "MongoDB", "Asynchronous Programming"]
-businessValue: "Dramatically improves developer productivity for TUI-focused engineers by eliminating context-switching between the editor and external database clients."
-technicalTradeOffs: "Used Lua coroutines to manage complex asynchronous database operations, significantly reducing UI latency at the expense of more complex state management in a single-threaded runtime."
-githubUrl: "https://github.com/igmrrf/vi-mongo.nvim"
-date: "2024-01-20"
-featured: true
+title: "vi-mongo.nvim: Session Persistence for an Embedded TUI"
+summary: "A merged contribution to Maciej Kopeć's Neovim wrapper around the vi-mongo MongoDB TUI, adding an opt-in persistent buffer so closing the window no longer discards the database session — plus a window-targeting bug fix and a deprecated-API migration."
+techStack: ["Lua", "Neovim API", "Terminal Buffers", "MongoDB", "Open Source Contribution"]
+businessValue: "Removes the cost of glancing away from a database session. Before this change, dismissing the floating window killed the vi-mongo process, so returning meant relaunching, reconnecting and renavigating to the collection and query you were already looking at. With persist enabled, the window closes and reopens over a live session, which turns the plugin into something usable alongside editing rather than a modal detour."
+technicalTradeOffs: "Persistence is opt-in and defaults to off, so existing users see no behavioural change and the plugin does not silently start holding a database connection and a live process for the lifetime of the editor. The mechanism is a bufhidden switch from wipe to hide, which keeps the terminal job alive at the cost of a resident buffer that outlives its window — acceptable for a single explicitly-invoked TUI, and the reason the option exists rather than becoming the default."
+githubUrl: "https://github.com/kopecmaciej/vi-mongo.nvim"
+date: "2025-10-15"
+featured: false
 ---
 
-# vi-mongo.nvim: Asynchronous TUI Database Explorer
+# vi-mongo.nvim: Session Persistence for an Embedded TUI
 
-## The TUI Workflow
-For many developers, staying within the terminal environment is critical for speed and focus. This plugin brings rich database interaction directly into the Neovim editor.
+> A contribution to [kopecmaciej/vi-mongo.nvim](https://github.com/kopecmaciej/vi-mongo.nvim), not a project of mine. `vi-mongo` is a Go MongoDB TUI by Maciej Kopeć; `vi-mongo.nvim` embeds it in a floating Neovim window. This covers [PR #6](https://github.com/kopecmaciej/vi-mongo.nvim/pull/6), merged October 2025.
+
+## The Problem
+
+The plugin opened `vi-mongo` in a floating terminal window, and the buffer was created with `bufhidden = "wipe"`. Closing the window therefore destroyed the buffer, which killed the terminal job, which ended the vi-mongo process.
+
+That is correct behaviour for a throwaway command and wrong for a database browser. Every glance back at the editor cost a full relaunch: reconnect, pick the database, pick the collection, retype the query, scroll back to where you were. The friction pushed you toward keeping the window open permanently or not using the plugin at all — which defeats the purpose of embedding a TUI in an editor, where the whole value is moving between the two cheaply.
 
 ## Architectural Deep-Dive
-### Asynchronous Database Operations
-The core challenge was performing MongoDB queries (which can be slow or involve large amounts of data) without freezing the editor's main thread. By leveraging Lua's coroutines and the Neovim job control API, I implemented a non-blocking request/response cycle.
 
-### Rich UI in a Text Buffer
-Building a functional UI (tree views, query editors, result tables) within a terminal buffer requires precise manipulation of the Neovim API. I developed a system of virtual text and floating windows to provide a modern "IDE-like" experience for database exploration.
+### Module state, and an option that finally does something
 
-## Business Impact
-For teams heavily invested in terminal-based workflows, this plugin streamlines development and debugging by providing immediate, context-aware access to their data.
+The module gained `_buf`, `_win` and a `config` table defaulting to `persist = false`.
+
+`setup(opts)` previously created the `ViMongo` user command and discarded its argument entirely — the plugin accepted configuration and applied none of it. It now merges opts into config via `vim.tbl_extend("force", ...)`, which is what makes any of the rest addressable by a user.
+
+### Separating geometry from creation
+
+Window dimensions were computed inline inside `create_vi_mongo_window`. They were extracted into `get_win_opts()`.
+
+That refactor is load-bearing rather than cosmetic: reopening a persisted buffer needs fresh geometry, because the terminal may have been resized while the window was closed. Recomputing on every open — rather than caching the options alongside the buffer — means the restored window fits the terminal as it is now, not as it was when the session started.
+
+### The persistence mechanism is one conditional
+
+```lua
+vim.bo[buf].bufhidden = M.config.persist and "hide" or "wipe"
+```
+
+With `hide`, closing the window detaches the buffer instead of destroying it, so the terminal job and the vi-mongo process survive. Reopening then takes the early path: if a valid buffer already exists, `nvim_open_win` mounts it in a fresh window and returns, without spawning anything.
+
+The entire feature is that switch plus the guarded reopen. Nothing caches or replays session state, because nothing has to — the process never died, so its state was never lost.
+
+### A window-targeting bug, fixed in passing
+
+The `TermClose` autocmd called `api.nvim_win_close(0, true)` — window `0` meaning *the current window*, which is only the plugin's window if focus happens to be there when the terminal exits. If focus had moved, quitting vi-mongo closed whatever the user was looking at instead.
+
+It now closes the captured `win` handle, guarded by `nvim_win_is_valid`, so it targets the right window and tolerates one already closed by the persist path.
+
+### Deprecated API migration
+
+`fn.termopen("vi-mongo")` became `fn.jobstart("vi-mongo", { term = true })`, following `termopen`'s deprecation, and the user command declares `nargs = 0`.
+
+## Impact
+
+Merged upstream in October 2025 across two files — `window.lua` and the README documenting the new option. Every user of the plugin gets the fixes; opting into persistence is a single `persist = true` in setup, and everyone who does not opt in keeps the previous behaviour exactly.
+
+The judgement worth extracting is about defaults in someone else's project. Persistence is better for most workflows and it still ships off, because a contribution that silently changes what an installed plugin does to a user's process table is a harder thing to accept — and a much harder thing to debug from the maintainer's side — than one that adds a flag.

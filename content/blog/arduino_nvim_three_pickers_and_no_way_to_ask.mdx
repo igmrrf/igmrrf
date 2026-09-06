@@ -1,0 +1,67 @@
+---
+title: "Arduino-Nvim: Three Pickers and No Way to Ask"
+summary: "A plugin that needs to show you a list has to guess which selection UI you installed. Hardcoding one is the common answer and it is the wrong one."
+date: "2026-04-17"
+tags: ["neovim", "lua", "arduino", "plugin-architecture", "open-source"]
+featured: false
+---
+
+Arduino-Nvim needs to ask you things. Which board, which port, which of four hundred libraries you meant.
+
+That is a list with a filter on it, which in Neovim is a solved problem several times over — and that is precisely the difficulty. Telescope solved it. Then `mini.pick` solved it more minimally. Then `snacks.nvim` solved it again as part of a larger bundle. All three are good. None of them share an interface, and a plugin has no way to ask the editor which one you chose.
+
+The upstream plugin answered by requiring Telescope. Reasonable in isolation, and it means everyone who moved to `snacks` has a hard dependency they no longer want for one dropdown.
+
+## The shape of the fix
+
+`pcall(require, ...)` in priority order, first hit wins.
+
+```lua
+local available_pickers = {
+  { id = "telescope", module = "telescope.pickers" },
+  { id = "snacks",    module = "snacks" },
+  { id = "mini",      module = "mini.pick" },
+}
+```
+
+If you set `picker = "mini"` explicitly, that is used and nothing is probed. If you set nothing, the plugin finds out what you have by trying to load it. There is no configuration to write in the common case, which matters, because a dependency you have to declare is a dependency you have to *know about* — and nobody installing an Arduino plugin wants to first reason about their fuzzy finder.
+
+## The part that is actually the work
+
+Detection is ten lines. Normalisation is the rest.
+
+The three pickers disagree about everything at the item level. Telescope wants an entry maker returning `value`/`display`/`ordinal`. `snacks` wants a `text` field for searching and a `format` function for rendering. `mini.pick` wants something else again. Their selection callbacks hand you different objects and expect you to close the picker differently, or not at all.
+
+So `picker.lua` defines one item shape and one `open({ title, items, on_select })` call, and each backend adapts to it — including a `get_display` that will take `display`, `text`, `label` or `name`, because upstream call sites had already used several of those and rewriting all of them was not the goal.
+
+That tolerance is not elegance, it is deliberate: the abstraction's job is to make the *call sites* stop caring, and a normaliser that rejects the shapes those call sites already emit has failed at its only task.
+
+## What it deleted
+
+The commit that added `picker.lua` removed fifty-five lines from `libGetter.lua`. References to `telescope` inside `init.lua` went from ten to one.
+
+That is the measure I trust more than the feature list. An abstraction that only adds code is usually a wrapper; one that deletes the thing it replaced has actually absorbed a responsibility. The library browser no longer knows what a picker is — it produces a list and a callback and hands both to something else.
+
+## Being honest about where this lives
+
+This is a fork, and the upstream plugin is alive — seventy-odd stars, commits after mine, open issues being handled. I have not sent the picker work back.
+
+I should. The honest reason I have not is that it touches the library management path fairly broadly, and a large unsolicited refactor of someone else's plugin is a lot to drop on a maintainer without asking first. That is an argument for opening an issue, not for sitting on it, and I am aware of the difference.
+
+## The general version
+
+When your ecosystem has three incompatible implementations of one concept and no registry, the choice is not "which one do I support". It is:
+
+- **Depend on one** — smallest code, forces your preference on every user
+- **Support all** — largest code, and each backend is a maintenance surface
+- **Detect, adapt, and stay quiet about it** — one thin normalisation layer, no configuration for anyone whose setup is ordinary
+
+The third only works if the surface you need is genuinely small. I need to show a list and get one item back. For that, the union of three pickers' capabilities is roughly the same as any one of their intersections, which is why a hundred and ninety lines is enough.
+
+If I needed multi-select, previewers and custom actions, this would be a much worse idea, and depending on one picker would start looking correct again.
+
+## Uses whichever picker you already have
+
+The fork adds board, port and library selection through Telescope, `snacks.nvim` or `mini.pick` — auto-detected, or pinned with `picker = "..."` — on top of upstream's compile, upload, serial monitor and LSP support.
+
+**[github.com/igmrrf/Arduino-Nvim](https://github.com/igmrrf/Arduino-Nvim)** — the abstraction on its own: [case study](/case-studies/arduino-nvim).

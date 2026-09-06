@@ -1,0 +1,56 @@
+---
+title: "sendchamp-sdk: Modernising a Messaging SDK Upstream"
+summary: "A 30-file contribution merged into a third-party TypeScript SDK for the Sendchamp messaging API — two new service wrappers, a rebuilt type surface, rewritten test suites, and migrated lint and test tooling."
+techStack: ["TypeScript", "Jest", "ESLint Flat Config", "REST APIs", "npm", "Open Source Contribution"]
+businessValue: "Extends a public SDK rather than privately forking it, so every consumer of the package gets Call and Email support, stronger types and a real test suite — and the contributor carries no ongoing maintenance for a library they do not own. Typed request and response interfaces turn integration mistakes against a messaging API into compile-time errors instead of failed sends discovered in production."
+technicalTradeOffs: "Working inside someone else's repository meant keeping their file layout, service structure and export shape even where a different design was tempting — the constraint that keeps a change this large reviewable rather than a rewrite. Rewriting the existing specs alongside the new ones raised the review burden but avoided a suite split between two testing styles. Landing upstream also means the contribution's future is the maintainer's call, not the contributor's."
+githubUrl: "https://github.com/fuadop/sendchamp-sdk"
+date: "2026-08-14"
+featured: false
+---
+
+# sendchamp-sdk: Modernising a Messaging SDK Upstream
+
+## The Problem
+
+Sendchamp exposes messaging as an API — SMS, WhatsApp, voice, verification, and more. The community TypeScript wrapper covered part of that surface, had thin typing on requests and responses, and had gone quiet.
+
+The default response to a gap in a dependency is a fork: patch the copy, repoint `package.json`, and accept permanent ownership of somebody else's library. That cost is invisible when taken on and compounds — new upstream endpoints, dependency advisories and upstream bug fixes all become the forker's problem. With an active upstream, a merged pull request dominates the fork on every axis over any meaningful time horizon.
+
+## Architectural Deep-Dive
+
+### Two services that did not exist
+
+`call` and `email` were added as service modules following the existing pattern — a class per service, constructed with shared config, exposing typed methods over the relevant endpoints — plus new entries in the endpoint constants and re-exports through the service index.
+
+New service surfaces shipped with spec files in the same commit rather than as a follow-up. For a maintainer reviewing an unfamiliar API surface, tests are what turn acceptance from an act of trust into a reading exercise.
+
+### A tripled type surface
+
+`src/constants/interfaces.ts` grew by 272 lines against 117 removed, with `types.ts` extended alongside it. Request payloads and response bodies for every service became explicit interfaces rather than loose object shapes.
+
+This is where an SDK earns its keep. Against a messaging API, an incorrect field name is not a type error at the boundary — it is an accepted request that fails to deliver, discovered later and from the wrong end. Encoding the contract moves that class of mistake to compile time.
+
+A dedicated `src/config.ts` centralised construction, and a committed `.env.schema` documented the values the suite expects.
+
+### Test suites rewritten, not appended
+
+Specs for SMS, WhatsApp, voice and verification were reworked rather than extended — `whatsapp.spec.ts` at +79/−56, `verification.spec.ts` at +82/−25 — and new suites added for call, email and the core client.
+
+Rewriting rather than appending raises review cost but avoids the outcome where a project carries two testing styles indefinitely, with the older half slowly ceasing to be maintained.
+
+### Tooling migrations
+
+`.eslintrc` was replaced by a flat `eslint.config.js`, `jest.config.js` became a typed `jest.config.ts`, and the bespoke `src/test-setup.ts` was removed in favour of standard configuration. These are the low-controversy half of the change: nobody holds an opinion about lint config format that survives the deprecation warnings.
+
+### Documentation as a second pass
+
+A later commit added 38 lines to the README covering the Call and Email services — functionality shipped in the original contribution but documented incompletely.
+
+That commit only exists because the work went upstream. A private fork has an audience of one who already knows what they built; a published package has users for whom undocumented functionality is functionality that does not exist.
+
+## Impact
+
+Thirty files changed and merged into a repository the contributor does not own: two new service wrappers, a substantially expanded type surface, test coverage across every service, and modernised lint and test tooling. Every consumer of the published package receives the improvements, upstream retains ownership, and no parallel copy of the SDK needs maintaining.
+
+The decision rule it illustrates is narrow and portable: when upstream is alive, shape the fix so the maintainer can take it. Reserve forking for the case where there is no maintainer left to send it to.

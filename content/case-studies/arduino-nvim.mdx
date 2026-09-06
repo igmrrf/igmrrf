@@ -1,0 +1,54 @@
+---
+title: "Arduino-Nvim: A Picker Abstraction for a Fragmented Ecosystem"
+summary: "Replacing a Neovim plugin's hardcoded Telescope dependency with a 192-line layer that detects and adapts to whichever of three incompatible picker plugins the user already has installed."
+techStack: ["Lua", "Neovim", "Telescope", "snacks.nvim", "mini.pick", "arduino-cli"]
+businessValue: "Removes a forced dependency from an embedded-development workflow. Board selection, port selection and library browsing work through whichever selection UI the user already runs, so adopting the plugin does not mean installing a second fuzzy finder alongside the one they chose — and no configuration is required for a setup that is at all ordinary."
+technicalTradeOffs: "Runtime detection via pcall keeps configuration at zero but means the active backend is discovered rather than declared, so a user with several pickers installed gets a priority order rather than their preference unless they pin it. Normalising three item formats down to one shape deliberately limits the abstraction to what all three do well — a list with a filter and a single selection — so multi-select, previewers and custom per-picker actions are out of reach by construction."
+githubUrl: "https://github.com/igmrrf/Arduino-Nvim"
+date: "2026-04-17"
+featured: false
+---
+
+# Arduino-Nvim: A Picker Abstraction for a Fragmented Ecosystem
+
+## The Problem
+
+Arduino-Nvim brings the Arduino IDE loop — compile, upload, serial monitor, library management, LSP — into Neovim on top of `arduino-cli`. Several of those operations are a filtered list: pick a board, pick a port, pick one of hundreds of libraries.
+
+Neovim has no standard for that. Telescope is the incumbent, `mini.pick` is the minimal alternative, `snacks.nvim` bundles a third, and the three share no interface. A plugin cannot query which one the user runs, so upstream did the usual thing and required Telescope — making a fuzzy finder a hard dependency of an embedded toolchain plugin, for users who may have deliberately moved to something else.
+
+## Architectural Deep-Dive
+
+### Detection instead of declaration
+
+`picker.lua` holds a priority-ordered table of backends and resolves one at setup by attempting to load each module:
+
+```lua
+local available_pickers = {
+  { id = "telescope", module = "telescope.pickers" },
+  { id = "snacks",    module = "snacks" },
+  { id = "mini",      module = "mini.pick" },
+}
+```
+
+An explicit `picker = "mini"` short-circuits the probe entirely. Otherwise the first module that loads wins, and the user configures nothing. Probing happens once at setup rather than per invocation, so the cost is a handful of `pcall(require, ...)` at startup.
+
+### One item shape, three adapters
+
+The backends disagree at every level: Telescope expects an entry maker producing `value`, `display` and `ordinal`; `snacks` expects a `text` field for matching plus a `format` callback for rendering, and passes the picker itself into `confirm` so it can be closed explicitly; `mini.pick` expects a third arrangement again.
+
+The layer exposes a single `open({ title, items, on_select })` and each backend translates. A `get_display` helper accepts `display`, `text`, `label` or `name`, or a bare string — permissive by design, because existing call sites already used several of these and the point of the abstraction is that call sites stop having to change.
+
+### Scope chosen to match the intersection
+
+The exposed surface is deliberately the part all three implementations do equivalently well: show a titled list, filter it, return one selection. Multi-select, previewers and picker-specific actions are excluded rather than emulated, which is what keeps the whole layer under two hundred lines and each adapter readable in one screen.
+
+### Measured by what it removed
+
+The commit introducing the abstraction added 151 lines and deleted 55 from `libGetter.lua`, and direct `telescope` references in `init.lua` dropped from ten to one. Library browsing, board selection and port selection now build a list and a callback and hand both away; none of them contains picker-specific code.
+
+## Impact
+
+The plugin's Arduino functionality — compilation, upload with UNO R4 WiFi reset support, serial monitor, cached library management with installed and update indicators, LSP integration — is reachable without adopting a specific selection UI. Users on `snacks.nvim` or `mini.pick` no longer install Telescope for the sake of three dropdowns.
+
+The work currently lives in a fork of an actively maintained upstream and has not been contributed back; the refactor touches the library management path broadly enough that it warrants an issue and a conversation with the maintainer before a pull request that size arrives unannounced.

@@ -1,0 +1,79 @@
+---
+title: "Sourcerer: The Client Outlived the Server"
+summary: "A tool my team used in 2019 shut down and took our profiles with it. The client was open source — which meant the protocol was, which meant the missing half was buildable."
+date: "2026-08-20"
+tags: ["go", "kotlin", "protobuf", "postgres", "htmx"]
+featured: false
+---
+
+In 2019 a few of us used Sourcerer to keep score.
+
+It read your git history and turned it into a profile — languages by volume, the libraries you actually reached for, when in the week you committed. We linked them in Slack. It was not serious. It was the kind of thing you check on a Friday and argue about.
+
+Then it shut down, and the profiles went with it.
+
+## What was left on the table
+
+The company is gone. The service is gone. `sourcerer-io/sourcerer-app` is still on GitHub — 6,737 stars, Kotlin, last pushed in September 2020.
+
+But what is published there is the *extractor*: the thing that walks a cloned repository, works out what language each file is, recognises libraries from import statements, and posts the results somewhere. The somewhere was proprietary and shut down with the company.
+
+So the repository is a program that talks fluently to a listener that no longer exists.
+
+## A client is a specification
+
+Here is the thing that made this project possible, and it took me embarrassingly long to notice.
+
+`cli/src/main/proto/sourcerer.proto` describes seventeen messages: `Commit`, `CommitStats`, `Fact`, `Author`, `Repo`, `RepoMeta`, `Process`, and so on. That file is not documentation *about* the API. It is the API. Protobuf is a contract, and the contract shipped inside the open-source half.
+
+I did not have to reverse-engineer a dead service. I had to implement the other end of a conversation where the only surviving participant is the one that does the talking — and it will tell you exactly what it expects to say, in a machine-readable file, if you read it.
+
+That reframed the whole project. Not "rebuild Sourcerer", which is a year of work I was never going to finish. Just: *write the server this client is already trying to reach.*
+
+## The part I refused to rewrite
+
+The extractor stays. It lives in `cli/`, forked and largely untouched.
+
+That decision is the reason this exists at all. Language classification across hundreds of file types, library recognition from import syntax per ecosystem — that is the part the original team spent real years on, and it is the part that is genuinely hard to get right. Its test fixtures alone include sample files in languages I have never written a line of.
+
+Rewriting it in Go would have been the instinct, and it would have been the mistake. I would have produced a worse classifier and spent all my time on it, and the thing I actually wanted — the profile, the stats, the memory — would never have shipped.
+
+So: Kotlin extractor, unchanged, invoked as a jar. Go for everything I was actually adding.
+
+## Where the seam is loud on purpose
+
+The Go backend has a background worker that clones a repository, runs the extractor jar against the checkout, and ingests the protobuf that comes back.
+
+That is a hard dependency on a build artefact from a different language and toolchain, and the failure mode is nasty if you let it be: everything starts fine, users connect their accounts, and every sync fails hours later on a missing jar.
+
+So the backend refuses to boot without a usable extractor. `./build_cli.sh` is not optional, and the image copies the jar in rather than mounting it, so a stale jar is a rebuild rather than a mystery. It is better to fail at startup, loudly, in front of the person who can fix it, than to fail per-job in a worker log nobody is reading.
+
+## What I built around it
+
+Once ingestion worked the rest was ordinary web application work, and it went faster than the ordinary web application work usually does, because the data model was already decided by the proto.
+
+GitHub OAuth. Postgres — users, repos, commits, commit stats, facts, authors, public profiles — with the indexes that a per-repository-per-author query pattern demands. A dashboard of languages, activity, punchcard and facts, rendered server-side with HTMX doing the partial updates. A sync status tracker with worker deduplication, so hammering refresh does not queue the same clone four times. Embeddable SVG badges. A Hall of Fame per repository, and per library.
+
+Roughly 8,500 lines of Go, with tests covering the charts, the fame ranking, the SEO output and the security surface.
+
+## Being straight about the fork
+
+Two things I would not gloss over.
+
+The extractor's understanding of the world is frozen in 2020. It recognises the libraries that existed when it was last touched, which means a repository full of things released since then is under-reported by a component I have deliberately chosen not to maintain. The backend carries its own expanded technology and library catalogue — north of twenty-two thousand entries — for naming, ranking and the library pages, but that is my data layered on top, not the classifier learning anything new.
+
+And this is a fork of an abandoned project, which means the upstream will not fix anything for me. Every bug in `cli/` is mine now, whether or not I wrote it. That is the actual price of not rewriting the hard part, and I think it is the right trade — but it is a trade, not a free lunch.
+
+## Why bother
+
+Nobody asked for this. The market for a resurrected 2019 developer-stats service is me and about four former colleagues.
+
+But the pattern is worth naming, because it generalises past this one dead startup: **when a service you relied on dies, check what shape its client was in.** An open-source client is not a consolation prize. If it speaks a documented protocol, it is a specification for the thing you lost, and the work in front of you is bounded and knowable rather than archaeological.
+
+Most shutdowns do not leave you that. This one did, and it seemed rude not to use it.
+
+## Clone it, point it at your repos
+
+Sourcerer runs as three parts behind nginx: the Go web app and ingestion API, the Kotlin extractor CLI, and PostgreSQL. `./build_cli.sh` then `docker compose up` gets you a local stack with GitHub OAuth on `:8080`.
+
+**[github.com/igmrrf/sourcerer-app](https://github.com/igmrrf/sourcerer-app)** — architecture without the eulogy: [case study](/case-studies/sourcerer).

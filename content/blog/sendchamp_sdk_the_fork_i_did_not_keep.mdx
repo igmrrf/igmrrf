@@ -1,0 +1,59 @@
+---
+title: "sendchamp-sdk: The Fork I Did Not Keep"
+summary: "I forked someone else's SDK to fix it, rewrote a third of it, and then did the part most forks never get to — sent it back and let it stop being mine."
+date: "2026-08-14"
+tags: ["typescript", "sdk", "open-source", "testing", "api-design"]
+featured: false
+---
+
+Sendchamp is a messaging API — SMS, WhatsApp, voice, verification — and there was a TypeScript wrapper for it on GitHub that somebody had written and largely stopped touching.
+
+I needed it to do things it did not do. The usual sequence follows: fork it, patch it, point `package.json` at your fork, move on with your life, and quietly own a copy of somebody else's library forever.
+
+I did the first two and then stopped, because the sequence is a trap and I have been caught by it before.
+
+## What a fork actually costs
+
+A fork feels free at the moment you make it. It is not free; it is a debt with a deferred first payment.
+
+You now maintain an SDK. When the upstream API adds an endpoint, that is your problem. When a transitive dependency has a CVE, that is your problem. When the original author fixes a bug you also had, you get to decide whether to merge it, and by then your copy has drifted enough that merging is work.
+
+Worse, the cost is invisible in the moment you take it on, which is exactly the property that makes bad decisions easy. The fork is one command. The maintenance is years.
+
+So the question I try to ask before forking anything is not "can I fix this myself" — I usually can — it is **"is there a version of this fix that the maintainer would take?"** Because if there is, that fix costs me one pull request and zero ongoing maintenance, and that is a wildly better trade even when the pull request is more work up front.
+
+## Making a large change take-able
+
+The change was not small. Thirty files. Two services that did not exist — `call` and `email` — with types and tests. The interface definitions roughly tripled. ESLint moved to flat config, Jest config moved to TypeScript, and the test suites for SMS, WhatsApp, voice and verification were rewritten rather than extended.
+
+That is a lot to ask someone to accept into a project they own, and there is a real difference between a change that is *good* and a change that is *acceptable*. Things I think mattered:
+
+**Tests arrived with the code, not after it.** Every new service came with a spec file. A maintainer reviewing a new API surface is being asked to trust that it works; the tests are how you make that a reading exercise rather than an act of faith.
+
+**Existing conventions stayed.** The file layout, the service class structure, the export shape — all upstream's. It is tempting when rewriting this much to also fix the structure you would have chosen differently. That converts a reviewable pull request into a rewrite with your name on it, and rewrites do not get merged.
+
+**The infrastructure changes were the boring correct ones.** Flat ESLint config, typed Jest config, a `.env.schema` for the values the tests need. Nobody has an opinion about these that survives contact with the deprecation warnings.
+
+It merged. And then it stopped being mine, which is the entire point.
+
+## The second commit is the tell
+
+Two years later I pushed one more thing: thirty-eight lines of documentation, adding the CALL and EMAIL services to the README.
+
+I had shipped those services in the original pull request and documented them incompletely. Nobody complained. There was no issue open about it. The library worked; the two newest services were just harder to discover than the six around them.
+
+Going back to finish that is the smallest possible commit and I think it is the most telling one in the whole story. The fork-and-forget path never produces it — you do not write documentation for a private copy of a library, because the audience is you and you already know. Contributing upstream means there is an audience who does not, and undocumented functionality is functionality nobody will find.
+
+## When forking is right
+
+None of this is an argument against forks. Elsewhere in my own work I maintain a fork of a project whose upstream company shut down — there is no maintainer to send anything to, so owning it is the only option available.
+
+The distinction is simply whether upstream is alive. If it is, a merged pull request beats a fork on every axis that matters over a two-year horizon: less code you own, wider testing, other people's bug reports working for you rather than around you.
+
+If it is not, fork it, and know that you have just adopted something.
+
+## Merged, not forked
+
+The pull request added Call and Email services, expanded the type surface, rewrote the test suites across every service, and modernised the lint and test tooling — landed upstream at **[github.com/fuadop/sendchamp-sdk](https://github.com/fuadop/sendchamp-sdk)** rather than kept in a copy.
+
+Full breakdown: [case study](/case-studies/sendchamp-sdk).
