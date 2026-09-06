@@ -1,0 +1,58 @@
+---
+title: "Aiko AI: A Plan-Patch-Verify Loop in a Docker Sandbox"
+summary: "An autonomous coding agent that plans a change from AST-retrieved context, emits a git patch, and applies and tests it inside a disposable container — looping back with the failure logs until the tests pass or it runs out of attempts."
+techStack: ["Python 3.11", "LangGraph", "LangChain", "Google Gemini 2.0 Flash", "tree-sitter", "Docker SDK", "NetworkX", "pytest"]
+businessValue: "Turns an LLM from a code suggester into something that can be held to a result. Generated changes are proven against the repository's own test suite before a human reads them, and the whole cycle happens against a throwaway copy inside a container, so an unattended run cannot touch the working tree it was pointed at. Language detection and per-language images extend that loop across Python, JavaScript/TypeScript, Go, Rust and C."
+technicalTradeOffs: "Making the model emit a unified diff rather than whole files keeps output bounded and reviewable, and buys a hard failure mode: git apply rejects anything malformed, so most of the prompt engineering went into diff syntax rather than code quality. The verifier currently classifies pass/fail by string-matching test output instead of reading the container exit code, which misreads suites that legitimately print the word 'error'. The retry edge returns to the Engineer only, so a flawed plan is re-implemented rather than reconsidered, and the secure_runtime parameter is accepted but never applied — isolation is standard Docker, not gVisor."
+githubUrl: "https://github.com/igmrrf/agent-workflow"
+date: "2026-01-16"
+featured: false
+---
+
+# Aiko AI: A Plan-Patch-Verify Loop in a Docker Sandbox
+
+## The Problem
+
+An LLM that writes code and stops has handed you an unverified claim. Someone still has to read it, apply it, run the tests and find out. The model's confidence is uncorrelated with whether the change works, so the review burden lands entirely on the human and scales with how much the model produced.
+
+The missing piece is not a better model. It is a loop that closes: generate a change, prove it against the repository's own tests, and feed the failure back in when it does not hold.
+
+## Architectural Deep-Dive
+
+### Three nodes and one conditional edge
+
+The system is a LangGraph state machine over a `AgentState` TypedDict carrying the request, the retrieved context, the plan, the current patch, the iteration count, the accumulated error log and a success flag.
+
+`architect → engineer → verifier`, then a conditional edge off the verifier: success ends the run, three iterations ends the run, anything else routes back to the engineer with the errors attached. The graph is deliberately small — the interesting behaviour lives in what each node does with its interfaces, not in the topology.
+
+### Retrieval through an AST graph
+
+`CodebaseGraph` parses the repository with tree-sitter and builds a graph whose nodes are identified as `relative/path::function_name`. The Architect matches request keywords against node identifiers, extracts the files those functions live in, and assembles two context blocks: the function definitions themselves, and the full contents of the files they came from.
+
+Traversal is filtered by an explicit ignore list covering build directories, dependency trees, lockfiles and compiled artifacts across five language ecosystems — `node_modules`, `target`, `.venv`, `__pycache__`, `vendor`, `.o` and `.dylib` files, minified JavaScript. Without it, retrieval on a real repository returns dependency source and the context window is spent before reaching the project.
+
+### The patch is the interface
+
+The Engineer's contract is a unified diff, not file contents. This bounds what the model can express, makes the output reviewable as a diff, and gives the system a decisive rejection path: malformed output fails at `git apply` rather than corrupting a file.
+
+The cost is that diff syntax becomes the dominant failure mode, and the system prompt reflects it — explicit rules for hunk headers matching line counts, the `e69de29` empty-file blob hash, omitting the `index` line when uncertain rather than inventing one, and using the exact relative paths from the context headers rather than assuming a `src/` prefix. Output is then stripped of any markdown fencing the model wrapped it in.
+
+### An ephemeral container per verification
+
+`SandboxExecutor` detects the repository's primary language by counting file extensions and selects an image accordingly — `python:3.11-bookworm`, `node:20-alpine`, `golang:1.21-alpine`, `rust:slim` or `gcc:latest`.
+
+It then starts a container held open with `tail -f /dev/null`, streams the repository in as a tar archive, installs `git` (trying `apk` first, falling back to `apt-get`) and `pytest` where needed, streams the patch in as a second archive, and runs `git apply -v --ignore-space-change --ignore-whitespace`. A failed apply returns immediately with git's own diagnostic, which becomes the next iteration's error context. A successful apply runs the test command. The container is force-removed in a `finally` block regardless of outcome.
+
+The isolation property that matters is structural: the container works on a copy, so nothing the model generates executes against the developer's checkout.
+
+### Where the loop is currently weakest
+
+Success is determined by inspecting test output for the substrings `failed`, `error`, `passed` and `success`, with a pytest-specific fallback. The Docker SDK returns an exit code from `exec_run` and it is discarded. This misclassifies in both directions — a passing suite that exercises an error path reads as a failure and burns an iteration; a command that never ran can slip past the fallback.
+
+Similarly, failures route only to the Engineer. The Architect's plan is produced once and never revisited, so a mistaken plan is re-implemented three times rather than replanned.
+
+Both are named here because they are the difference between a loop that closes and a loop that appears to.
+
+## Impact
+
+The system tests exercise the cases where an agent's assumptions fail rather than the happy path: multi-language repositories, external repositories it did not generate, and — most usefully — an empty repository, where retrieval returns nothing, the plan is written without context and the patch necessarily references files that do not exist. That is the scenario no model quality improvement addresses, and the one a plan-patch-verify loop has to survive before it can be trusted with anything real.

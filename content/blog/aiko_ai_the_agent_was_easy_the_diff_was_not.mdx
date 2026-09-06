@@ -1,0 +1,76 @@
+---
+title: "Aiko AI: The Agent Was Easy, the Diff Was Not"
+summary: "Wiring three LLM agents into a plan-write-verify loop took an afternoon. Getting their output to actually apply to a file took considerably longer."
+date: "2026-01-16"
+tags: ["python", "ai", "agents", "langgraph", "docker"]
+featured: false
+---
+
+The architecture diagram for Aiko AI is the one everybody draws. An Architect reads the codebase and writes a plan. An Engineer turns the plan into a change. A Verifier runs the tests. If the tests fail, go back to the Engineer with the errors. Stop after three tries.
+
+In LangGraph that is about forty lines, and it worked on the first afternoon.
+
+Then I spent much longer than that on unified diff formatting, which is the part nobody draws.
+
+## The handoff is a patch, and patches do not negotiate
+
+The Engineer does not write files. It emits a git patch, and the Verifier runs `git apply` on it inside a container.
+
+That choice is deliberate — a diff is bounded and reviewable in a way that "here is the new contents of eleven files" is not, and it means the model's output can be rejected wholesale before it touches anything. But it moves the difficulty somewhere specific: `git apply` is a parser, and parsers do not grade on a curve. A patch that is ninety-nine percent correct applies zero percent.
+
+The failures are never about the code. They are:
+
+- A hunk header that says `@@ -0,0 +1,2 @@` above three added lines
+- `index 0000000..` on a file that already exists, which tells git this is a new file, which it is not
+- A path of `a/src/calc.py` when the file is at `calc.py`, because the model assumed a `src/` directory that the context never mentioned
+- Context lines re-indented into something that no longer matches the file
+
+So the Engineer's system prompt is seven numbered rules, and six of them are about diff syntax. There is one line about writing code. It tells the model the empty-file blob hash is `e69de29`. It tells it to omit the `index` line entirely if unsure, because git usually manages without it and a wrong hash is worse than a missing one. It tells it, in capitals, that hunk headers must match line counts.
+
+I did not expect the prompt engineering on a coding agent to be mostly about a 2005 file format. But that is where the loop actually breaks, and prompt effort should go where the loop breaks rather than where the interesting part is.
+
+## The Verifier is only as honest as its definition of "passed"
+
+The Verifier tars the repository into an ephemeral container, tars the patch in beside it, runs `git apply`, runs the test command, and reads what comes back. The container is removed in a `finally` block whether or not any of that worked.
+
+Then it has to decide whether the tests passed, and here is the weak point of the whole system, stated plainly: it decides by looking for words in the output.
+
+If `failed` or `error` appears anywhere in stdout, it is a failure. If `passed` appears, it is a success. There is a fallback that treats a pytest run without "no tests ran" as success.
+
+`exec_run` returns an exit code. The exit code is right there, and the code currently drops it and greps the text instead.
+
+This is wrong in both directions, which is the bad kind of wrong. A passing suite that logs the word "error" while testing an error path is scored a failure, and the loop burns an iteration fixing code that was already correct. A test command that dies before running anything can produce output containing neither word and get scored however the fallback happens to land.
+
+An agent that cannot tell whether it succeeded is not an autonomous agent, it is an expensive autocomplete with a retry loop. Reading the exit code is the single highest-value change left in this project and it is a small one.
+
+## The sandbox is a container, not a claim
+
+`SandboxExecutor` takes a `secure_runtime` parameter that defaults to `"runsc"` — gVisor. It is not applied. The runtime config dict is built empty and passed empty, so what actually runs is a normal Docker container.
+
+I am naming that rather than letting the parameter imply otherwise, because a security parameter that does nothing is worse than no parameter: it reads as a guarantee in code review, and someone eventually relies on it.
+
+What the isolation genuinely gives you is real and worth having. Model-generated code executes in a throwaway container that is destroyed after the run, against a copy of the repository, not the repository. Your working tree is never the thing being patched. That is the property that makes it safe to let the loop run unattended — not the runtime flag.
+
+Language detection walks the repo, counts extensions, and picks an image: `node:20-alpine`, `golang:1.21-alpine`, `rust:slim`, `gcc:latest`, `python:3.11-bookworm`. Crude, and it is right nearly always, because repositories are not usually ambiguous about what they are.
+
+## The plan is never wrong, apparently
+
+The retry edge goes from the Verifier back to the Engineer. Never to the Architect.
+
+So when tests fail, the system assumes the plan was right and the implementation was wrong. Three iterations of a competent Engineer executing a bad plan produces three failures and a shrug, and the error logs it accumulates are all evidence about the wrong stage.
+
+I know the fix — route the failure back to the Architect after N engineer attempts, with the failed patches as context — and I have not built it. It is the limitation I would fix before I would fix anything about the model or the prompts.
+
+## What the tests are actually about
+
+There are test files for multi-language repos, for external repos, and for an empty repo.
+
+That last one is the whole project in miniature. An empty repository is where every assumption a coding agent makes quietly collapses: retrieval returns nothing, so the plan is written from no context, so the patch invents paths, so `git apply` fails on a file that does not exist. Nothing about it is a model quality problem, and no amount of a better model fixes it.
+
+That is the thing I would tell anyone building one of these. The agent is the easy half. The hard half is every interface it has to speak through — a diff format, a container filesystem, a test runner's exit code — and each of those will fail in a way that has nothing to do with intelligence and everything to do with whether you read the spec.
+
+## Plan, patch, verify, repeat three times
+
+Aiko AI takes a repository path and a task, retrieves context through a tree-sitter AST graph, plans with Gemini, emits a git patch, and applies and tests it inside a disposable Docker container — looping back with the failure logs until the tests pass or it has tried three times.
+
+The graph, the prompts and the sandbox: **[github.com/igmrrf/agent-workflow](https://github.com/igmrrf/agent-workflow)**. The architecture on its own: [case study](/case-studies/aiko-ai).

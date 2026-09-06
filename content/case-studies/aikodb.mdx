@@ -1,0 +1,58 @@
+---
+title: "aikodb: A B-Tree Database in One C File, Tested From Ruby"
+summary: "A single-file C database with a REPL, a paged B-tree on disk and persistence across restarts, verified end-to-end by an RSpec suite that drives the compiled binary over a pipe."
+techStack: ["C", "B-Tree", "Custom Pager", "POSIX File I/O", "RSpec", "Ruby", "Make", "Rake"]
+businessValue: "A working reference implementation of the layer most engineers only ever consume: how a database turns a line of text into bytes on a page, keeps them ordered as the dataset grows past a single node, and gets them back after the process dies. Roughly 1,100 lines with no dependencies, which is small enough to read in an afternoon and still exercises pages, cursors, node splitting and durability."
+technicalTradeOffs: "Testing the binary as a black box from another language keeps the specs independent of internal layout, but limits them to what the program prints — which is why the database ships .btree and .constants commands that exist only so the suite can inspect state it otherwise could not reach. Rows are a fixed struct rather than a schema, and the internal node branching factor is deliberately set to 3 so the split paths are reachable in tests, trading real-world tree depth for coverage of the code most likely to be wrong."
+githubUrl: "https://github.com/igmrrf/aikodb"
+date: "2026-02-16"
+featured: false
+---
+
+# aikodb: A B-Tree Database in One C File, Tested From Ruby
+
+## The Problem
+
+Every backend engineer uses a database daily and very few have watched one work from the inside. The abstraction is excellent, which is exactly why the layer underneath it — pages, cursors, node splits, the moment data becomes durable — stays opaque.
+
+`aikodb` is that layer made small enough to read. It is a REPL that accepts `insert` and `select`, stores rows in a B-tree spread across 4KB pages, writes them to a file, and reads them back after the process exits. No dependencies, no build system beyond a Makefile, one translation unit.
+
+## Architectural Deep-Dive
+
+### Layout is arithmetic, not a format
+
+A `Row` is a `uint32_t` id, a 33-byte username and a 256-byte email — 293 bytes, fixed. Every other size in the file derives from that by constant folding rather than being written down: a leaf cell is a 4-byte key plus the row (297 bytes), a page is 4096 bytes, the leaf header takes 14 of them, and what remains divides into thirteen cells per leaf.
+
+Nothing is stored to describe this. The layout exists as a chain of `const uint32_t` definitions and offset helpers — `leaf_node_cell`, `leaf_node_key`, `leaf_node_value` — that do pointer arithmetic into a raw page. Changing the email column moves every number downstream of it, which is why the test suite pins all six via a `.constants` command.
+
+### The pager owns the file, the tree owns the pages
+
+`Pager` is the only code that touches the file descriptor. It holds up to a hundred page pointers, faults a page in from disk on first access, and hands out a `void *` that the tree code interprets. Pages are written back only on `db_close`, which flushes each dirty page and closes the descriptor — durability is at session boundaries, not per statement.
+
+Above that, nodes are self-describing: a one-byte type tag, a root flag and a parent pointer make up a six-byte common header, and leaf and internal nodes extend it differently. Leaves additionally carry a `next_leaf` pointer, so a full scan walks the leaf chain rather than descending the tree repeatedly.
+
+### Cursors are the seam
+
+Every operation goes through a `Cursor` — a page number, a cell number and an end-of-table flag. `table_start` produces one at the smallest key, `table_find` descends from the root to the position a key belongs at, and `cursor_advance` steps to the next cell or follows `next_leaf` when a node runs out.
+
+That abstraction is what keeps `execute_select` to a loop and `execute_insert` to a lookup plus a write. The tree's complexity — descending internal nodes, binary search within a node, detecting a full leaf — lives behind the cursor rather than inside the statement handlers.
+
+### Splitting, and the case that makes it hard
+
+A full leaf triggers `leaf_node_split_and_insert`: allocate a new page, redistribute cells between old and new so both halves are balanced, fix the sibling pointer, and propagate the new maximum key to the parent. If the node being split is the root, `create_new_root` builds a fresh internal node above it.
+
+The genuinely hard case is a full *internal* node, which requires splitting a node whose children all hold parent pointers back at it — `internal_node_split_and_insert` moves children between parents and updates every pointer in both directions. `INTERNAL_NODE_MAX_CELLS` is set to 3 rather than the ~500 the page could hold, which makes this path reachable after fifteen inserts instead of tens of thousands, and therefore actually covered.
+
+### The test suite runs the binary, not the code
+
+The specs are Ruby. `IO.popen("./db test.db", "r+")` starts the compiled database, writes commands into the pipe, closes the write end and reads the complete output back. Assertions compare against the exact lines the REPL printed, prompt characters included.
+
+Nothing in the suite can reach a struct, which is the point: the tests survive internal refactoring because they never knew the internals. Structural assertions go through `.btree`, which prints the tree indented by level, and durability is tested the only honest way — run a script that inserts and exits, then run a second script against the same file and check the rows are still there.
+
+`rake` compiles with clang and runs the suite in one step, so a spec run can never test a stale binary.
+
+## Impact
+
+The database handles the full lifecycle a real one does at small scale: parse, validate (`ID must be positive`, `String is too long`, `Error: Duplicate key`), locate via B-tree descent, insert with splitting, scan in key order, and persist across restarts. The failure modes are explicit rather than undefined — a full table, an oversized string and a duplicate key each produce a specific message the tests assert on.
+
+Its most reusable idea is not in the database at all. Facing tests that could not see inside the program, the fix was to make the program describe itself: `.btree` and `.constants` were built for the suite and became the primary debugging tools.

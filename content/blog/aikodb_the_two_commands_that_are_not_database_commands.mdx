@@ -1,0 +1,110 @@
+---
+title: "aikodb: The Two Commands That Are Not Database Commands"
+summary: "A test suite written in another language can only see what your program prints. So two commands exist in the database purely so the tests can see inside it."
+date: "2026-02-16"
+tags: ["c", "databases", "b-tree", "testing", "systems"]
+featured: false
+---
+
+I wrote a database in C. About eleven hundred lines, one file, no dependencies — a REPL that speaks four statements and stores rows in a B-tree on disk.
+
+Then I had to decide how to test it, and that turned out to be the more interesting problem.
+
+## The interface is the only interface
+
+There is no library here. `aiko.c` compiles to a binary called `db` that you hand a filename and talk to over stdin:
+
+```
+$ ./db aiko.db
+db > insert 1 user1 person1@example.com
+Executed.
+db > select
+(1, user1, person1@example.com)
+Executed.
+db > .exit
+```
+
+A C test suite could have linked against the object file and called `leaf_node_insert` directly. That option was available and I did not take it, because a test that calls `leaf_node_insert` is a test of `leaf_node_insert` — and I did not want tests that would need rewriting every time I moved a byte around inside a page.
+
+So the specs are Ruby. RSpec opens the compiled binary with `IO.popen`, writes commands into the pipe, closes the write end, reads everything that came back, and splits it on newlines. The entire test harness is that one helper.
+
+The upside is immediate: the tests cannot cheat. Ruby has no access to my structs. It knows the same things a user knows.
+
+## Which is also the problem
+
+If the tests can only see stdout, then anything the database does not print is untestable.
+
+Inserting fourteen rows should split a leaf node and produce a two-level tree. That is the behaviour I most wanted to be sure about, and from the outside it is completely invisible — `select` returns the same fourteen rows either way. A correct B-tree and a broken one that happens to still be a sorted list are indistinguishable through the front door.
+
+The obvious fix is to open the database file in Ruby and decode the pages. I did not want that either: it would put a second implementation of my page layout inside the test suite, and then every layout change becomes two changes that must agree.
+
+## So the database prints its own internals
+
+`.btree` walks the tree from the root and prints it, indented by level:
+
+```
+db > .btree
+Tree:
+- internal (size 1)
+  - leaf (size 7)
+    - 1
+    - 2
+    ...
+  - key 7
+  - leaf (size 7)
+    - 8
+    ...
+```
+
+`.constants` prints the layout arithmetic:
+
+```
+db > .constants
+Constants:
+ROW_SIZE: 293
+COMMON_NODE_HEADER_SIZE: 6
+LEAF_NODE_HEADER_SIZE: 14
+LEAF_NODE_CELL_SIZE: 297
+LEAF_NODE_SPACE_FOR_CELLS: 4082
+LEAF_NODE_MAX_CELLS: 13
+```
+
+Neither of these is a database feature. Nobody storing rows needs to know that a 4096-byte page minus a 14-byte header divided by a 297-byte cell is thirteen. They exist because the tests needed a way to ask questions that `select` cannot answer, and stdout was the only channel available.
+
+`.constants` in particular is a test asserting on a number nobody typed. `ROW_SIZE` is derived from a struct, `LEAF_NODE_CELL_SIZE` from `ROW_SIZE`, `LEAF_NODE_MAX_CELLS` from the page size. Change `COLUMN_EMAIL_SIZE` and all four numbers move. The spec that pins them is not testing the arithmetic — it is testing that I noticed.
+
+## The constant I set to a lie
+
+`INTERNAL_NODE_MAX_CELLS` is 3.
+
+An internal node has a 4096-byte page and 8-byte cells, so it could hold five hundred children. Three is not a capacity, it is a lever. With a real branching factor, reaching a three-level tree in a test means inserting tens of thousands of rows and waiting, and the split path — the code most likely to be wrong — stays unexercised in a run you actually want to sit through.
+
+At three, fifteen inserts get you a multi-level tree, and the split code runs in every spec file.
+
+This is the same instinct as the observability commands, pointed at a different problem: the tests could not reach the interesting state, so I changed the program until they could. That is a real cost and I would name it plainly — the tuning parameter that governs tree shape is currently set for the convenience of the test suite rather than for performance. Raising it is a one-line change; the specs that assert on tree structure would all need new expected output, which is precisely the point of them.
+
+## Where printing your state as a contract bites
+
+Stdout as a test interface has a failure mode, and I have one.
+
+There is a spec that inserts 1,300 rows and expects the last line to be `Need to implement splitting internal node`. That message was accurate when the tree could only split leaves. Internal node splitting is implemented now — `internal_node_split_and_insert` is right there, and the string it asserts on is nowhere in the source any more.
+
+The spec did not fail loudly at the time it went stale. It failed later, out of context, as an unexplained mismatch on a run I did for another reason.
+
+That is the trade this whole approach makes. Black-box tests over printed output survive refactoring the internals, which is what I wanted. In exchange, they encode your error messages as public API, and error messages are the part of a program people change most carelessly. A test asserting on a `printf` is a test that a string you thought was a diagnostic is actually a contract.
+
+Worth it, I think, but it is not free, and pretending it is free is how you end up with a suite that passes on strings nobody prints.
+
+## The part I did not expect
+
+The two debugging commands became the tool I use most.
+
+`.btree` was written for a spec. It is now the first thing I type when an insert does something surprising, because it turns "the rows come back in the wrong order" into a picture of the tree that shows me which node is wrong. It is not that the tests got observability for free — it is that I only bothered to build observability because a test demanded it, and then I got the debugging tool as a side effect.
+
+The general version: instrumentation you add to make a program testable from the outside is instrumentation, and instrumentation is useful to whoever is standing outside — which is usually you, at midnight, holding a corrupted page.
+
+## Thirteen rows a leaf, one file, no dependencies
+
+`aikodb` is a single-file C database: fixed-size rows in 4KB pages, a pager with a hundred-page ceiling, a B-tree with leaf splitting, internal splitting and root creation, cursors, duplicate key rejection and persistence across restarts. `make build` compiles it, `rake` compiles it and runs the Ruby specs against the binary.
+
+Read it as one file: **[github.com/igmrrf/aikodb](https://github.com/igmrrf/aikodb)**. The architecture without the testing argument: [case study](/case-studies/aikodb).
