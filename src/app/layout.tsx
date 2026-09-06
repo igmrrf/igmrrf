@@ -84,31 +84,27 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   manifest: "/site.webmanifest",
-  // Without `capable`, an iOS home-screen shortcut opens in a Safari tab and
-  // keeps Safari's chrome; the manifest's display mode is ignored there. The
-  // "default" status bar style is the one that takes its background from the
-  // page rather than forcing black, which is what makes it follow the theme.
+  // iOS ignores the manifest's display mode; without this a home-screen
+  // shortcut opens in a Safari tab.
   appleWebApp: {
     capable: true,
     title: "The_LDO",
     statusBarStyle: "default",
   },
-  // `capable` only emits the unprefixed `mobile-web-app-capable`; older iOS
-  // reads nothing but the apple-prefixed spelling.
+  // `capable` only emits the unprefixed spelling; older iOS wants this one.
   other: {
     "apple-mobile-web-app-capable": "yes",
   },
 };
 
 export const viewport: Viewport = {
-  // The first paint's chrome colour, before any script runs. A saved theme that
-  // disagrees with the OS is corrected by THEME_COLOR_INIT_SCRIPT below.
+  // The first paint's colour; THEME_COLOR_INIT_SCRIPT corrects a saved theme
+  // that disagrees with the OS.
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: THEME_COLORS.light },
     { media: "(prefers-color-scheme: dark)", color: THEME_COLORS.dark },
   ],
-  // Tells the browser to render its own widgets — scrollbars, form controls,
-  // the pull-to-refresh overscroll — in the matching scheme.
+  // Scrollbars, form controls and overscroll follow the scheme.
   colorScheme: "light dark",
 };
 
@@ -161,8 +157,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Metadata tags are emitted above this point, so the script can see
-            the theme-color tags it is correcting. */}
+        {/* Metadata is emitted above this point, so the script can see it. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_COLOR_INIT_SCRIPT }} />
         <script
           type="application/ld+json"
