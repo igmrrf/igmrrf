@@ -28,6 +28,7 @@ export async function generateMetadata({
         absolute: post.meta.title,
       },
       description: post.meta.summary,
+      alternates: { canonical: `/blog/${slug}` },
       openGraph: {
         title: post.meta.title,
         description: post.meta.summary,
@@ -88,7 +89,7 @@ export default async function BlogPostPage({
             <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
             Back_to_Articles.log
           </Link>
-          <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+          <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
             DOC_ID: {slug}
           </span>
         </div>
@@ -117,6 +118,7 @@ export default async function BlogPostPage({
                   year: "numeric",
                   month: "long",
                   day: "numeric",
+                  timeZone: "UTC",
                 })}
               </span>
 
@@ -143,7 +145,7 @@ export default async function BlogPostPage({
         </header>
 
         {/* Article Prose Content */}
-        <div className="prose dark:prose-invert max-w-none px-2 sm:px-4
+        <div className="prose dark:prose-invert w-full max-w-[75ch] mx-auto px-2 sm:px-4
           prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tight prose-headings:text-foreground
           prose-h1:text-3xl sm:prose-h1:text-4xl prose-h1:mt-14 prose-h1:mb-6
           prose-h2:text-2xl sm:prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-b prose-h2:border-border/60 prose-h2:pb-2
@@ -176,7 +178,7 @@ export default async function BlogPostPage({
               </span>
             </Link>
           ) : (
-            <div className="p-6 border border-dashed border-border/50 text-muted-foreground/50 font-mono text-[10px] uppercase flex items-center justify-center">
+            <div className="p-6 border border-dashed border-border text-muted-foreground font-mono text-xs flex items-center justify-center">
               {"// FIRST_POST_IN_STREAM"}
             </div>
           )}
@@ -195,7 +197,7 @@ export default async function BlogPostPage({
               </span>
             </Link>
           ) : (
-            <div className="p-6 border border-dashed border-border/50 text-muted-foreground/50 font-mono text-[10px] uppercase flex items-center justify-center text-right">
+            <div className="p-6 border border-dashed border-border text-muted-foreground font-mono text-xs flex items-center justify-center text-right">
               {"// LATEST_POST_IN_STREAM"}
             </div>
           )}

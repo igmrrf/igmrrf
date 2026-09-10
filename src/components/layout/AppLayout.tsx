@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -17,13 +17,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { WallpaperSelector } from "@/components/theme/WallpaperSelector";
 import { useWallpaper } from "@/components/theme/WallpaperProvider";
+import { TerminalLauncher } from "./TerminalLauncher";
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
 
 const navLinks = [
-  { href: "/case-studies", label: "Work", icon: BookText },
+  { href: "/case-studies", label: "Projects", icon: BookText },
   { href: "/talks", label: "Talks", icon: Presentation },
   { href: "/experience", label: "Experience", icon: History },
   { href: "/blog", label: "Blog", icon: PenTool },
@@ -33,7 +34,17 @@ const navLinks = [
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const menuButton = useRef<HTMLButtonElement>(null);
   const { currentWallpaper, opacity } = useWallpaper();
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setIsMenuOpen(false); menuButton.current?.focus(); }
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [isMenuOpen]);
 
   return (
     <div
@@ -41,6 +52,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         currentWallpaper ? "bg-transparent" : "bg-background"
       } text-foreground relative overflow-x-hidden selection:bg-primary selection:text-primary-foreground`}
     >
+      <a href="#main-content" className="fixed top-2 left-4 z-[60] -translate-y-24 focus:translate-y-0 bg-primary text-primary-foreground px-5 py-3">Skip to content</a>
       {/* Dynamic Terminal Wallpaper Background with 0.90 Opacity Effect */}
       {currentWallpaper && (
         <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
@@ -66,8 +78,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 z-40 w-full border-b border-border bg-background/85 backdrop-blur-md transition-colors">
-        <div className="container mx-auto px-6 flex h-16 items-center justify-between">
-          <div className="flex items-center gap-10">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex h-16 items-center justify-between gap-3">
+          <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center space-x-2 group">
               <span className="text-xl font-black tracking-tighter uppercase italic group-hover:text-primary transition-colors">
                 The
@@ -77,7 +89,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               </span>
             </Link>
 
-            <nav className="hidden md:flex items-center space-x-8 text-xs font-mono tracking-widest uppercase">
+            <nav aria-label="Main navigation" className="hidden lg:flex items-center space-x-5 text-xs font-mono">
               {navLinks.map((link) => {
                 const isActive =
                   pathname === link.href ||
@@ -86,6 +98,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   <Link
                     key={link.href}
                     href={link.href}
+                    aria-current={isActive ? "page" : undefined}
                     className={`transition-all hover:text-primary py-1 border-b-2 ${
                       isActive
                         ? "text-primary border-primary font-bold"
@@ -99,23 +112,27 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <TerminalLauncher />
             <Link
               href="/chat"
-              className="hidden sm:inline-flex items-center gap-2 border border-primary/80 bg-primary/5 hover:bg-primary px-3.5 py-1.5 text-[10px] font-mono tracking-widest uppercase text-primary hover:text-primary-foreground transition-all active:scale-95 font-bold shadow-xs"
+              className="hidden xl:inline-flex items-center gap-2 border border-primary/80 bg-primary/5 hover:bg-primary px-3 py-3 text-xs font-mono text-primary hover:text-primary-foreground transition-colors"
               title="Chat with the AI Architect about systems, architectures, and case studies"
             >
               <Bot className="h-3.5 w-3.5" />
-              <span>Ask AI Architect</span>
+              <span>Ask AI</span>
             </Link>
 
             <ThemeToggle />
 
             {/* Mobile Menu Toggle */}
             <button
+              ref={menuButton}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 border border-border bg-accent/50 text-primary hover:bg-primary hover:text-primary-foreground transition-all active:scale-90"
-              aria-label="Toggle Menu"
+              className="lg:hidden p-3 border border-border bg-accent/50 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -126,13 +143,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
+              id="mobile-navigation"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="md:hidden absolute top-16 left-0 w-full border-b border-border bg-background/95 backdrop-blur-xl z-50 shadow-2xl"
+              className="lg:hidden absolute top-16 left-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-border bg-background/95 backdrop-blur-xl z-50 shadow-2xl"
             >
-              <nav className="flex flex-col p-8 gap-2">
+              <nav aria-label="Mobile navigation" className="flex flex-col p-6 gap-2">
                 {navLinks.map((link) => {
                   const isActive =
                     pathname === link.href ||
@@ -142,6 +160,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsMenuOpen(false)}
+                      aria-current={isActive ? "page" : undefined}
                       className={`flex items-center gap-4 text-xs font-mono tracking-[0.2em] uppercase py-4 border-b border-border/30 transition-all group ${
                         isActive ? "text-primary font-bold" : "hover:text-primary"
                       }`}
@@ -165,7 +184,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 container mx-auto px-6 py-12 md:py-20 mt-16 relative z-10">
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full min-w-0 container max-w-7xl mx-auto px-4 sm:px-6 py-10 md:py-16 mt-16 relative z-10">
         {children}
       </main>
 
@@ -178,8 +197,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 The<span className="text-primary">_LDO</span>
               </div>
               <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground leading-relaxed max-w-sm">
-                Architecting resilient systems through high-craft engineering
-                and clean technical decoupling.
+                Francis Igbiriki — building useful systems, sharing what I learn,
+                and making my terminal feel like home.
               </p>
               <a
                 href="mailto:francis.igbiriki@gmail.com"
@@ -221,7 +240,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                   X (TWITTER)
                 </Link>
               </div>
-              <p className="text-[10px] font-mono uppercase tracking-tighter text-muted-foreground/60">
+              <p className="text-xs font-mono text-muted-foreground">
                 &copy; {new Date().getFullYear()} igmrrf // SYSTEM_STABLE
               </p>
             </div>

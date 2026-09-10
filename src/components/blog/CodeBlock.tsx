@@ -9,6 +9,7 @@ interface PreProps extends React.HTMLAttributes<HTMLPreElement> {
 
 export function CodeBlock({ children, ...props }: PreProps) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   // Extract raw text from children for copying
   const getTextContent = (node: React.ReactNode): string => {
@@ -26,10 +27,12 @@ export function CodeBlock({ children, ...props }: PreProps) {
     if (!text) return;
 
     try {
-      await navigator.clipboard.writeText(text.trim());
+      await navigator.clipboard.writeText(text);
+      setCopyError(false);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      setCopyError(true);
       console.error("Failed to copy code", err);
     }
   };
@@ -76,6 +79,8 @@ export function CodeBlock({ children, ...props }: PreProps) {
           )}
         </button>
       </div>
+
+      {copyError && <p role="status" className="px-4 py-2 text-xs text-zinc-200">Clipboard access is unavailable. Select the code below to copy it.</p>}
 
       {/* Code Body */}
       <div className="p-4 overflow-x-auto text-xs sm:text-sm font-mono leading-relaxed text-zinc-200">

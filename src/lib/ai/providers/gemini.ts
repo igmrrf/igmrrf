@@ -32,6 +32,7 @@ export class GeminiProvider implements AIProvider {
     }
 
     const chat = this.model.startChat({
+      systemInstruction: systemMessage?.content,
       history,
       generationConfig: {
         maxOutputTokens: 1024,
@@ -39,9 +40,7 @@ export class GeminiProvider implements AIProvider {
     });
 
     const lastMessage = userMessages[userMessages.length - 1];
-    const prompt = systemMessage
-      ? `System Instructions: ${systemMessage.content}\n\nUser: ${lastMessage?.content || ""}`
-      : lastMessage?.content || "";
+    const prompt = lastMessage?.content || "";
 
     return { chat, prompt };
   }
@@ -52,25 +51,23 @@ export class GeminiProvider implements AIProvider {
     return result.response.text();
   }
 
-  async generateStream(messages: Message[]): Promise<ReadableStream<Uint8Array>> {
+  async generateStream(messages: Message[], signal?: AbortSignal): Promise<ReadableStream<Uint8Array>> {
     const { chat, prompt } = this.buildChat(messages);
-    const result = await chat.sendMessageStream(prompt);
+    const result = await chat.sendMessageStream(prompt, { signal });
     const encoder = new TextEncoder();
+    const iterator = result.stream[Symbol.asyncIterator]();
 
     return new ReadableStream<Uint8Array>({
-      async start(controller) {
+      async pull(controller) {
         try {
-          for await (const chunk of result.stream) {
-            const text = chunk.text();
-            if (text) {
-              controller.enqueue(encoder.encode(text));
-            }
-          }
-          controller.close();
+          const { done, value } = await iterator.next();
+          if (done) controller.close();
+          else controller.enqueue(encoder.encode(value.text()));
         } catch (err) {
           controller.error(err);
         }
       },
+      async cancel() { await iterator.return?.(undefined); },
     });
   }
 }

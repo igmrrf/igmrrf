@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
+import { useElementSize } from "@/hooks/useElementSize";
+import { useReducedMotion } from "framer-motion";
 import ForceGraph2D, { ForceGraphMethods, NodeObject } from "react-force-graph-2d";
 import { useTheme } from "next-themes";
 import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
@@ -29,46 +31,40 @@ interface TechGraphProps {
 
 export default function NodeGraphView({ data }: TechGraphProps) {
   const fg2DRef = useRef<ForceGraphMethods<CustomNode, CustomLink> | undefined>(undefined);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const { ref, ...dimensions } = useElementSize();
+  const reducedMotion = useReducedMotion();
+  const duration = reducedMotion ? 0 : 400;
+  const graphData = useMemo(() => ({ nodes: data.nodes.map((node) => ({ ...node })), links: data.links.map((link) => ({ source: typeof link.source === "string" ? link.source : link.source.id, target: typeof link.target === "string" ? link.target : link.target.id })) }), [data]);
   const { resolvedTheme } = useTheme();
 
   const isDark = resolvedTheme === "dark";
 
   useEffect(() => {
-    const handleResize = () => {
-      setDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight - 120,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    return () => window.removeEventListener("resize", handleResize);
+    const update = () => { if (document.hidden) fg2DRef.current?.pauseAnimation(); else fg2DRef.current?.resumeAnimation(); };
+    document.addEventListener("visibilitychange", update);
+    return () => document.removeEventListener("visibilitychange", update);
   }, []);
 
   const handleZoomIn = () => {
     if (fg2DRef.current) {
-      fg2DRef.current.zoom(fg2DRef.current.zoom() * 1.3, 400);
+      fg2DRef.current.zoom(fg2DRef.current.zoom() * 1.3, duration);
     }
   };
 
   const handleZoomOut = () => {
     if (fg2DRef.current) {
-      fg2DRef.current.zoom(fg2DRef.current.zoom() / 1.3, 400);
+      fg2DRef.current.zoom(fg2DRef.current.zoom() / 1.3, duration);
     }
   };
 
   const handleResetZoom = () => {
     if (fg2DRef.current) {
-      fg2DRef.current.centerAt(0, 0, 800);
-      fg2DRef.current.zoom(1, 800);
+      fg2DRef.current.zoomToFit(duration, 50);
     }
   };
 
   return (
-    <div className="w-full h-full overflow-hidden relative">
+    <div ref={ref} className="w-full h-full overflow-hidden relative">
       {/* Zoom Controls */}
       <div className="absolute top-20 right-6 z-30 flex flex-col gap-1.5 bg-background/90 backdrop-blur-md p-1.5 border border-border">
         <button
@@ -97,9 +93,9 @@ export default function NodeGraphView({ data }: TechGraphProps) {
         </button>
       </div>
 
-      <ForceGraph2D
+      {dimensions.width > 0 && <ForceGraph2D
         ref={fg2DRef}
-        graphData={data}
+        graphData={graphData}
         nodeLabel="name"
         nodeAutoColorBy="group"
         nodeRelSize={5}
@@ -108,15 +104,15 @@ export default function NodeGraphView({ data }: TechGraphProps) {
         onNodeClick={(node: CustomNode) => {
           if (node.id === "root" || !node.category) {
             if (typeof node.x === "number" && typeof node.y === "number") {
-              fg2DRef.current?.centerAt(node.x, node.y, 800);
-              fg2DRef.current?.zoom(2.5, 800);
+              fg2DRef.current?.centerAt(node.x, node.y, duration);
+              fg2DRef.current?.zoom(2.5, duration);
             }
           } else {
             window.open(
               `https://www.google.com/search?q=${encodeURIComponent(
                 node.name + " technology"
               )}`,
-              "_blank"
+              "_blank", "noopener,noreferrer"
             );
           }
         }}
@@ -169,7 +165,7 @@ export default function NodeGraphView({ data }: TechGraphProps) {
             ctx.fillText(label, nx, ny + nodeRadius + fontSize + 1);
           }
         }}
-      />
+      />}
 
       <div className="absolute bottom-4 left-6 text-[10px] font-mono bg-background/80 backdrop-blur-xs text-muted-foreground border border-border px-3 py-1.5 pointer-events-none">
         • Click any node to inspect & search • Scroll to zoom • Drag to pan

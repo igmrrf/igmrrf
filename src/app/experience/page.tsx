@@ -34,7 +34,7 @@ export default function ExperiencePage() {
   return (
     <motion.div
       variants={container}
-      initial="hidden"
+      initial={false}
       animate="show"
       className="flex flex-col gap-24 max-w-6xl mx-auto"
     >
@@ -63,7 +63,7 @@ export default function ExperiencePage() {
           className="group relative px-8 py-4 bg-primary text-primary-foreground font-mono text-xs tracking-widest uppercase overflow-hidden shrink-0"
         >
           <span className="relative z-10 flex items-center gap-3">
-            Download.pdf() <Download className="h-4 w-4" />
+            Download résumé <Download className="h-4 w-4" />
           </span>
           <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
         </Link>
@@ -87,7 +87,7 @@ export default function ExperiencePage() {
               className="group grid grid-cols-1 md:grid-cols-12 border-b border-border last:border-b-0 transition-colors hover:bg-muted/30"
             >
               <div className="md:col-span-3 p-10 border-r-0 md:border-r border-border bg-accent/10 flex flex-col gap-2">
-                <div className="text-[10px] font-mono font-black uppercase tracking-widest text-primary/50">
+                <div className="text-xs font-mono text-primary">
                   Period.ts
                 </div>
                 <div className="text-sm font-bold font-mono tracking-tighter">

@@ -8,12 +8,12 @@ import { ThemeColorSync } from "@/components/theme/ThemeColorSync";
 import { THEME_COLORS, THEME_COLOR_INIT_SCRIPT } from "@/lib/theme-colors";
 
 const bricolage = Bricolage_Grotesque({
-  variable: "--font-sans",
+  variable: "--font-bricolage",
   subsets: ["latin"],
 });
 
 const jetbrains = JetBrains_Mono({
-  variable: "--font-mono",
+  variable: "--font-jetbrains",
   subsets: ["latin"],
 });
 
@@ -45,9 +45,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Francis Igbiriki", url: "https://github.com/igmrrf" }],
   creator: "Francis Igbiriki",
   publisher: "The LDO",
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "The LDO | Francis Igbiriki — System Architect & Founder",
     description:

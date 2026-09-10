@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prepareChunksFromCaseStudies, prepareChunksFromBlog } from "@/lib/ai/ingestion";
 import { getAIProvider } from "@/lib/ai/factory";
+import { allowChatRequest, ChatRequestError, readChatRequest } from "@/lib/ai/chat-request";
+
+export const maxDuration = 60;
 
 async function findRelevantContext(query: string): Promise<string> {
   try {
@@ -10,17 +13,14 @@ async function findRelevantContext(query: string): Promise<string> {
     ]);
 
     const allChunks = [...caseStudies, ...blogPosts];
-    const q = query.toLowerCase();
+    const terms = [...new Set(query.toLowerCase().match(/[a-z0-9][a-z0-9.-]{2,}/g) || [])];
 
     // Find chunks that match keywords in title or body
-    const matching = allChunks.filter(
-      (chunk) =>
-        chunk.text.toLowerCase().includes(q) ||
-        chunk.metadata.title.toLowerCase().includes(q)
-    );
+    const matching = allChunks.map((chunk) => ({ chunk, score: terms.reduce((score, term) => score + (chunk.metadata.title.toLowerCase().includes(term) ? 4 : 0) + (chunk.text.toLowerCase().includes(term) ? 1 : 0), 0) }))
+      .filter(({ score }) => score > 0).sort((a, b) => b.score - a.score).map(({ chunk }) => chunk);
 
     if (matching.length > 0) {
-      return matching.map((c) => c.text).slice(0, 4).join("\n\n---\n\n");
+      return matching.slice(0, 4).map((c) => c.text).join("\n\n---\n\n").slice(0, 12000);
     }
 
     // Default to summary overview of top case studies
@@ -36,14 +36,13 @@ async function findRelevantContext(query: string): Promise<string> {
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
-
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { error: "Invalid messages payload" },
-        { status: 400 }
-      );
-    }
+    const origin = req.headers.get("origin");
+    if (origin && origin !== new URL(req.url).origin) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+    const { messages } = await readChatRequest(req);
+    // Use a proxy-overwritten header only when explicitly configured by the operator.
+    const ipHeader = process.env.CHAT_TRUSTED_IP_HEADER;
+    const clientKey = ipHeader ? req.headers.get(ipHeader)?.split(",")[0].trim() || "shared" : "shared";
+    if (!allowChatRequest(clientKey)) return NextResponse.json({ error: "Too many requests. Please try again in a minute." }, { status: 429, headers: { "Retry-After": "60" } });
 
     const lastMessage = messages[messages.length - 1]?.content || "";
 
@@ -71,6 +70,7 @@ ${context}
 === RESPONSE GUIDELINES ===
 - Tone: Crisp, technical, authoritative, and direct.
 - Format: Monospace backticks for tools, architectural layers, and code concepts.
+- Ground biographical claims in the supplied context. If a detail is missing, say so rather than inventing it. Link visitors to /about, /experience, /case-studies, or /blog when useful.
 - Engineering Maxim: Anchor trade-off discussions in Clean Architecture principles and business value ("Value Begets Peace").`;
 
     const fullMessages = [
@@ -81,19 +81,19 @@ ${context}
     const provider = getAIProvider();
 
     // 3. Generate Streamed Response
-    const stream = await provider.generateStream(fullMessages);
+    const signal = AbortSignal.any([req.signal, AbortSignal.timeout(55_000)]);
+    const stream = await provider.generateStream(fullMessages, signal);
 
     return new Response(stream, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
-        "Transfer-Encoding": "chunked",
-        "Cache-Control": "no-cache, no-transform",
+        "Cache-Control": "no-store, no-transform",
+        "X-Accel-Buffering": "no",
       },
     });
   } catch (error: unknown) {
+    if (error instanceof ChatRequestError) return NextResponse.json({ error: error.message }, { status: error.status });
     console.error("Chat API error:", error);
-    const message =
-      error instanceof Error ? error.message : "Failed to process chat stream";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "The AI assistant is temporarily unavailable. Please try again, or explore the projects and experience pages." }, { status: 503 });
   }
 }

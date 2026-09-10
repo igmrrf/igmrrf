@@ -23,7 +23,7 @@ export default function AboutPage() {
   return (
     <motion.div
       variants={container}
-      initial="hidden"
+      initial={false}
       animate="show"
       className="flex flex-col gap-24 max-w-6xl mx-auto"
     >
@@ -36,7 +36,7 @@ export default function AboutPage() {
           Entity.profile_fetch()
         </div>
         <h1 className="text-4xl sm:text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">
-          Francis_Igbiriki
+          Francis Igbiriki
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl leading-relaxed font-medium">
           System Architect specializing in high-performance distributed systems
@@ -167,7 +167,7 @@ export default function AboutPage() {
           debugging for LSP configurations and modern framework friction points.
         </p>
 
-        <h2 className="mt-16">Upstream_Contributions</h2>
+        <h2 id="contributions" className="mt-16">Open-source contributions</h2>
         <p>
           Patches merged into projects I do not own — from one-line corrections
           to a full SDK overhaul. Listed because a merged pull request is worth
@@ -225,7 +225,7 @@ export default function AboutPage() {
                 {c.note}
               </p>
               <div className="flex items-center gap-4 shrink-0">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/60">
+                <span className="text-xs font-mono text-muted-foreground">
                   {c.scale}
                 </span>
                 {c.caseStudy && (

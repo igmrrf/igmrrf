@@ -42,6 +42,10 @@ export const ChatInterface = () => {
   const [input, setInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [error, setError] = useState("");
+  const requestRef = useRef<AbortController | null>(null);
+  const followStream = useRef(true);
+  const fullscreenDialog = useRef<HTMLDialogElement>(null);
   const { currentWallpaper, opacity } = useWallpaper();
   const isMounted = useIsMounted();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,7 +54,7 @@ export const ChatInterface = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = useCallback(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && followStream.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, []);
@@ -91,30 +95,17 @@ export const ChatInterface = () => {
     }
   }, [isFullscreen, exitFullscreen, enterFullscreen]);
 
-  // Handle Fullscreen Esc key and body scroll lock
+  useEffect(() => () => requestRef.current?.abort(), []);
+
+  // A native modal provides focus containment and makes the page behind it inert.
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isFullscreen) {
-        exitFullscreen();
-      }
-    };
-
-    if (isFullscreen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isFullscreen, exitFullscreen]);
+    if (isFullscreen) fullscreenDialog.current?.showModal();
+  }, [isFullscreen]);
 
   const handleReset = () => {
     if (isGenerating) return;
     setMessages(INITIAL_MESSAGES);
+    setError("");
     setInput("");
     inputRef.current?.focus({ preventScroll: true });
   };
@@ -127,7 +118,11 @@ export const ChatInterface = () => {
 
   const executeChat = useCallback(
     async (userText: string) => {
-      if (!userText || isGenerating) return;
+      if (!userText || requestRef.current) return;
+      const controller = new AbortController();
+      requestRef.current = controller;
+      setError("");
+      followStream.current = true;
 
       const userMessage: Message = { role: "user", content: userText };
       const nextMessages = [...messages, userMessage];
@@ -138,21 +133,26 @@ export const ChatInterface = () => {
       setIsGenerating(true);
 
       try {
+        const history = nextMessages.filter((message) => message !== INITIAL_MESSAGES[0] && message.content).slice(-9).map((message) => ({ ...message, content: message.content.slice(0, 4000) }));
+        const encoder = new TextEncoder();
+        while (history.length > 1 && encoder.encode(JSON.stringify({ messages: history })).byteLength > 32_768) history.shift();
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: nextMessages }),
+          body: JSON.stringify({ messages: history }),
+          signal: controller.signal,
         });
 
         if (!response.ok || !response.body) {
-          throw new Error(`HTTP error ${response.status}`);
+          const payload = await response.json().catch(() => null);
+          throw new Error(payload?.error || "The assistant couldn’t connect. Please try again shortly.");
         }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let accumulated = "";
 
-        while (true) {
+        try { while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
@@ -169,9 +169,12 @@ export const ChatInterface = () => {
             }
             return next;
           });
-        }
+        } } finally { reader.releaseLock(); }
+        accumulated += decoder.decode();
+        if (!accumulated.trim()) throw new Error("No response arrived. Please try again.");
+        setMessages((previous) => [...previous.slice(0, -1), { role: "assistant", content: accumulated }]);
       } catch (error) {
-        console.error("Stream reader error:", error);
+        if (!controller.signal.aborted) setError(error instanceof Error ? error.message : "The response was interrupted. Please try again.");
         setMessages((prev) => {
           const next = [...prev];
           if (
@@ -179,20 +182,17 @@ export const ChatInterface = () => {
             next[next.length - 1].role === "assistant" &&
             !next[next.length - 1].content
           ) {
-            next[next.length - 1] = {
-              role: "assistant",
-              content:
-                "// PIPELINE_ERROR // Failed to connect to the AI stream. Please ensure your AI API key is configured in .env.local.",
-            };
+            return next.slice(0, -2);
           }
           return next;
         });
+        if (!controller.signal.aborted) setInput(userText);
       } finally {
+        requestRef.current = null;
         setIsGenerating(false);
-        setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 50);
       }
     },
-    [messages, isGenerating]
+    [messages]
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -241,7 +241,7 @@ export const ChatInterface = () => {
           <Terminal className="h-4 w-4 text-primary" />
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-black uppercase tracking-wider text-foreground">
-              neural_session // rag_stream
+              Ask about my work
             </span>
             {isFullscreen && (
               <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 bg-primary/10 border border-primary/30 text-primary font-mono text-[9px] uppercase tracking-widest font-bold">
@@ -255,7 +255,7 @@ export const ChatInterface = () => {
           <div className="hidden sm:flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[10px] font-mono text-muted-foreground uppercase">
-              Guardrails_Active
+              AI assistant
             </span>
           </div>
 
@@ -306,6 +306,8 @@ export const ChatInterface = () => {
           isFullscreen && "max-w-4xl mx-auto w-full px-4 sm:px-8 py-8"
         )}
         ref={scrollRef}
+        onScroll={(event) => { const element = event.currentTarget; followStream.current = element.scrollHeight - element.scrollTop - element.clientHeight < 100; }}
+        aria-label="Conversation"
       >
         {messages.map((m, i) => {
           const isRestricted = m.content.includes("// ACCESS_RESTRICTED //");
@@ -398,6 +400,8 @@ export const ChatInterface = () => {
         )}
       </div>
 
+      <p role="status" className="sr-only">{isGenerating ? "Generating a response" : messages.length > 1 ? "Response complete" : "Ready for your question"}</p>
+      {error && <p role="alert" className="relative z-10 border-t border-border bg-background px-4 py-3 text-sm text-foreground">{error}</p>}
       {/* Input Prompt Form */}
       <div
         className={cn(
@@ -417,17 +421,20 @@ export const ChatInterface = () => {
               $&gt;
             </span>
             <input
+              aria-label="Your question"
+              maxLength={4000}
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={isGenerating}
               placeholder="Ask about Clean Architecture, system design, or case studies..."
-              className="w-full py-2 bg-transparent text-xs font-mono text-foreground focus:outline-none placeholder:text-muted-foreground/60 disabled:opacity-50"
+              className="w-full min-w-0 py-2 bg-transparent text-base sm:text-sm font-mono text-foreground focus:outline-none placeholder:text-muted-foreground disabled:opacity-50"
             />
           </div>
-          <button
+          {isGenerating ? <button type="button" onClick={() => requestRef.current?.abort()} className="border border-border px-4 py-3 text-sm">Stop</button> : <button
             type="submit"
+            aria-label="Send question"
             disabled={isGenerating || !input.trim()}
             className="bg-primary text-primary-foreground px-4 sm:px-6 py-2.5 font-mono text-[10px] uppercase tracking-widest font-black transition-all hover:bg-primary/90 disabled:opacity-40 active:scale-95 flex items-center gap-2 shrink-0"
           >
@@ -437,7 +444,7 @@ export const ChatInterface = () => {
               <Send className="h-3.5 w-3.5" />
             )}
             <span className="hidden sm:inline">Send</span>
-          </button>
+          </button>}
         </form>
       </div>
     </div>
@@ -452,7 +459,7 @@ export const ChatInterface = () => {
           aria-hidden="true"
           className="h-[78vh] max-w-4xl mx-auto border border-transparent pointer-events-none opacity-0"
         />
-        {createPortal(chatMarkup, document.body)}
+        {createPortal(<dialog ref={fullscreenDialog} aria-label="Fullscreen AI conversation" onCancel={(event) => { event.preventDefault(); exitFullscreen(); }} className="m-0 max-w-none max-h-none w-screen h-dvh p-0 border-0 bg-background">{chatMarkup}</dialog>, document.body)}
       </>
     );
   }

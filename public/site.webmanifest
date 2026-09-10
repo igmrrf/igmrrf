@@ -4,8 +4,8 @@
   "description": "High-performance distributed systems, Clean Architecture, and terminal-first engineering.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#080c10",
+  "theme_color": "#080c10",
   "icons": [
     {
       "src": "/favicon-96x96.png",

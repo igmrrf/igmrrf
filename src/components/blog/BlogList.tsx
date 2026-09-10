@@ -92,6 +92,7 @@ export function BlogList({ posts }: BlogListProps) {
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
+              aria-label="Search articles"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -113,6 +114,7 @@ export function BlogList({ posts }: BlogListProps) {
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground shrink-0 hidden sm:inline" />
             <select
+              aria-label="Sort articles"
               value={sortBy}
               onChange={(e) =>
                 setSortBy(e.target.value as "newest" | "oldest")
@@ -132,6 +134,7 @@ export function BlogList({ posts }: BlogListProps) {
           </span>
           <button
             onClick={() => setSelectedTag("all")}
+            aria-pressed={selectedTag === "all"}
             className={`px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider border transition-all ${
               selectedTag === "all"
                 ? "bg-primary text-primary-foreground border-primary font-black"
@@ -146,6 +149,7 @@ export function BlogList({ posts }: BlogListProps) {
             return (
               <button
                 key={tag}
+                aria-pressed={isSelected}
                 onClick={() => setSelectedTag(tag)}
                 className={`px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider border transition-all ${
                   isSelected
@@ -161,7 +165,7 @@ export function BlogList({ posts }: BlogListProps) {
 
         {/* Feed Status Summary */}
         <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground pt-2 border-t border-border/30">
-          <span>
+          <span role="status">
             FEED_INDEX: Showing {filteredPosts.length} of {posts.length} articles
           </span>
           {(searchQuery || selectedTag !== "all") && (
@@ -203,7 +207,7 @@ export function BlogList({ posts }: BlogListProps) {
       ) : (
         <motion.div
           variants={container}
-          initial="hidden"
+          initial={false}
           animate="show"
           key={`${selectedTag}-${searchQuery}-${sortBy}`}
           className="grid grid-cols-1 md:grid-cols-2 border-t border-l border-border"
@@ -224,6 +228,7 @@ export function BlogList({ posts }: BlogListProps) {
                           year: "numeric",
                           month: "short",
                           day: "numeric",
+                          timeZone: "UTC",
                         })}
                       </span>
                       {post.readingTime && (
@@ -232,7 +237,7 @@ export function BlogList({ posts }: BlogListProps) {
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] font-mono text-border font-bold group-hover:text-primary/40 transition-colors select-none">
+                    <span className="text-xs font-mono text-muted-foreground select-none">
                       {"// " + String(index + 1).padStart(2, "0")}
                     </span>
                   </div>

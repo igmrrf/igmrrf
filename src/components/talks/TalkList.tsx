@@ -28,7 +28,7 @@ export function TalkList({ talks }: { talks: (Talk & { slug: string })[] }) {
   return (
     <motion.div
       variants={container}
-      initial="hidden"
+      initial={false}
       animate="show"
       className="grid grid-cols-1 md:grid-cols-2 border-t border-l border-border"
     >
@@ -40,6 +40,7 @@ export function TalkList({ talks }: { talks: (Talk & { slug: string })[] }) {
                 <span className="flex items-center gap-1.5 px-2 py-0.5 border border-border bg-accent/30 text-foreground font-bold">
                   <Calendar className="h-3 w-3 text-primary" />{" "}
                   {new Date(talk.date).toLocaleDateString("en-US", {
+                    timeZone: "UTC",
                     year: "numeric",
                     month: "short",
                   })}
@@ -92,7 +93,7 @@ export function TalkList({ talks }: { talks: (Talk & { slug: string })[] }) {
               >
                 Talk.open() <ArrowRight className="h-3 w-3" />
               </Link>
-              <span className="text-[10px] font-mono text-muted-foreground/60 font-bold">
+              <span className="text-xs font-mono text-muted-foreground">
                 0{i + 1}
               </span>
             </div>

@@ -38,7 +38,7 @@ export async function RecommendedReads({ currentSlug, tags = [] }: RecommendedRe
           >
             <div className="flex flex-col gap-3">
               <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-                {new Date(post.date).toLocaleDateString()} {"// REL_IDX"}
+                {new Date(post.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}
               </span>
               <h4 className="text-lg sm:text-xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">
                 {post.title}

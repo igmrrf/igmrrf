@@ -73,14 +73,14 @@ interface WallpaperContextType {
 const WallpaperContext = createContext<WallpaperContextType | undefined>(undefined);
 
 function getInitialWallpaperId(): string | null {
-  if (typeof window === "undefined") return "akane-1";
+  if (typeof window === "undefined") return null;
   try {
     const stored = localStorage.getItem("ldo_wallpaper");
     if (stored === "none") return null;
     if (stored && WALLPAPERS.some((w) => w.id === stored)) return stored;
-    return "akane-1";
+    return null;
   } catch {
-    return "akane-1";
+    return null;
   }
 }
 

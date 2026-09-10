@@ -353,4 +353,4 @@
   text-align: left;
 }
 
-.df-statement__body :deep(pre) { text-align: left; }
+.df-statement__body pre { text-align: left; }

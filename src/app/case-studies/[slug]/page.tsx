@@ -23,6 +23,7 @@ export async function generateMetadata({
     return {
       title: study.meta.title,
       description: study.meta.summary,
+      alternates: { canonical: `/case-studies/${slug}` },
       openGraph: {
         title: `${study.meta.title} | Case Study | The LDO`,
         description: study.meta.summary,
@@ -74,7 +75,7 @@ export default async function CaseStudyPage({
       <div className="flex flex-col gap-8 border-l-4 border-primary pl-8 py-6 bg-accent/15">
         <div className="flex flex-wrap items-center gap-4 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
           <span className="flex items-center gap-1.5 px-2.5 py-1 border border-border bg-background font-bold text-foreground">
-            <Calendar className="h-3.5 w-3.5 text-primary" /> {new Date(meta.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+            <Calendar className="h-3.5 w-3.5 text-primary" /> {new Date(meta.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}
           </span>
           <Link
             href={meta.githubUrl}

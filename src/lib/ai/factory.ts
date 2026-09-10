@@ -1,27 +1,21 @@
-import { AIProvider, Message } from "./types";
+import { AIProvider } from "./types";
 import { GeminiProvider } from "./providers/gemini";
 import { OpenAIProvider } from "./providers/openai";
 import { GroqProvider } from "./providers/groq";
 
 class MockProvider implements AIProvider {
-  name = "Mock (Development)";
-  async generateResponse(messages: Message[]): Promise<string> {
-    const lastMsg = messages[messages.length - 1]?.content || "";
-    return `[AI ARCHITECT OFFLINE] To enable real-time AI responses, configure your free AI API key (Google Gemini from aistudio.google.com or Groq from console.groq.com) in .env.local.\n\nQuery received: "${lastMsg}".`;
+  name = "Offline";
+  async generateResponse(): Promise<string> {
+    return "The AI assistant is currently offline. You can still explore Francis’s [projects](/case-studies), [experience](/experience), and [writing](/blog), or [get in touch](mailto:francis.igbiriki@gmail.com).";
   }
 
-  async generateStream(messages: Message[]): Promise<ReadableStream<Uint8Array>> {
-    const responseText = await this.generateResponse(messages);
+  async generateStream(): Promise<ReadableStream<Uint8Array>> {
+    const responseText = await this.generateResponse();
     const encoder = new TextEncoder();
-    const words = responseText.split(" ");
 
     return new ReadableStream<Uint8Array>({
-      async start(controller) {
-        for (let i = 0; i < words.length; i++) {
-          const chunk = (i === 0 ? "" : " ") + words[i];
-          controller.enqueue(encoder.encode(chunk));
-          await new Promise((r) => setTimeout(r, 20));
-        }
+      start(controller) {
+        controller.enqueue(encoder.encode(responseText));
         controller.close();
       },
     });
@@ -32,8 +26,7 @@ export function getAIProvider(): AIProvider {
   const provider = (process.env.AI_PROVIDER || "gemini").toLowerCase();
   const apiKey =
     process.env.AI_API_KEY ||
-    process.env.GROQ_API_KEY ||
-    process.env.GEMINI_API_KEY ||
+    (provider === "groq" ? process.env.GROQ_API_KEY : provider === "openai" ? process.env.OPENAI_API_KEY : process.env.GEMINI_API_KEY) ||
     "";
 
   // Default models per provider
@@ -41,7 +34,7 @@ export function getAIProvider(): AIProvider {
     provider === "groq"
       ? "llama-3.3-70b-versatile"
       : provider === "gemini"
-      ? "gemini-1.5-flash"
+       ? "gemini-2.5-flash"
       : "gpt-4o";
 
   const modelName = process.env.AI_MODEL_NAME || defaultModel;

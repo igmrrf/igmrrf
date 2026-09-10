@@ -32,6 +32,7 @@ export async function generateMetadata({
     return {
       title: talk.meta.title,
       description: talk.meta.summary,
+      alternates: { canonical: `/talks/${slug}` },
       openGraph: {
         title: `${talk.meta.title} | Talk | The LDO`,
         description: talk.meta.summary,
@@ -85,6 +86,7 @@ export default async function TalkPage({
           <span className="flex items-center gap-1.5 px-2.5 py-1 border border-border bg-background font-bold text-foreground">
             <Calendar className="h-3.5 w-3.5 text-primary" />{" "}
             {new Date(meta.date).toLocaleDateString("en-US", {
+              timeZone: "UTC",
               year: "numeric",
               month: "short",
               day: "numeric",

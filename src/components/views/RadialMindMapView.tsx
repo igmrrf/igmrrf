@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useReducedMotion } from 'framer-motion';
+import { useElementSize } from '@/hooks/useElementSize';
 import * as d3 from 'd3';
 import { useTheme } from 'next-themes';
 import { HierarchicalData } from '@/lib/parseTechStack';
@@ -15,34 +17,17 @@ type ExtendedHierarchyNode = d3.HierarchyPointNode<HierarchicalData> & {
 export default function RadialMindMapView({ data }: { data: HierarchicalData }) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
-  const containerRef = useRef<HTMLDivElement>(null);
+  const { ref: containerRef, width, height } = useElementSize();
+  const reducedMotion = useReducedMotion();
   const svgRef = useRef<SVGSVGElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    const { width, height } = containerRef.current.getBoundingClientRect();
-    setDimensions({ width, height });
-
-    const handleResize = () => {
-      if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.getBoundingClientRect().width,
-          height: containerRef.current.getBoundingClientRect().height,
-        });
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (!data || !svgRef.current || dimensions.width === 0) return;
+    if (!data || !svgRef.current || width === 0) return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
-    const radius = Math.max(300, Math.min(dimensions.width, dimensions.height) / 2 - 50);
+    const radius = Math.max(150, Math.min(width, height) / 2 - 70);
 
     const root = d3.hierarchy<HierarchicalData>(data) as ExtendedHierarchyNode;
     const tree = d3
@@ -74,8 +59,8 @@ export default function RadialMindMapView({ data }: { data: HierarchicalData }) 
     svg.call(
       zoom.transform,
       d3.zoomIdentity
-        .translate(dimensions.width / 2, dimensions.height / 2)
-        .scale(dimensions.width < 600 ? 0.6 : 1)
+        .translate(width / 2, height / 2)
+        .scale(width < 600 ? 0.6 : 1)
     );
 
     const gLink = g
@@ -94,7 +79,7 @@ export default function RadialMindMapView({ data }: { data: HierarchicalData }) 
 
       tree(root);
 
-      const transition = svg.transition().duration(500);
+      const transition = svg.transition().duration(reducedMotion ? 0 : 500);
 
       // Links
       const link = gLink
@@ -156,6 +141,12 @@ export default function RadialMindMapView({ data }: { data: HierarchicalData }) 
 
       nodeEnter
         .append('circle')
+        .attr('tabindex', 0)
+        .attr('role', 'button')
+        .attr('aria-label', (d) => `${d.data.name}: expand, collapse, or search`)
+        .on('keydown', function(event) {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.dispatchEvent(new MouseEvent('click')); }
+        })
         .attr('r', (d) => (d.depth === 0 ? 8 : d.depth === 1 ? 6 : 4))
         .attr('fill', (d) =>
           d._children && !d.children
@@ -178,7 +169,7 @@ export default function RadialMindMapView({ data }: { data: HierarchicalData }) 
               `https://www.google.com/search?q=${encodeURIComponent(
                 targetNode.data.name + ' technology'
               )}`,
-              '_blank'
+              '_blank', 'noopener,noreferrer'
             );
             return;
           }
@@ -209,7 +200,7 @@ export default function RadialMindMapView({ data }: { data: HierarchicalData }) 
               `https://www.google.com/search?q=${encodeURIComponent(
                 targetNode.data.name + ' technology'
               )}`,
-              '_blank'
+              '_blank', 'noopener,noreferrer'
             );
           }
         });
@@ -267,12 +258,13 @@ export default function RadialMindMapView({ data }: { data: HierarchicalData }) 
     root.y0 = 0;
 
     update(root);
-  }, [data, dimensions]);
+    return () => { svg.interrupt(); svg.selectAll('*').interrupt(); svg.on('.zoom', null); };
+  }, [data, width, height, reducedMotion]);
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full pt-16 cursor-grab active:cursor-grabbing text-zinc-800 dark:text-zinc-200 relative bg-transparent"
+      className="w-full h-full cursor-grab active:cursor-grabbing text-foreground relative bg-transparent"
       style={
         {
           '--bg-color': isDark ? '#09090b' : '#f9fafb',

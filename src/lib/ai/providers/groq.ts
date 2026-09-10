@@ -40,9 +40,10 @@ export class GroqProvider implements AIProvider {
     return data.choices?.[0]?.message?.content || "";
   }
 
-  async generateStream(messages: Message[]): Promise<ReadableStream<Uint8Array>> {
+  async generateStream(messages: Message[], signal?: AbortSignal): Promise<ReadableStream<Uint8Array>> {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
+      signal,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this.apiKey}`,

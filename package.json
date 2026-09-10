@@ -7,6 +7,8 @@
     "build": "npm run build:decks && next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test scripts/core.test.mjs",
     "build:decks": "node scripts/build-decks.mjs",
     "previews": "node scripts/capture-previews.mjs"
   },

@@ -32,7 +32,7 @@ export function CaseStudyList({
   return (
     <motion.div
       variants={container}
-      initial="hidden"
+      initial={false}
       animate="show"
       className="grid grid-cols-1 md:grid-cols-2 border-t border-l border-border"
     >
@@ -46,6 +46,7 @@ export function CaseStudyList({
                   {new Date(study.date).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "short",
+                    timeZone: "UTC",
                   })}
                 </span>
                 <span className="flex items-center gap-4">
@@ -71,7 +72,7 @@ export function CaseStudyList({
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-black group-hover:text-primary transition-colors leading-tight uppercase italic tracking-tight break-words">
-                {study.title}
+                <Link href={`/case-studies/${study.slug}`}>{study.title}</Link>
               </h2>
 
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 font-medium">
@@ -95,9 +96,9 @@ export function CaseStudyList({
                 href={`/case-studies/${study.slug}`}
                 className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase font-black text-primary hover:tracking-[0.25em] transition-all"
               >
-                Case_Study.view() <ArrowRight className="h-3 w-3" />
+                Read case study <ArrowRight className="h-3 w-3" />
               </Link>
-              <span className="text-[10px] font-mono text-muted-foreground/60 font-bold">
+              <span className="text-xs font-mono text-muted-foreground">
                 0{i + 1}
               </span>
             </div>

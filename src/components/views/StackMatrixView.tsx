@@ -59,12 +59,13 @@ export default function StackMatrixView({ hierarchy }: StackMatrixViewProps) {
   }, [categories]);
 
   return (
-    <div className="w-full h-full flex flex-col pt-16 px-4 md:px-8 max-w-6xl mx-auto overflow-y-auto">
+    <div className="w-full flex flex-col pt-6 px-4 md:px-8 max-w-6xl mx-auto">
       {/* Search & Filter Bar */}
       <div className="flex flex-col md:flex-row gap-4 mb-8 bg-background/80 backdrop-blur-md p-4 border border-border">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
+            aria-label="Search technologies"
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -76,9 +77,10 @@ export default function StackMatrixView({ hierarchy }: StackMatrixViewProps) {
         <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
           <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           <select
+            aria-label="Filter technologies by domain"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-background border border-border px-3 py-2 text-xs font-mono uppercase tracking-wider text-foreground focus:outline-none focus:border-primary"
+            className="min-w-0 w-full md:w-auto max-w-full bg-background border border-border px-3 py-2 text-xs font-mono text-foreground focus:outline-none focus:border-primary"
           >
             <option value="all">All Domains ({totalSkillsCount})</option>
             {categories.map((cat) => (

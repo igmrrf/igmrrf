@@ -37,17 +37,19 @@ export const WallpaperSelector: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end" ref={panelRef}>
+    <div data-site-controls className="fixed bottom-4 right-4 z-50 flex flex-col items-end" ref={panelRef}>
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-3 border border-border bg-background/80 backdrop-blur-md shadow-2xl text-foreground hover:text-primary hover:border-primary transition-all active:scale-95 flex items-center gap-2 group"
         aria-label="Customize Terminal Background and Opacity"
+        aria-expanded={isOpen}
+        aria-controls="wallpaper-settings"
         title="Terminal Wallpaper & Opacity Settings"
       >
         <Sliders size={18} className="text-primary group-hover:rotate-45 transition-transform" />
         <span className="hidden sm:inline font-mono text-[10px] uppercase tracking-widest font-black">
-          Style.cfg
+          Appearance
         </span>
       </button>
 
@@ -55,18 +57,19 @@ export const WallpaperSelector: React.FC = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id="wallpaper-settings"
             initial={{ opacity: 0, y: 15, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 15, scale: 0.96 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute bottom-16 right-0 w-[340px] sm:w-[400px] border border-border bg-background/95 backdrop-blur-xl shadow-2xl p-6 flex flex-col gap-6"
+            className="absolute bottom-16 right-0 w-[min(400px,calc(100vw-2rem))] max-h-[calc(100dvh-7rem)] overflow-y-auto border border-border bg-background/95 backdrop-blur-xl shadow-2xl p-5 flex flex-col gap-6"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border pb-4">
               <div className="flex items-center gap-2">
                 <Terminal className="h-4 w-4 text-primary" />
                 <span className="font-mono text-xs font-black uppercase tracking-wider text-foreground">
-                  Terminal.wallpaper_select()
+                  Appearance settings
                 </span>
               </div>
               <button
@@ -93,6 +96,7 @@ export const WallpaperSelector: React.FC = () => {
                 ].map((item) => (
                   <button
                     key={item.val}
+                    aria-pressed={Math.abs(opacity - item.val) < 0.01}
                     onClick={() => setOpacity(item.val)}
                     className={`py-1.5 px-2 border text-[10px] font-mono uppercase tracking-wider transition-all ${
                       Math.abs(opacity - item.val) < 0.01
@@ -117,6 +121,7 @@ export const WallpaperSelector: React.FC = () => {
                 {/* None / Solid Option */}
                 <button
                   onClick={() => setWallpaperId(null)}
+                  aria-pressed={wallpaperId === null}
                   className={`relative flex flex-col items-center justify-center p-3 border h-20 transition-all ${
                     wallpaperId === null
                       ? "border-primary ring-1 ring-primary bg-accent/40"
@@ -142,6 +147,7 @@ export const WallpaperSelector: React.FC = () => {
                   return (
                     <button
                       key={wp.id}
+                      aria-pressed={isSelected}
                       onClick={() => setWallpaperId(wp.id)}
                       className={`relative group overflow-hidden border h-20 transition-all ${
                         isSelected
@@ -175,7 +181,7 @@ export const WallpaperSelector: React.FC = () => {
 
             {/* Footer summary */}
             <div className="text-[9px] font-mono uppercase text-muted-foreground/70 border-t border-border/50 pt-3 flex justify-between items-center">
-              <span>Terminal mode: 0.90 translucent</span>
+              <span>Background opacity: {Math.round(opacity * 100)}%</span>
               <span className="text-primary font-bold">AKANE_PACK</span>
             </div>
           </motion.div>

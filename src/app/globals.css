@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@theme {
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -12,8 +14,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
   
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --font-sans: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains);
 }
 
 :root {
@@ -46,7 +48,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans), system-ui, sans-serif;
+    font-family: var(--font-bricolage), system-ui, sans-serif;
     transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     background-image: radial-gradient(var(--border) 1px, transparent 1px);
     background-size: 40px 40px;
@@ -55,7 +57,35 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tighter leading-tight font-black;
+    overflow-wrap: anywhere;
   }
+
+  :focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+  [id] { scroll-margin-top: 6rem; }
+  button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+  button:not(:disabled), select { cursor: pointer; }
+  dialog { color: var(--foreground); }
+}
+
+.terminal-dialog { position: fixed; inset: 0; margin: auto; padding: 0; width: min(44rem, calc(100% - 2rem)); max-height: calc(100dvh - 3rem); overflow-y: auto; background: transparent; }
+.terminal-dialog::backdrop { background: rgb(0 0 0 / 65%); backdrop-filter: blur(6px); }
+body:has(dialog[open]) { overflow: hidden; }
+.terminal-scene { position: relative; perspective: 1000px; padding: 2rem 0 0; isolation: isolate; }
+.scene-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 32px 32px; opacity: .4; mask-image: radial-gradient(ellipse, black 20%, transparent 70%); }
+.scene-tilt { position: relative; transform-style: preserve-3d; margin: 1rem 1.5rem 2rem; }
+.scene-float { position: relative; transform-style: preserve-3d; animation: terminal-float 8s ease-in-out infinite; }
+.scene-window { position: relative; border: 1px solid var(--border); background: var(--background); box-shadow: 0 24px 60px rgb(0 0 0 / 15%); transform: translateZ(30px); border-radius: 12px; overflow: hidden; }
+.scene-layer { position: absolute; inset: 0; border: 1px solid var(--primary); background: var(--accent); border-radius: 12px; pointer-events: none; }
+.scene-layer-back { transform: translateZ(-40px) rotate(-7deg); opacity: .22; }
+.scene-layer-middle { transform: translateZ(-10px) rotate(4deg); opacity: .35; }
+@keyframes terminal-float { 0%, 100% { transform: translateY(0) rotateY(-5deg) rotateX(3deg); } 50% { transform: translateY(-10px) rotateY(3deg) rotateX(-2deg); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .scene-float { animation: none; }
+}
+@media print {
+  header, footer, .terminal-scene, [data-site-controls] { display: none !important; }
+  main { margin: 0 !important; padding: 0 !important; }
 }
 
 @layer utilities {

@@ -6,7 +6,7 @@ export interface Message {
 export interface AIProvider {
   name: string;
   generateResponse(messages: Message[]): Promise<string>;
-  generateStream(messages: Message[]): Promise<ReadableStream<Uint8Array>>;
+  generateStream(messages: Message[], signal?: AbortSignal): Promise<ReadableStream<Uint8Array>>;
 }
 
 export interface AIConfig {
