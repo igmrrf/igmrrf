@@ -34,7 +34,7 @@ The reference implementation for this workshop had three real defects in it. Eac
 
 1. **Exercise 03.** A step-up MFA gate whose entire authorization check was `ticket.startsWith('MFA_PROOF_')` — a string prefix the attacker controls.
 2. **Exercise 05.** A canary-token killswitch that tested each stream chunk in isolation, so a canary split across chunks (which is every canary, in production) never matched.
-3. **Exercise 08.** A secret scanner that reported a clean tree while a fake credential sat in the bundle, because the regex character class stopped at the first hyphen.
+3. **Exercise 08.** A secret scanner that reported a clean tree while a fake credential sat in the source tree, because the regex character class stopped at the first hyphen.
 
 They are in the workshop because the fix is more useful than the pretence, and because each generalises: bind approvals to arguments, test detections against streams rather than strings, and prove your scanner catches a secret you planted on purpose.
 
