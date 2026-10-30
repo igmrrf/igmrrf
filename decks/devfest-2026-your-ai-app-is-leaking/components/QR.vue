@@ -28,12 +28,11 @@ const resolved = computed(() => {
       :width="size"
       :height="size"
       alt=""
-      style="border-radius: 8px; background: #fff; padding: 6px; display: block"
+      style="border-radius: 8px; background: #fff; padding: 6px; display: block; border: 1px solid #dadce0"
     />
     <span
       v-if="caption"
-      class="df-mono"
-      style="font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--df-dim)"
+      style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--df-qr-caption, var(--df-muted))"
     >
       {{ caption }}
     </span>

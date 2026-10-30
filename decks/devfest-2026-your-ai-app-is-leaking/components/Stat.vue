@@ -6,15 +6,15 @@ withDefaults(
 </script>
 
 <template>
-  <div class="df-card" style="padding: 1rem 1.15rem">
+  <div class="df-card" :class="`df-card--${tone}`" style="padding: 0.9rem 1.1rem">
     <div
-      class="df-mono"
-      style="font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1"
-      :style="{ color: `var(--df-${tone})` }"
+      class="df-head"
+      style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1"
+      :style="{ color: `var(--df-${tone}-ink)` }"
     >
       {{ value }}
     </div>
-    <div style="font-size: 0.74rem; color: var(--df-muted); margin-top: 0.45rem; line-height: 1.4">
+    <div style="font-size: 0.8rem; color: var(--df-muted); margin-top: 0.4rem; line-height: 1.4">
       {{ label }}
     </div>
   </div>

@@ -1,36 +1,40 @@
 <template>
-  <div class="slidev-layout df-cover">
-    <div class="df-cover__glow" />
+  <div class="slidev-layout df-cover df-dark-scope">
+    <Rail position="top" />
     <div class="df-cover__inner"><slot /></div>
-    <Rail />
+    <Rail position="bottom" />
   </div>
 </template>
 
 <style scoped>
+/* Template cover: #202124 ground, Google four-colour bars top and bottom,
+   centred DevFest lock-up. */
 .df-cover {
-  display: flex;
-  align-items: center;
   position: relative;
   overflow: hidden;
-}
-/* One soft bloom behind the title. Keeps the cover from reading as a flat slab
-   without adding anything the projector has to resolve. */
-.df-cover__glow {
-  position: absolute;
-  inset: -20% -10% auto -25%;
-  height: 130%;
-  background:
-    radial-gradient(46% 52% at 22% 34%, rgba(234, 67, 53, 0.2), transparent 70%),
-    radial-gradient(40% 46% at 68% 62%, rgba(66, 133, 244, 0.16), transparent 72%);
-  filter: blur(6px);
-  pointer-events: none;
+  background: var(--df-dark) !important;
+  color: var(--df-on-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.5rem 4rem;
 }
 .df-cover__inner {
-  position: relative;
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  align-items: center;
+}
+.df-cover :deep(h1) {
+  color: var(--df-on-dark);
+  font-size: 3.6rem;
+  margin: 0;
+}
+.df-cover :deep(p) {
+  color: var(--df-on-dark-muted);
+}
+.df-cover :deep(strong) {
+  color: var(--df-on-dark);
 }
 </style>

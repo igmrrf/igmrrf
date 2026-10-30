@@ -17,6 +17,7 @@ const outDir = path.join(here, '..', 'public');
 const targets = [
   { name: 'qr-repo.svg', url: TALK.repoUrl },
   { name: 'qr-talk.svg', url: TALK.talkUrl },
+  { name: 'qr-workshop.svg', url: TALK.workshopUrl },
 ];
 
 await mkdir(outDir, { recursive: true });
@@ -26,7 +27,7 @@ for (const target of targets) {
     type: 'svg',
     errorCorrectionLevel: 'M',
     margin: 1,
-    color: { dark: '#0B0C0F', light: '#FFFFFF' },
+    color: { dark: '#202124', light: '#FFFFFF' },
   });
   await writeFile(path.join(outDir, target.name), svg, 'utf8');
   console.log(`[qr] ${target.name} -> ${target.url}`);

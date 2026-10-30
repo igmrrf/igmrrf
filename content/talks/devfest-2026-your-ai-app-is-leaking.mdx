@@ -1,45 +1,45 @@
 ---
 title: "Your AI App is Leaking"
-summary: "A practical guide to securing AI-powered applications in production — from API keys in the client bundle to prompt injection that walks straight past your authorization layer."
-event: "DevFest 2026"
-location: "Lagos, Nigeria"
-date: "2026-11-14"
-durationMinutes: 45
-tags: ["AI Security", "Prompt Injection", "Web Crypto", "Docker", "Data Sovereignty", "OWASP LLM"]
+summary: "A 30-minute hands-on workshop on securing AI-powered applications in production — from API keys in the client bundle to prompt injection that walks straight past your authorization layer. Bring a laptop: you fix three real bugs, red to green."
+event: "DevFest Abuja 2026"
+location: "Abuja, Nigeria"
+date: "2026-10-30"
+durationMinutes: 30
+tags: ["AI Security", "Prompt Injection", "Workshop", "Docker", "Data Sovereignty", "OWASP LLM"]
 deckSlug: "devfest-2026-your-ai-app-is-leaking"
 pdf: "/decks/devfest-2026-your-ai-app-is-leaking.pdf"
-repoUrl: "https://github.com/igmrrf/igmrrf"
+repoUrl: "https://github.com/igmrrf/leaky-ai-workshop"
 featured: true
 ---
 
 Every team is shipping AI features. Most are bolting intelligence onto architectures that were never designed to protect the data those models consume. The result is predictable and it is everywhere: API keys in client bundles, unvalidated model inputs, sensitive documents streamed to third-party inference APIs with no access controls, and prompt injection attacks that bypass the entire authorization layer.
 
-This session is a walkthrough of what it actually takes to secure an AI application from code to deployment, built on patterns from production systems rather than theory slides.
+This 30-minute workshop at DevFest Abuja 2026 is a hands-on walkthrough of what it actually takes to secure an AI application from code to deployment, built on patterns from production systems rather than theory slides. The slides run side by side with a deliberately vulnerable app and its hardened twin: you clone the repo, watch the same attack succeed and then fail, and make three failing tests go green.
 
-## What the talk covers
+## What the workshop covers
 
-**Authentication and access control for AI endpoints.** Your `/api/chat` is not a CRUD route — it is a metered, privileged, impersonatable resource. RBAC, step-up MFA for high-risk tool calls, and session lifecycle management, so your inference APIs are not open doors.
+**Access and agency.** Your `/api/chat` is not a CRUD route — it is a metered, privileged, impersonatable resource. One gateway holds the provider key server-side and owns every control: session JWT verification, rate limits, input caps and an audit log. Tool calls that change state go through a step-up MFA gate, and the approval is a signed, expiring, single-use ticket bound to the user, the action and its exact arguments.
 
-**Protecting sensitive data in the pipeline.** Client-side envelope encryption with the Web Crypto API (RSA-OAEP wrapping an AES-GCM key), secrets management, and an honest accounting of where your PII actually ends up — observability traces, vector stores, provider retention windows, and your own error handlers.
+**Prompt, stream and pipeline.** Treating model inputs with the discipline you would apply to SQL. Structural delimiters are a mitigation, not a fix. Direct injection is the noisy case; indirect injection through a document your user received is the one that gets you. Canary tokens catch a system-prompt leak mid-stream, but only if the check survives chunk boundaries. Model output is untrusted input, and a secret scanner is only trustworthy once it has caught a secret you planted on purpose. Secrets management gets a word too: Bitbid (formerly bsec) is a Rust CLI that shares team secrets recipient-encrypted and injects them into process memory instead of writing `.env` files.
 
-**Input validation and prompt injection defence.** Treating model inputs with the discipline you would apply to SQL, and being clear that structural delimiters are a mitigation rather than a fix. Direct injection is the noisy case; indirect injection through a document your user received is the one that gets you.
+**Infrastructure hardening.** A non-root container with a read-only root filesystem, dropped capabilities, `no-new-privileges` and a `noexec` `/tmp`. CI/CD security gates — Gitleaks, Semgrep, Trivy and `npm audit` — fail the build rather than filing a ticket. Every control is mapped to the OWASP Top 10 for LLM Applications.
 
-**Infrastructure hardening.** Rootless containers, read-only root filesystems, dropped capabilities, and CI/CD security gates that fail the build rather than filing a ticket.
+**The sovereignty question.** When on-premise inference makes more sense than renting cloud capacity — regulation (NDPA, POPIA, Kenya's DPA), resilience after the 2024 subsea cable cuts, and FX exposure for teams earning in local currency and paying per token in USD. The pattern that ships is hybrid routing: a small local model tokenises PII on-premise, the cloud model reasons over surrogates only, and the answer is rehydrated at home.
 
-**The sovereignty question.** When on-premise inference makes more sense than renting cloud capacity — regulation (NDPA, POPIA, Kenya's DPA), resilience after the 2024 subsea cable cuts, and FX exposure for teams earning in local currency and paying per token in USD.
+Browser-side envelope encryption with Web Crypto is not part of the 30 minutes. It protects the wire and the middleboxes, but it does not stop the model reading plaintext, so the workshop spends its time on gateways and tokenisation instead.
 
 ## Three bugs I shipped
 
-The reference implementation for this talk had three real defects in it, and each one is on a slide:
+The reference implementation for this workshop had three real defects in it. Each one is on a slide, and each one is a live exercise you fix in the room:
 
-1. A step-up MFA gate whose entire authorization check was `ticket.startsWith('MFA_PROOF_')` — a string prefix the attacker controls.
-2. A canary-token killswitch that tested each stream chunk in isolation, so a canary split across chunks (which is every canary, in production) never matched.
-3. A secret scanner that reported a clean tree while a fake credential sat in the bundle, because the regex character class stopped at the first hyphen.
+1. **Exercise 03.** A step-up MFA gate whose entire authorization check was `ticket.startsWith('MFA_PROOF_')` — a string prefix the attacker controls.
+2. **Exercise 05.** A canary-token killswitch that tested each stream chunk in isolation, so a canary split across chunks (which is every canary, in production) never matched.
+3. **Exercise 08.** A secret scanner that reported a clean tree while a fake credential sat in the bundle, because the regex character class stopped at the first hyphen.
 
-They are in the deck because the fix is more useful than the pretence, and because each generalises: bind approvals to arguments, test detections against streams rather than strings, and prove your scanner catches a secret you planted on purpose.
+They are in the workshop because the fix is more useful than the pretence, and because each generalises: bind approvals to arguments, test detections against streams rather than strings, and prove your scanner catches a secret you planted on purpose.
 
 ## What you leave with
 
 A mental model for threat assessment in AI applications, a checklist of vulnerabilities to audit in your own stack, and working patterns you can apply on Monday. The first three items on that checklist are free and take about an hour.
 
-The full reference implementation — hardened gateway, Web Crypto demo, Docker and Compose configs, CI security pipeline, and the threat-model documentation — is open source and linked above.
+The workshop project — a vulnerable and a hardened gateway, an offline mock model (with optional Ollama for local inference), eight red-to-green exercises, Docker and Compose hardening, and a CI security pipeline — is open source and linked above. Every secret in it is fake. Exercises not covered live are in the repo in the same format, to finish at home.

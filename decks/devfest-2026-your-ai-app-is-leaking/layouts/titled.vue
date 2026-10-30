@@ -1,24 +1,21 @@
 <template>
   <div class="slidev-layout df-titled">
-    <slot />
-    <Rail />
+    <div class="df-titled__body"><slot /></div>
+    <SlideFooter />
   </div>
 </template>
 
 <style scoped>
+/* White content slide: heading top-left, content below, footer mark. */
 .df-titled {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* Centre the whole block. Top-aligned content leaves a dead band at the
-     bottom of every slide, which reads as an unfinished layout on a 16:9 screen. */
-  justify-content: center;
 }
-.df-titled :deep(h1) {
-  font-size: 2.35rem;
-  margin-bottom: 0.9rem;
-}
-.df-titled :deep(h2) {
-  font-size: 1.5rem;
+.df-titled__body {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 </style>

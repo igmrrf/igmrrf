@@ -6,35 +6,65 @@ defineProps<{ index?: string }>()
 
 <template>
   <div class="slidev-layout df-section">
-    <div v-if="index" class="df-section__index df-mono">{{ index }}</div>
-    <div class="df-section__body"><slot /></div>
-    <Rail />
+    <div class="df-section__body">
+      <div v-if="index" class="df-section__index">Part {{ index }}</div>
+      <slot />
+      <div class="df-section__rule" />
+    </div>
+    <div class="df-section__logo"><DevFestLogo size="sm" on="dark" /></div>
   </div>
 </template>
 
 <style scoped>
+/* Template section slide: solid Google blue, white centred title, short
+   yellow rule. Ground is #1a73e8 so white body text clears WCAG AA. */
 .df-section {
+  position: relative;
+  background: var(--df-section) !important;
   display: flex;
   align-items: center;
-  gap: 3rem;
-  position: relative;
-}
-/* Oversized numeral as a chapter marker — gives the audience a sense of
-   position in a 45-minute talk without a progress bar they have to read. */
-.df-section__index {
-  font-size: 11rem;
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.06em;
-  color: transparent;
-  -webkit-text-stroke: 2px var(--df-accent);
-  opacity: 0.8;
-  flex: none;
+  justify-content: center;
+  text-align: center;
 }
 .df-section__body {
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 48rem;
 }
-.df-section__body :deep(h1) {
-  font-size: 3.2rem;
+.df-section__index {
+  font-family: var(--df-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+.df-section :deep(h1) {
+  color: #fff;
+  font-size: 3.4rem;
+  margin: 0;
+}
+.df-section :deep(p) {
+  color: #fff;
+  font-size: 1.15rem;
+  margin-top: 1.4rem;
+  max-width: 44ch;
+}
+.df-section__rule {
+  order: 1;
+  width: 72px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--df-yellow);
+  margin-top: 1.4rem;
+}
+.df-section__body :deep(h1) { order: 0; }
+.df-section__body :deep(p) { order: 2; }
+.df-section__logo {
+  position: absolute;
+  right: 2rem;
+  bottom: 0.85rem;
 }
 </style>
